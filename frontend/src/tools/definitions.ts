@@ -141,6 +141,16 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     implemented: true,
     window: { width: 1024, height: 768, minWidth: 700, minHeight: 500 },
   },
+  {
+    id: 'ascii',
+    name: 'ASCII 转换',
+    description: '字符与 ASCII 码双向转换',
+    category: 'encode',
+    icon: 'icon-ascii',
+    route: '/tool/ascii',
+    implemented: true,
+    window: { width: 1024, height: 768, minWidth: 700, minHeight: 500 },
+  },
   // 时间处理
   {
     id: 'timestamp',

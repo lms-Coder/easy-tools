@@ -21,6 +21,7 @@ const toolComponentMap: Record<string, () => Promise<any>> = {
   'crypto': () => import('@/views/tools/security/crypto/index.vue'),
   'url': () => import('@/views/tools/encode/url/index.vue'),
   'unicode': () => import('@/views/tools/encode/unicode/index.vue'),
+  'ascii': () => import('@/views/tools/encode/ascii/index.vue'),
   'markdown': () => import('@/views/tools/text/markdown/index.vue'),
   'color-picker': () => import('@/views/tools/other/color-picker/index.vue'),
   'uuid': () => import('@/views/tools/other/uuid/index.vue'),

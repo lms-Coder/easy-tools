@@ -19,7 +19,8 @@
       "Bash(python3 -c ':*)",
       "Bash(python -c ':*)",
       "Bash(npx vue-tsc:*)",
-      "Bash(awk 'BEGIN{u=0;d=0;c=0;cat=\"user\"} /\\\\/\\\\/ === 磁盘存储 ===/{cat=\"disk\"} /\\\\/\\\\/ === 压缩减压 ===/{cat=\"compress\"} /\\\\/\\\\/ === 系统信息 ===/{print \"User: \"u\" Disk: \"d\" Compress: \"c\" Total: \"\\(u+d+c\\); exit} /name: '\\\\''[a-z]/{if\\(cat==\"user\"\\)u++; else if\\(cat==\"disk\"\\)d++; else c++}' \"f:/1.code/go/easy-tools/frontend/src/views/tools/dev/linux-commands/useLinuxCommands.ts\")"
+      "Bash(awk 'BEGIN{u=0;d=0;c=0;cat=\"user\"} /\\\\/\\\\/ === 磁盘存储 ===/{cat=\"disk\"} /\\\\/\\\\/ === 压缩减压 ===/{cat=\"compress\"} /\\\\/\\\\/ === 系统信息 ===/{print \"User: \"u\" Disk: \"d\" Compress: \"c\" Total: \"\\(u+d+c\\); exit} /name: '\\\\''[a-z]/{if\\(cat==\"user\"\\)u++; else if\\(cat==\"disk\"\\)d++; else c++}' \"f:/1.code/go/easy-tools/frontend/src/views/tools/dev/linux-commands/useLinuxCommands.ts\")",
+      "Bash(xxd)"
     ]
   }
 }

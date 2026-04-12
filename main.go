@@ -133,7 +133,8 @@ func main() {
 			win.Hide()
 			e.Cancel()
 		default:
-			// "close" — 不取消，让窗口正常关闭并退出
+			// "close" — 退出应用
+			go app.Quit()
 		}
 	})
 
