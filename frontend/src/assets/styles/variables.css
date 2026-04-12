@@ -1,0 +1,190 @@
+/* macOS 原生风格 - Native macOS Style
+   参考：macOS Sonoma/Sequoia 系统控件
+   特点：纯白底、系统蓝、精致灰阶、轻盈通透
+*/
+
+:root {
+  /* ========================================
+     亮色主题 - macOS Light
+     ======================================== */
+
+  /* 背景层级 - 纯白到微灰 */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f7;
+  --bg-tertiary: #ececee;
+  --bg-hover: rgba(0, 0, 0, 0.04);
+  --bg-active: rgba(0, 0, 0, 0.06);
+  --bg-selected: rgba(0, 122, 255, 0.1);
+  --bg-overlay: rgba(0, 0, 0, 0.3);
+
+  /* 卡片和浮层 */
+  --bg-card: #ffffff;
+  --bg-popover: #ffffff;
+  --bg-input: #ffffff;
+  --bg-sidebar: #f5f5f7;
+  --bg-tooltip: #1d1d1f;
+  --bg-header: #f5f5f7;
+
+  /* 文字色 - Apple 灰阶 */
+  --text-primary: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --text-muted: #aeaeb2;
+  --text-disabled: #c7c7cc;
+  --text-inverse: #ffffff;
+  --text-link: #007AFF;
+
+  /* 边框 - macOS 分隔线 */
+  --border-subtle: #e5e5ea;
+  --border-default: #d1d1d6;
+  --border-strong: #aeaeb2;
+  --border-focus: #007AFF;
+  --border-light: #f2f2f7;
+
+  /* 主题色 - macOS System Blue */
+  --accent: #007AFF;
+  --accent-hover: #0062cc;
+  --accent-active: #003d99;
+  --accent-light: rgba(0, 122, 255, 0.1);
+
+  /* 状态色 - macOS 系统色 */
+  --success: #34C759;
+  --success-light: rgba(52, 199, 89, 0.1);
+  --warning: #FF9F0A;
+  --warning-light: rgba(255, 159, 10, 0.1);
+  --error: #FF3B30;
+  --error-light: rgba(255, 59, 48, 0.1);
+  --info: #007AFF;
+
+  /* 字体 - 系统原生 */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace;
+
+  /* 字号 */
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 13px;
+  --font-size-lg: 14px;
+  --font-size-xl: 16px;
+  --font-size-2xl: 18px;
+  --font-size-3xl: 22px;
+
+  /* 字重 */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  /* 间距 */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 20px;
+  --spacing-2xl: 24px;
+
+  /* 圆角 - macOS 风格 */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-full: 9999px;
+
+  /* 过渡 */
+  --transition-fast: 120ms ease;
+  --transition-normal: 200ms ease;
+
+  /* 阴影 - macOS 轻盈阴影 */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-focus: 0 0 0 3px rgba(0, 122, 255, 0.3);
+
+  /* 原生风格替代 */
+  --glass-bg: var(--bg-secondary);
+  --glass-bg-hover: var(--bg-hover);
+  --glass-bg-active: var(--bg-active);
+  --glass-bg-weak: var(--bg-secondary);
+  --glass-bg-strong: var(--bg-tertiary);
+  --glass-border: var(--border-default);
+  --glass-border-hover: var(--border-strong);
+  --glass-border-weak: var(--border-subtle);
+  --glass-blur: none;
+  --glass-blur-sm: none;
+  --glass-blur-lg: none;
+
+  /* 布局 */
+  --titlebar-height: 38px;
+  --sidebar-width: 220px;
+  --sidebar-width-expanded: 220px;
+  --sidebar-width-collapsed: 56px;
+}
+
+/* ========================================
+   暗色主题 - macOS Dark
+   ======================================== */
+html.dark {
+  /* 背景 - macOS 深灰层级 */
+  --bg-primary: #1c1c1e;
+  --bg-secondary: #2c2c2e;
+  --bg-tertiary: #3a3a3c;
+  --bg-hover: rgba(255, 255, 255, 0.06);
+  --bg-active: rgba(255, 255, 255, 0.1);
+  --bg-selected: rgba(10, 132, 255, 0.2);
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+
+  /* 卡片和浮层 */
+  --bg-card: #2c2c2e;
+  --bg-popover: #2c2c2e;
+  --bg-input: #1c1c1e;
+  --bg-sidebar: #252527;
+  --bg-tooltip: #e5e5ea;
+  --bg-header: #252527;
+
+  /* 文字色 - macOS 暗色文字 */
+  --text-primary: #f5f5f7;
+  --text-secondary: #a1a1a6;
+  --text-muted: #6e6e73;
+  --text-disabled: #48484a;
+  --text-inverse: #1c1c1e;
+  --text-link: #0A84FF;
+
+  /* 边框 */
+  --border-subtle: #38383a;
+  --border-default: #48484a;
+  --border-strong: #636366;
+  --border-focus: #0A84FF;
+  --border-light: #2c2c2e;
+
+  /* 主题色 - macOS Dark Blue */
+  --accent: #0A84FF;
+  --accent-hover: #409CFF;
+  --accent-active: #007AFF;
+  --accent-light: rgba(10, 132, 255, 0.2);
+
+  /* 状态色 - macOS 暗色系统色 */
+  --success: #30D158;
+  --success-light: rgba(48, 209, 88, 0.2);
+  --warning: #FFD60A;
+  --warning-light: rgba(255, 214, 10, 0.2);
+  --error: #FF453A;
+  --error-light: rgba(255, 69, 58, 0.2);
+  --info: #0A84FF;
+
+  /* 阴影 */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 1px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-focus: 0 0 0 3px rgba(10, 132, 255, 0.4);
+
+  /* 原生风格 */
+  --glass-bg: var(--bg-secondary);
+  --glass-bg-hover: var(--bg-hover);
+  --glass-bg-active: var(--bg-active);
+  --glass-bg-weak: var(--bg-secondary);
+  --glass-bg-strong: var(--bg-tertiary);
+  --glass-border: var(--border-default);
+  --glass-border-hover: var(--border-strong);
+  --glass-border-weak: var(--border-subtle);
+}

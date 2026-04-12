@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//f/1.code/go/boss-tools/**)",
+      "Bash(python -c \"import os.path; print\\(os.path.relpath\\('bindings/easy-tools/internal/services/diffservice.ts', 'src/views/tools/text/diff'\\)\\)\")",
+      "mcp__web-search-prime__web_search_prime",
+      "Bash(node -e ':*)",
+      "Bash(npx -y tsx -e ':*)",
+      "Bash(npx -y tsx -e \"import { tokenizePattern } from './src/views/tools/dev/regex/regexTokenizer'; const t = tokenizePattern\\(String.raw\\\\`\\\\\\\\d+\\\\\\\\.\\\\\\\\d+\\\\`\\); console.log\\(JSON.stringify\\(t\\)\\)\")",
+      "Read(//f/1.code/go/**)",
+      "Read(//f/1.code/**)",
+      "Bash(wails3 generate:*)",
+      "Read(//f/1/code/go/boss-tools/frontend/src/views/**)",
+      "Bash(npm ls:*)",
+      "Bash(ls f:/1.code/go/easy-tools/frontend/node_modules/lunar-javascript/*.d.ts)",
+      "Read(//f/1.code/go/easy-tools/$\\(go env GOMODCACHE\\)/github.com/wailsapp/wails/**)",
+      "Bash(go mod:*)",
+      "Bash(xxd \"f:/1.code/go/easy-tools/internal/services/config_service.go\")",
+      "Bash(python3 -c ':*)",
+      "Bash(python -c ':*)",
+      "Bash(npx vue-tsc:*)",
+      "Bash(awk 'BEGIN{u=0;d=0;c=0;cat=\"user\"} /\\\\/\\\\/ === 磁盘存储 ===/{cat=\"disk\"} /\\\\/\\\\/ === 压缩减压 ===/{cat=\"compress\"} /\\\\/\\\\/ === 系统信息 ===/{print \"User: \"u\" Disk: \"d\" Compress: \"c\" Total: \"\\(u+d+c\\); exit} /name: '\\\\''[a-z]/{if\\(cat==\"user\"\\)u++; else if\\(cat==\"disk\"\\)d++; else c++}' \"f:/1.code/go/easy-tools/frontend/src/views/tools/dev/linux-commands/useLinuxCommands.ts\")"
+    ]
+  }
+}

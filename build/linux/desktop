@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Name=My Product
+Comment=A easy-tools application
+# The Exec line includes %u to pass the URL to the application
+Exec=/usr/local/bin/easy-tools.exe %u
+Terminal=false
+Type=Application
+Icon=easy-tools.exe
+Categories=Utility;
+StartupWMClass=easy-tools.exe
+
+ 

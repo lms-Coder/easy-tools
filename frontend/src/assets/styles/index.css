@@ -1,0 +1,5 @@
+/* 样式入口文件 */
+
+/* 导入自定义样式 */
+@import './variables.css';
+@import './global.css';
