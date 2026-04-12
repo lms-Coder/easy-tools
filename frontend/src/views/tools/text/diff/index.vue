@@ -44,81 +44,92 @@ const {
           <RefreshCw v-else-if="hasDiff" :size="12" />
           {{ summaryText }}
         </span>
-      </div>
-    </ToolTitleBar>
-
-    <!-- 工具栏 -->
-    <div class="tool-toolbar">
-      <div class="tool-toolbar-left">
-        <!-- 视图切换 -->
-        <div class="tool-segment">
-          <button
-            class="tool-segment-btn"
-            :class="{ active: viewMode === 'split' }"
-            @click="viewMode = 'split'"
-            @mouseenter="showTooltip('并排视图', $event)"
-            @mouseleave="hideTooltip"
-          >
-            <Columns2 :size="14" />
-            <span>并排</span>
-          </button>
-          <button
-            class="tool-segment-btn"
-            :class="{ active: viewMode === 'unified' }"
-            @click="viewMode = 'unified'"
-            @mouseenter="showTooltip('统一视图', $event)"
-            @mouseleave="hideTooltip"
-          >
-            <AlignJustify :size="14" />
-            <span>统一</span>
-          </button>
-        </div>
-
-        <div class="tool-divider"></div>
-
-        <!-- 文件操作 -->
-        <button class="glass-icon-btn" @click="compareFiles" @mouseenter="showTooltip('对比文件', $event)" @mouseleave="hideTooltip"><FileInput :size="15" /></button>
-        <button class="glass-icon-btn" @click="importLeftFile" @mouseenter="showTooltip('导入左侧文件', $event)" @mouseleave="hideTooltip"><Upload :size="15" /></button>
-        <button class="glass-icon-btn" @click="importRightFile" @mouseenter="showTooltip('导入右侧文件', $event)" @mouseleave="hideTooltip"><Upload :size="15" /></button>
-
-        <div class="tool-divider"></div>
-
-        <!-- 导出 -->
-        <button class="glass-icon-btn" @click="exportAsHTML" :disabled="!hasDiff" @mouseenter="showTooltip('导出 HTML', $event)" @mouseleave="hideTooltip"><Download :size="15" /></button>
-        <button class="glass-icon-btn" @click="exportAsPatch" :disabled="!hasDiff" @mouseenter="showTooltip('导出 Patch', $event)" @mouseleave="hideTooltip"><FileCode :size="15" /></button>
-
-        <div class="tool-divider"></div>
-
-        <!-- Diff 导航 -->
-        <template v-if="changeBlocks.length > 0">
-          <button class="glass-icon-btn" @click="navigateToChange('prev')" @mouseenter="showTooltip('上一个差异', $event)" @mouseleave="hideTooltip"><ChevronUp :size="15" /></button>
-          <button class="glass-icon-btn" @click="navigateToChange('next')" @mouseenter="showTooltip('下一个差异', $event)" @mouseleave="hideTooltip"><ChevronDown :size="15" /></button>
-          <span class="nav-indicator" v-if="changeBlocks.length > 0">{{ activeChangeIndex + 1 }}/{{ changeBlocks.length }}</span>
-        </template>
-
-        <div class="tool-divider" v-if="changeBlocks.length > 0"></div>
-
-        <!-- 选项 -->
-        <button class="glass-icon-btn" @click="useExample" @mouseenter="showTooltip('示例文本', $event)" @mouseleave="hideTooltip"><FileText :size="15" /></button>
-        <button class="glass-icon-btn" @click="swapTexts" @mouseenter="showTooltip('左右互换', $event)" @mouseleave="hideTooltip"><ArrowLeftRight :size="15" /></button>
-        <div class="tool-divider"></div>
-        <label class="diff-option">
-          <input v-model="ignoreWhitespace" type="checkbox" />
-          <span>忽略空白</span>
-        </label>
-        <label class="diff-option">
-          <input v-model="inlineHighlight" type="checkbox" />
-          <span>行内高亮</span>
-        </label>
-        <div class="tool-divider"></div>
-        <button class="glass-icon-btn danger" @click="clearAll" :disabled="!leftText && !rightText" @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip"><Trash2 :size="15" /></button>
-      </div>
-      <div class="tool-toolbar-right">
         <span v-if="hasDiff" class="diff-stats">
           <span class="diff-stat add">+{{ stats.added }}</span>
           <span class="diff-stat del">-{{ stats.removed }}</span>
           <span class="diff-stat mod">~{{ stats.changed }}</span>
         </span>
+      </div>
+    </ToolTitleBar>
+
+    <!-- 控制卡片 -->
+    <div class="control-card">
+      <div class="control-row">
+        <div class="control-group">
+          <!-- 视图切换 -->
+          <div class="control-toggle">
+            <button
+              :class="['seg-btn xs', { active: viewMode === 'split' }]"
+              @click="viewMode = 'split'"
+              @mouseenter="showTooltip('并排视图', $event)" @mouseleave="hideTooltip"
+            >
+              <Columns2 :size="11" /> 并排
+            </button>
+            <button
+              :class="['seg-btn xs', { active: viewMode === 'unified' }]"
+              @click="viewMode = 'unified'"
+              @mouseenter="showTooltip('统一视图', $event)" @mouseleave="hideTooltip"
+            >
+              <AlignJustify :size="11" /> 统一
+            </button>
+          </div>
+
+          <div class="control-divider"></div>
+
+          <!-- 文件操作 -->
+          <button class="action-btn" @click="compareFiles"
+            @mouseenter="showTooltip('对比文件', $event)" @mouseleave="hideTooltip"><FileInput :size="13" /></button>
+          <button class="action-btn" @click="importLeftFile"
+            @mouseenter="showTooltip('导入左侧', $event)" @mouseleave="hideTooltip"><Upload :size="13" /></button>
+          <button class="action-btn" @click="importRightFile"
+            @mouseenter="showTooltip('导入右侧', $event)" @mouseleave="hideTooltip"><Upload :size="13" /></button>
+
+          <div class="control-divider"></div>
+
+          <!-- 导出 -->
+          <button class="action-btn" @click="exportAsHTML" :disabled="!hasDiff"
+            @mouseenter="showTooltip('导出 HTML', $event)" @mouseleave="hideTooltip"><Download :size="13" /></button>
+          <button class="action-btn" @click="exportAsPatch" :disabled="!hasDiff"
+            @mouseenter="showTooltip('导出 Patch', $event)" @mouseleave="hideTooltip"><FileCode :size="13" /></button>
+
+          <template v-if="changeBlocks.length > 0">
+            <div class="control-divider"></div>
+            <button class="action-btn" @click="navigateToChange('prev')"
+              @mouseenter="showTooltip('上一个差异', $event)" @mouseleave="hideTooltip"><ChevronUp :size="13" /></button>
+            <button class="action-btn" @click="navigateToChange('next')"
+              @mouseenter="showTooltip('下一个差异', $event)" @mouseleave="hideTooltip"><ChevronDown :size="13" /></button>
+            <span class="nav-indicator">{{ activeChangeIndex + 1 }}/{{ changeBlocks.length }}</span>
+          </template>
+        </div>
+
+        <div class="control-group">
+          <!-- 工具 -->
+          <button class="action-btn" @click="useExample"
+            @mouseenter="showTooltip('示例', $event)" @mouseleave="hideTooltip"><FileText :size="13" /></button>
+          <button class="action-btn" @click="swapTexts"
+            @mouseenter="showTooltip('左右互换', $event)" @mouseleave="hideTooltip"><ArrowLeftRight :size="13" /></button>
+
+          <div class="control-divider"></div>
+
+          <!-- 选项 -->
+          <label class="diff-option" @click="ignoreWhitespace = !ignoreWhitespace">
+            <span :class="['toggle-check', { on: ignoreWhitespace }]">
+              <Check v-if="ignoreWhitespace" :size="8" />
+            </span>
+            <span>忽略空白</span>
+          </label>
+          <label class="diff-option" @click="inlineHighlight = !inlineHighlight">
+            <span :class="['toggle-check', { on: inlineHighlight }]">
+              <Check v-if="inlineHighlight" :size="8" />
+            </span>
+            <span>行内高亮</span>
+          </label>
+
+          <div class="control-divider"></div>
+
+          <button class="action-btn" @click="clearAll" :disabled="!leftText && !rightText"
+            @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip"><Trash2 :size="13" /></button>
+        </div>
       </div>
     </div>
 
@@ -132,10 +143,12 @@ const {
             <span class="panel-icon blue">L</span>
             <span>{{ leftFileName }}</span>
           </div>
-          <div class="tool-panel-actions">
+          <div class="panel-actions">
             <span v-if="leftText" class="diff-meta">{{ leftText.length }} 字符</span>
-            <button class="glass-icon-btn small" @click="importLeftFile" @mouseenter="showTooltip('导入文件', $event)" @mouseleave="hideTooltip"><Upload :size="13" /></button>
-            <button class="glass-icon-btn small" @click="copyText(leftText, '左侧文本')" :disabled="!leftText" @mouseenter="showTooltip('复制左侧文本', $event)" @mouseleave="hideTooltip"><Copy :size="13" /></button>
+            <button class="action-btn" @click="importLeftFile"
+              @mouseenter="showTooltip('导入文件', $event)" @mouseleave="hideTooltip"><Upload :size="13" /></button>
+            <button class="action-btn" @click="copyText(leftText, '左侧文本')" :disabled="!leftText"
+              @mouseenter="showTooltip('复制', $event)" @mouseleave="hideTooltip"><Copy :size="13" /></button>
           </div>
         </div>
         <div class="tool-panel-body diff-editor-body">
@@ -164,10 +177,12 @@ const {
             <span class="panel-icon green">R</span>
             <span>{{ rightFileName }}</span>
           </div>
-          <div class="tool-panel-actions">
+          <div class="panel-actions">
             <span v-if="rightText" class="diff-meta">{{ rightText.length }} 字符</span>
-            <button class="glass-icon-btn small" @click="importRightFile" @mouseenter="showTooltip('导入文件', $event)" @mouseleave="hideTooltip"><Upload :size="13" /></button>
-            <button class="glass-icon-btn small" @click="copyText(rightText, '右侧文本')" :disabled="!rightText" @mouseenter="showTooltip('复制右侧文本', $event)" @mouseleave="hideTooltip"><Copy :size="13" /></button>
+            <button class="action-btn" @click="importRightFile"
+              @mouseenter="showTooltip('导入文件', $event)" @mouseleave="hideTooltip"><Upload :size="13" /></button>
+            <button class="action-btn" @click="copyText(rightText, '右侧文本')" :disabled="!rightText"
+              @mouseenter="showTooltip('复制', $event)" @mouseleave="hideTooltip"><Copy :size="13" /></button>
           </div>
         </div>
         <div class="tool-panel-body diff-editor-body">
@@ -199,8 +214,9 @@ const {
             <span class="panel-icon green" style="margin-left: 0;">R</span>
             <span>{{ leftFileName }} ↔ {{ rightFileName }}</span>
           </div>
-          <div class="tool-panel-actions">
-            <button class="glass-icon-btn small" @click="copyText(leftText + '\n---\n' + rightText, '全部文本')" :disabled="!leftText && !rightText" @mouseenter="showTooltip('复制全部', $event)" @mouseleave="hideTooltip"><Copy :size="13" /></button>
+          <div class="panel-actions">
+            <button class="action-btn" @click="copyText(leftText + '\n---\n' + rightText, '全部文本')" :disabled="!leftText && !rightText"
+              @mouseenter="showTooltip('复制全部', $event)" @mouseleave="hideTooltip"><Copy :size="13" /></button>
           </div>
         </div>
         <div class="tool-panel-body diff-editor-body">
@@ -246,37 +262,164 @@ const {
   align-items: center;
   gap: 5px;
   padding: 2px 8px;
-  border-radius: var(--radius-xs);
+  border-radius: 10px;
   font-size: 11px;
   font-weight: 500;
   color: var(--text-muted);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
+  background: var(--bg-tertiary);
 }
 
 .diff-summary.same {
   color: var(--success);
   background: var(--success-light);
-  border-color: transparent;
 }
 
 .diff-summary.changed {
   color: var(--accent);
   background: var(--accent-light);
-  border-color: transparent;
 }
 
-/* ====== 工具栏选项 ====== */
-.diff-option {
+/* 统计 */
+.diff-stats {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
+}
+
+.diff-stat {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.diff-stat.add { color: var(--success); background: var(--success-light); }
+.diff-stat.del { color: var(--error); background: var(--error-light); }
+.diff-stat.mod { color: var(--accent); background: var(--accent-light); }
+
+.diff-meta {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  padding: 1px 6px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+}
+
+.nav-indicator {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  padding: 1px 6px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* ====== 控制卡片 ====== */
+.control-card {
+  margin: 12px 16px 0;
+  padding: 8px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg, 10px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.control-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.control-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--border-subtle);
+  margin: 0 4px;
+}
+
+/* ====== Segment Buttons ====== */
+.seg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 12px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-secondary);
+  border-radius: 6px;
   font-size: 12px;
   font-weight: 500;
   color: var(--text-secondary);
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.seg-btn:hover { border-color: var(--border-default); background: var(--bg-hover); color: var(--text-primary); }
+
+.seg-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.seg-btn.xs { padding: 3px 8px; font-size: 11px; height: 24px; }
+
+.control-toggle {
+  display: flex;
+  gap: 2px;
+}
+
+/* ====== Action Buttons ====== */
+.action-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all var(--transition-fast);
+  padding: 0;
+}
+
+.action-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
+.action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* ====== Options ====== */
+.diff-option {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
   transition: all 0.15s;
 }
 
@@ -285,53 +428,29 @@ const {
   background: var(--bg-hover);
 }
 
-.diff-option input[type="checkbox"] {
+.toggle-check {
   width: 14px;
   height: 14px;
-  accent-color: var(--accent);
-  cursor: pointer;
-}
-
-/* 统计 */
-.diff-stats {
+  border: 1px solid var(--border-default);
+  border-radius: 3px;
+  background: var(--bg-input);
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
 }
 
-.diff-stat {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: var(--radius-xs);
-}
-
-.diff-stat.add { color: var(--success); background: var(--success-light); }
-.diff-stat.del { color: var(--error); background: var(--error-light); }
-.diff-stat.mod { color: var(--accent); background: var(--accent-light); }
-
-.diff-meta {
-  font-size: 11px;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-}
-
-.nav-indicator {
-  font-size: 11px;
-  font-family: var(--font-mono);
-  color: var(--text-muted);
-  padding: 2px 6px;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-xs);
-  white-space: nowrap;
+.toggle-check.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
 }
 
 /* ====== 编辑器 ====== */
 .diff-editor-body {
   padding: 0 !important;
   overflow: hidden !important;
-  /* 关键：让子元素能用 height:100% 撑满 */
   display: flex;
   flex-direction: column;
 }
@@ -482,21 +601,20 @@ const {
 .toolbar-tooltip {
   position: fixed;
   z-index: 9999;
-  padding: 5px 12px;
+  padding: 5px 10px;
   font-size: 12px;
   color: var(--text-inverse, #fff);
   background: var(--bg-tooltip, rgba(0, 0, 0, 0.85));
-  border-radius: var(--radius-sm, 4px);
+  border-radius: 4px;
   white-space: nowrap;
   pointer-events: none;
   transform: translateX(-50%);
-  min-width: 60px;
-  text-align: center;
+  line-height: 1.4;
 }
 
-/* ====== 响应式 ====== */
+/* ====== Responsive ====== */
 @media (max-width: 760px) {
   .tool-main { grid-template-columns: 1fr !important; }
-  .tool-toolbar-left { flex-wrap: wrap; }
+  .control-row { flex-wrap: wrap; }
 }
 </style>

@@ -28,85 +28,62 @@ const onGenerate = () => {
       </div>
     </ToolTitleBar>
 
-    <!-- 工具栏 -->
-    <div class="tool-toolbar">
-      <div class="tool-toolbar-left">
-        <!-- 数量 -->
-        <div class="count-input-wrap">
-          <label class="count-label">数量</label>
-          <input type="number" v-model.number="count" min="1" max="1000" class="count-input" />
-        </div>
-
-        <div class="tool-divider"></div>
-
-        <button class="action-btn primary" @click="onGenerate" @mouseenter="showTooltip('生成', $event)" @mouseleave="hideTooltip">
-          <RefreshCw :size="14" />
-          <span>生成</span>
-        </button>
-
-        <button class="glass-icon-btn" @click="copyAll" :disabled="!results.length" @mouseenter="showTooltip('复制全部', $event)" @mouseleave="hideTooltip">
-          <Copy v-if="!copied" :size="15" />
-          <Check v-else :size="15" />
-        </button>
-        <button class="glass-icon-btn danger" @click="clear" :disabled="!results.length" @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
-          <Trash2 :size="15" />
-        </button>
-      </div>
-    </div>
-
     <!-- 主内容 -->
-    <main class="tool-main" style="grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);">
+    <main class="tool-main split">
       <!-- 左侧：设置 -->
       <section class="tool-panel">
         <div class="tool-panel-header">
           <div class="tool-panel-title">
-            <span class="panel-icon blue"><Fingerprint :size="12" /></span>
-            <span>UUID 设置</span>
+            <span class="panel-icon blue"><Fingerprint :size="14" /></span>
+            <span>设置</span>
+          </div>
+          <div class="panel-actions">
+            <button class="action-btn" @click="clear" :disabled="!results.length"
+              @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
+              <Trash2 :size="13" />
+            </button>
           </div>
         </div>
-        <div class="tool-panel-body" style="overflow: auto;">
-          <div class="uuid-form">
-            <!-- 版本说明 -->
-            <div class="uuid-section">
-              <div class="uuid-section-title">UUID 类型</div>
-              <div class="type-list">
-                <button
-                  v-for="t in uuidTypes" :key="t.value"
-                  class="type-card" :class="{ active: version === t.value }"
-                  @click="version = t.value"
-                >
-                  <span class="type-name">{{ t.label }}</span>
-                  <span class="type-desc">{{ t.desc }}</span>
-                </button>
-              </div>
+        <div class="tool-panel-body">
+          <!-- UUID 类型 -->
+          <div class="config-section">
+            <label class="config-label">UUID 类型</label>
+            <div class="type-list">
+              <button
+                v-for="t in uuidTypes" :key="t.value"
+                class="type-card" :class="{ active: version === t.value }"
+                @click="version = t.value"
+              >
+                <span class="type-name">{{ t.label }}</span>
+                <span class="type-desc">{{ t.desc }}</span>
+              </button>
             </div>
+          </div>
 
-            <!-- 输出格式 -->
-            <div class="uuid-section">
-              <div class="uuid-section-title">输出格式</div>
-              <div class="format-grid">
-                <button
-                  v-for="f in uuidFormats" :key="f.value"
-                  class="format-card" :class="{ active: format === f.value }"
-                  @click="format = f.value"
-                >
-                  {{ f.label }}
-                </button>
-              </div>
+          <!-- 输出格式 -->
+          <div class="config-section">
+            <label class="config-label">输出格式</label>
+            <div class="format-chips">
+              <button
+                v-for="f in uuidFormats" :key="f.value"
+                class="format-chip" :class="{ active: format === f.value }"
+                @click="format = f.value"
+              >{{ f.label }}</button>
             </div>
+          </div>
 
-            <!-- 批量数量 -->
-            <div class="uuid-section">
-              <div class="uuid-section-title">批量生成</div>
-              <div class="batch-row">
-                <input type="range" v-model.number="count" min="1" max="100" class="batch-slider" />
-                <span class="batch-value">{{ count }}</span>
-              </div>
+          <!-- 批量数量 -->
+          <div class="config-section">
+            <div class="config-row">
+              <label class="config-label">数量 <code class="val-code">{{ count }}</code></label>
             </div>
+            <input type="range" v-model.number="count" min="1" max="100" class="qr-range" />
+          </div>
 
-            <!-- 生成按钮 -->
+          <!-- 生成按钮 -->
+          <div class="config-section grow">
             <button class="generate-btn" @click="onGenerate">
-              <RefreshCw :size="16" />
+              <RefreshCw :size="14" />
               <span>生成 UUID</span>
             </button>
           </div>
@@ -117,18 +94,19 @@ const onGenerate = () => {
       <section class="tool-panel">
         <div class="tool-panel-header">
           <div class="tool-panel-title">
-            <span class="panel-icon green"><Check :size="12" /></span>
+            <span class="panel-icon green"><Check :size="14" /></span>
             <span>生成结果</span>
             <span v-if="results.length" class="panel-stat accent">{{ results.length }} 项</span>
           </div>
-          <div class="tool-panel-actions">
-            <button class="glass-icon-btn small" @click="copyAll" :disabled="!results.length" @mouseenter="showTooltip('复制全部', $event)" @mouseleave="hideTooltip">
-              <Copy v-if="!copied" :size="13" />
-              <Check v-else :size="13" />
+          <div class="panel-actions">
+            <button class="action-btn" @click="copyAll" :disabled="!results.length"
+              @mouseenter="showTooltip('复制全部', $event)" @mouseleave="hideTooltip">
+              <Check v-if="copied" :size="13" style="color: var(--success)" />
+              <Copy v-else :size="13" />
             </button>
           </div>
         </div>
-        <div class="tool-panel-body" style="padding: 0; overflow: auto;">
+        <div class="tool-panel-body">
           <div v-if="results.length" class="result-list">
             <div
               v-for="(uuid, i) in results" :key="i"
@@ -143,9 +121,9 @@ const onGenerate = () => {
           </div>
 
           <div v-else class="tool-empty">
-            <div class="empty-icon"><Fingerprint :size="24" /></div>
-            <p class="empty-title">点击生成</p>
-            <p class="empty-desc">选择 UUID 类型和格式，点击生成按钮</p>
+            <div class="empty-icon"><Fingerprint :size="28" /></div>
+            <p class="empty-title">等待生成</p>
+            <p class="empty-desc">选择 UUID 类型和格式，点击生成</p>
           </div>
         </div>
       </section>
@@ -156,6 +134,7 @@ const onGenerate = () => {
 </template>
 
 <style scoped>
+/* ====== Header ====== */
 .header-content {
   display: flex;
   align-items: center;
@@ -165,7 +144,7 @@ const onGenerate = () => {
 
 .version-tag {
   padding: 2px 8px;
-  border-radius: var(--radius-xs);
+  border-radius: 10px;
   font-size: 11px;
   font-weight: 600;
   color: var(--accent);
@@ -174,90 +153,86 @@ const onGenerate = () => {
 
 .result-tag {
   padding: 2px 8px;
-  border-radius: var(--radius-xs);
+  border-radius: 10px;
   font-size: 11px;
   font-weight: 500;
   color: var(--success);
   background: var(--success-light);
 }
 
-/* ====== 工具栏控件 ====== */
-.format-btn { font-family: var(--font-mono); font-size: 11px; }
-
-.count-input-wrap {
+/* ====== Panel Actions ====== */
+.panel-actions {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
 }
-
-.count-label {
-  font-size: 11px;
-  color: var(--text-muted);
-  font-weight: 600;
-}
-
-.count-input {
-  width: 56px;
-  height: 28px;
-  padding: 0 8px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--text-primary);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  outline: none;
-  text-align: center;
-}
-
-.count-input:focus { border-color: var(--accent); }
 
 .action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+  width: 28px;
   height: 28px;
-  padding: 0 12px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.15s;
+  border-radius: 6px;
+  transition: all var(--transition-fast);
+  padding: 0;
 }
 
-.action-btn.primary {
-  color: var(--accent);
-  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
-  background: var(--accent-light);
-}
+.action-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
+.action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-.action-btn.primary:hover { border-color: var(--accent); }
-
-/* ====== 左侧表单 ====== */
-.uuid-form {
+/* ====== Config Sections ====== */
+.tool-panel-body {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding: 14px;
+  gap: 0;
+  overflow-y: auto;
 }
 
-.uuid-section {
+.config-section {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.config-section.grow {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  border-bottom: none;
+  min-height: 0;
 }
 
-.uuid-section-title {
+.config-label {
+  display: block;
   font-size: 11px;
   font-weight: 600;
   color: var(--text-muted);
+  margin-bottom: 6px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
 }
 
+.config-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.config-row .config-label { margin-bottom: 0; }
+
+.val-code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: none;
+}
+
+/* ====== UUID 类型 ====== */
 .type-list {
   display: flex;
   flex-direction: column;
@@ -273,7 +248,7 @@ const onGenerate = () => {
   padding: 8px 10px;
   background: var(--bg-primary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+  border-radius: 6px;
   text-align: left;
   cursor: pointer;
   transition: all 0.15s;
@@ -285,64 +260,53 @@ const onGenerate = () => {
 .type-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
 .type-desc { font-size: 10px; color: var(--text-muted); }
 
-.format-grid {
+/* ====== 格式 Chips ====== */
+.format-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
 }
 
-.format-card {
-  padding: 5px 10px;
-  background: transparent;
+.format-chip {
+  padding: 3px 10px;
   border: 1px solid var(--border-subtle);
   border-radius: 999px;
   font-size: 11px;
   font-weight: 500;
   color: var(--text-secondary);
+  background: transparent;
   cursor: pointer;
   transition: all 0.15s;
   white-space: nowrap;
 }
 
-.format-card:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
-.format-card.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.format-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.format-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-.batch-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.batch-slider {
-  flex: 1;
-  height: 4px;
-  -webkit-appearance: none;
+/* ====== Range Slider ====== */
+.qr-range {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
   appearance: none;
   background: var(--bg-secondary);
-  border-radius: 2px;
+  border: 1px solid var(--border-subtle);
   outline: none;
+  margin-top: 4px;
 }
 
-.batch-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
+.qr-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: var(--accent);
+  border: 2px solid var(--bg-card);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
   cursor: pointer;
-  border: 2px solid #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-.batch-value {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-primary);
-  width: 28px;
-  text-align: center;
-}
-
+/* ====== 生成按钮 ====== */
 .generate-btn {
   display: flex;
   align-items: center;
@@ -356,7 +320,7 @@ const onGenerate = () => {
   color: #fff;
   background: var(--accent);
   border: 1px solid var(--accent);
-  border-radius: var(--radius-md);
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -371,7 +335,7 @@ const onGenerate = () => {
   color: var(--text-muted);
   padding: 1px 6px;
   background: var(--bg-secondary);
-  border-radius: var(--radius-xs);
+  border-radius: 4px;
 }
 
 .panel-stat.accent { color: var(--accent); background: var(--accent-light); }
@@ -418,7 +382,7 @@ const onGenerate = () => {
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: var(--radius-xs);
+  border-radius: 4px;
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;
@@ -430,23 +394,57 @@ const onGenerate = () => {
 .result-row:hover .result-copy-btn { opacity: 1; }
 .result-copy-btn:hover { background: var(--bg-secondary); color: var(--accent); }
 
+/* ====== Empty State ====== */
+.tool-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 20px;
+  flex: 1;
+}
+
+.empty-icon {
+  color: var(--text-muted);
+  opacity: 0.25;
+  margin-bottom: 12px;
+}
+
+.empty-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin: 0 0 4px 0;
+}
+
+.empty-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
 /* ====== Tooltip ====== */
 .toolbar-tooltip {
   position: fixed;
   z-index: 9999;
-  padding: 5px 12px;
+  padding: 5px 10px;
   font-size: 12px;
   color: var(--text-inverse, #fff);
   background: var(--bg-tooltip, rgba(0, 0, 0, 0.85));
-  border-radius: var(--radius-sm, 4px);
+  border-radius: 4px;
   white-space: nowrap;
   pointer-events: none;
   transform: translateX(-50%);
-  min-width: 60px;
-  text-align: center;
+  line-height: 1.4;
 }
 
-/* ====== 响应式 ====== */
+/* ====== Scrollbar ====== */
+.tool-panel-body::-webkit-scrollbar { width: 5px; }
+.tool-panel-body::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
+.tool-panel-body::-webkit-scrollbar-track { background: transparent; }
+
+/* ====== Responsive ====== */
 @media (max-width: 760px) {
   .tool-main { grid-template-columns: 1fr !important; }
 }

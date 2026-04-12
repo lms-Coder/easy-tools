@@ -33,89 +33,94 @@ const {
       </div>
     </ToolTitleBar>
 
-    <!-- 工具栏 -->
-    <div class="tool-toolbar">
-      <div class="tool-toolbar-left">
-        <div class="tool-segment">
-          <button class="tool-segment-btn" :class="{ active: currentTab === 'codec' }" @click="currentTab = 'codec'" @mouseenter="showTooltip('编解码', $event)" @mouseleave="hideTooltip">
-            <Link :size="14" />
-            <span>编解码</span>
-          </button>
-          <button class="tool-segment-btn" :class="{ active: currentTab === 'parse' }" @click="currentTab = 'parse'" @mouseenter="showTooltip('URL 拆解', $event)" @mouseleave="hideTooltip">
-            <List :size="14" />
-            <span>URL 拆解</span>
-          </button>
-        </div>
-
-        <template v-if="currentTab === 'codec'">
-          <div class="tool-divider"></div>
-          <div class="tool-segment">
-            <button class="tool-segment-btn" :class="{ active: mode === 'encode' }" @click="mode = 'encode'">编码</button>
-            <button class="tool-segment-btn" :class="{ active: mode === 'decode' }" @click="mode = 'decode'">解码</button>
-          </div>
-        </template>
-
-        <div class="tool-divider"></div>
-
-        <button class="glass-icon-btn" @click="paste" @mouseenter="showTooltip('粘贴', $event)" @mouseleave="hideTooltip">
-          <ClipboardPaste :size="15" />
-        </button>
-        <button v-if="currentTab === 'parse'" class="glass-icon-btn" @click="loadExample" @mouseenter="showTooltip('示例', $event)" @mouseleave="hideTooltip">
-          <Code :size="15" />
-        </button>
-        <button class="glass-icon-btn danger" @click="clear" :disabled="!inputText" @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
-          <Trash2 :size="15" />
-        </button>
-      </div>
-
-      <div class="tool-toolbar-right">
-        <span v-if="inputStats.chars" class="tool-stat">{{ inputStats.chars }} 字符</span>
-      </div>
-    </div>
-
     <!-- 编解码模式 -->
     <main v-if="currentTab === 'codec'" class="tool-main split">
-      <!-- 输入面板 -->
+      <!-- 左：配置 + 输入 -->
       <section class="tool-panel">
         <div class="tool-panel-header">
           <div class="tool-panel-title">
-            <span class="panel-icon blue"><Link :size="12" /></span>
+            <span class="panel-icon blue"><Link :size="14" /></span>
             <span>输入</span>
           </div>
-          <div class="tool-panel-actions">
-            <button class="glass-icon-btn small" @click="paste" @mouseenter="showTooltip('粘贴', $event)" @mouseleave="hideTooltip">
+          <div class="panel-actions">
+            <span v-if="inputStats.chars" class="byte-info">{{ inputStats.chars }} 字符</span>
+            <button class="action-btn" @click="paste"
+              @mouseenter="showTooltip('粘贴', $event)" @mouseleave="hideTooltip">
               <ClipboardPaste :size="13" />
+            </button>
+            <button class="action-btn" @click="clear" :disabled="!inputText"
+              @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
+              <Trash2 :size="13" />
             </button>
           </div>
         </div>
-        <div class="tool-panel-body" style="padding:0">
-          <textarea
-            v-model="inputText"
-            class="url-textarea"
-            :placeholder="mode === 'encode' ? '输入需要编码的 URL 或文本...' : '输入需要解码的 URL 编码文本...'"
-            spellcheck="false"
-          ></textarea>
+
+        <div class="tool-panel-body">
+          <!-- 模式切换 -->
+          <div class="config-section">
+            <label class="config-label">功能</label>
+            <div class="tab-toggle">
+              <button class="seg-btn xs active">
+                <Link :size="11" /> 编解码
+              </button>
+              <button class="seg-btn xs" @click="currentTab = 'parse'">
+                <List :size="11" /> URL 拆解
+              </button>
+            </div>
+          </div>
+
+          <!-- 编码/解码 -->
+          <div class="config-section">
+            <label class="config-label">模式</label>
+            <div class="mode-toggle">
+              <button :class="['seg-btn xs', { active: mode === 'encode' }]" @click="mode = 'encode'">编码</button>
+              <button :class="['seg-btn xs', { active: mode === 'decode' }]" @click="mode = 'decode'">解码</button>
+            </div>
+          </div>
+
+          <!-- 编码规则 -->
+          <div class="config-section">
+            <label class="config-label">编码规则</label>
+            <div class="rules-list">
+              <span class="rule-chip"><code>空格</code> → <code>%20</code></span>
+              <span class="rule-chip"><code>中文</code> → <code>%XX</code></span>
+              <span class="rule-chip"><code>&</code> → <code>%26</code></span>
+              <span class="rule-chip"><code>=</code> → <code>%3D</code></span>
+            </div>
+          </div>
+
+          <!-- 输入文本 -->
+          <div class="config-section grow">
+            <textarea
+              v-model="inputText"
+              class="config-textarea"
+              :placeholder="mode === 'encode' ? '输入需要编码的 URL 或文本...' : '输入需要解码的 URL 编码文本...'"
+              spellcheck="false"
+            />
+          </div>
         </div>
       </section>
 
-      <!-- 输出面板 -->
+      <!-- 右：输出 -->
       <section class="tool-panel">
         <div class="tool-panel-header">
           <div class="tool-panel-title">
-            <span class="panel-icon green"><Check :size="12" /></span>
+            <span class="panel-icon green"><Check :size="14" /></span>
             <span>输出</span>
           </div>
-          <div class="tool-panel-actions">
-            <button class="glass-icon-btn small" @click="toggleMode" @mouseenter="showTooltip('交换输入输出', $event)" @mouseleave="hideTooltip">
+          <div class="panel-actions">
+            <button class="action-btn" @click="toggleMode"
+              @mouseenter="showTooltip('交换输入输出', $event)" @mouseleave="hideTooltip">
               <ArrowLeftRight :size="13" />
             </button>
-            <button class="glass-icon-btn small" @click="copyOutput" :disabled="!outputText" @mouseenter="showTooltip('复制', $event)" @mouseleave="hideTooltip">
-              <Copy v-if="!copied" :size="13" />
-              <Check v-else :size="13" />
+            <div class="panel-divider"></div>
+            <button class="action-btn" @click="copyOutput" :disabled="!outputText"
+              @mouseenter="showTooltip('复制', $event)" @mouseleave="hideTooltip">
+              <Check v-if="copied" :size="13" /><Copy v-else :size="13" />
             </button>
           </div>
         </div>
-        <div class="tool-panel-body" style="padding:0; overflow: auto">
+        <div class="tool-panel-body">
           <div v-if="outputText" class="url-output-area" @click="copyOutput">
             <div class="url-output-line" v-for="(line, index) in outputText.split('\n')" :key="index">
               <span class="line-num">{{ index + 1 }}</span>
@@ -123,7 +128,7 @@ const {
             </div>
           </div>
           <div v-else class="tool-empty">
-            <div class="empty-icon"><Link :size="24" /></div>
+            <div class="empty-icon"><Link :size="28" /></div>
             <p class="empty-title">等待输入</p>
             <p class="empty-desc">在左侧输入文本，自动{{ mode === 'encode' ? '编码' : '解码' }}</p>
           </div>
@@ -137,25 +142,48 @@ const {
       <section class="tool-panel">
         <div class="tool-panel-header">
           <div class="tool-panel-title">
-            <span class="panel-icon blue"><Link :size="12" /></span>
+            <span class="panel-icon blue"><Link :size="14" /></span>
             <span>URL 输入</span>
           </div>
-          <div class="tool-panel-actions">
-            <button class="glass-icon-btn small" @click="paste" @mouseenter="showTooltip('粘贴', $event)" @mouseleave="hideTooltip">
+          <div class="panel-actions">
+            <button class="action-btn" @click="paste"
+              @mouseenter="showTooltip('粘贴', $event)" @mouseleave="hideTooltip">
               <ClipboardPaste :size="13" />
             </button>
-            <button class="glass-icon-btn small" @click="loadExample" @mouseenter="showTooltip('示例', $event)" @mouseleave="hideTooltip">
+            <button class="action-btn" @click="loadExample"
+              @mouseenter="showTooltip('示例', $event)" @mouseleave="hideTooltip">
               <Code :size="13" />
+            </button>
+            <button class="action-btn" @click="clear" :disabled="!inputText"
+              @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
+              <Trash2 :size="13" />
             </button>
           </div>
         </div>
-        <div class="tool-panel-body" style="padding:0">
-          <textarea
-            v-model="inputText"
-            class="url-textarea"
-            placeholder="输入完整的 URL 地址进行解析..."
-            spellcheck="false"
-          ></textarea>
+
+        <div class="tool-panel-body">
+          <!-- 功能切换 -->
+          <div class="config-section">
+            <label class="config-label">功能</label>
+            <div class="tab-toggle">
+              <button class="seg-btn xs" @click="currentTab = 'codec'">
+                <Link :size="11" /> 编解码
+              </button>
+              <button class="seg-btn xs active">
+                <List :size="11" /> URL 拆解
+              </button>
+            </div>
+          </div>
+
+          <!-- 输入 -->
+          <div class="config-section grow">
+            <textarea
+              v-model="inputText"
+              class="config-textarea"
+              placeholder="输入完整的 URL 地址进行解析..."
+              spellcheck="false"
+            />
+          </div>
         </div>
       </section>
 
@@ -163,12 +191,12 @@ const {
       <section class="tool-panel">
         <div class="tool-panel-header">
           <div class="tool-panel-title">
-            <span class="panel-icon green"><List :size="12" /></span>
+            <span class="panel-icon green"><List :size="14" /></span>
             <span>解析结果</span>
           </div>
         </div>
-        <div class="tool-panel-body url-parse-body">
-          <template v-if="parsedUrl && parsedUrl.valid">
+        <div class="tool-panel-body">
+          <div v-if="parsedUrl && parsedUrl.valid" class="parse-body">
             <!-- URL 组成 -->
             <div class="parse-section">
               <div class="parse-section-head">
@@ -226,10 +254,10 @@ const {
                 </div>
               </div>
             </div>
-          </template>
+          </div>
 
           <div v-else class="tool-empty">
-            <div class="empty-icon"><Link :size="24" /></div>
+            <div class="empty-icon"><Link :size="28" /></div>
             <p class="empty-title">{{ parsedUrl && !parsedUrl.valid ? '无效的 URL' : '输入 URL 进行解析' }}</p>
             <p class="empty-desc">支持 HTTP/HTTPS 协议的完整 URL</p>
           </div>
@@ -237,25 +265,13 @@ const {
       </section>
     </main>
 
-    <!-- 底部编码规则 -->
-    <div v-if="currentTab === 'codec'" class="url-rules-bar">
-      <span class="rules-label">编码规则</span>
-      <div class="rules-list">
-        <span class="rule-chip"><code>空格</code> → <code>%20</code></span>
-        <span class="rule-chip"><code>中文</code> → <code>%XX</code></span>
-        <span class="rule-chip"><code>&</code> → <code>%26</code></span>
-        <span class="rule-chip"><code>=</code> → <code>%3D</code></span>
-        <span class="rule-chip"><code>?</code> → <code>%3F</code></span>
-        <span class="rule-chip"><code>/</code> → <code>%2F</code></span>
-      </div>
-    </div>
-
     <!-- Tooltip -->
     <div v-if="tooltip.show" class="toolbar-tooltip" :style="{ left: tooltip.x + 'px', top: tooltip.y + 'px' }">{{ tooltip.text }}</div>
   </div>
 </template>
 
 <style scoped>
+/* ====== Header ====== */
 .header-content {
   display: flex;
   align-items: center;
@@ -265,7 +281,7 @@ const {
 
 .mode-tag {
   padding: 2px 8px;
-  border-radius: var(--radius-xs);
+  border-radius: 10px;
   font-size: 11px;
   font-weight: 600;
   color: var(--accent);
@@ -273,56 +289,179 @@ const {
 }
 
 .mode-tag.success { color: var(--success); background: var(--success-light); }
-.mode-tag.error { color: var(--error); background: var(--error-light, #fef2f2); }
+.mode-tag.error { color: var(--error); background: var(--error-light); }
 
 .stat-tag {
   padding: 2px 8px;
-  border-radius: var(--radius-xs);
+  border-radius: 10px;
   font-size: 11px;
   font-weight: 500;
   color: var(--text-muted);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
+  background: var(--bg-tertiary);
 }
 
-/* ====== 统计 ====== */
-.tool-stat {
+/* ====== Panel Actions ====== */
+.panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.panel-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--border-subtle);
+  margin: 0 4px;
+}
+
+.action-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all var(--transition-fast);
+  padding: 0;
+}
+
+.action-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
+.action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.byte-info {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  padding: 1px 6px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  margin-right: 2px;
+}
+
+/* ====== Segment Buttons ====== */
+.seg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 12px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.seg-btn:hover { border-color: var(--border-default); background: var(--bg-hover); color: var(--text-primary); }
+
+.seg-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.seg-btn.xs { padding: 3px 8px; font-size: 11px; height: 24px; }
+
+.tab-toggle, .mode-toggle {
+  display: flex;
+  gap: 2px;
+}
+
+/* ====== Config Sections ====== */
+.tool-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow-y: auto;
+}
+
+.config-section {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.config-section.grow {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-bottom: none;
+  min-height: 0;
+}
+
+.config-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* ====== 编码规则 ====== */
+.rules-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.rule-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
   font-size: 11px;
   font-family: var(--font-mono);
   color: var(--text-muted);
-  padding: 2px 8px;
   background: var(--bg-secondary);
-  border-radius: var(--radius-xs);
+  border-radius: 4px;
 }
 
-/* ====== 输入区 ====== */
-.url-textarea {
+.rule-chip code {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* ====== Textarea ====== */
+.config-textarea {
+  flex: 1;
   width: 100%;
-  height: 100%;
-  padding: 14px 16px;
+  min-height: 100px;
+  padding: 8px 10px;
+  font-size: 12px;
   font-family: var(--font-mono);
-  font-size: 13px;
-  line-height: 1.7;
-  border: none;
+  color: var(--text-primary);
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
   outline: none;
   resize: none;
-  background: transparent;
-  color: var(--text-primary);
-  tab-size: 2;
+  line-height: 1.6;
+  transition: all var(--transition-fast);
 }
 
-.url-textarea::placeholder { color: var(--text-muted); }
+.config-textarea:hover { border-color: var(--border-strong); }
+.config-textarea:focus { border-color: var(--accent); box-shadow: var(--shadow-focus); }
+.config-textarea::placeholder { color: var(--text-muted); }
 
 /* ====== 输出区 ====== */
 .url-output-area {
   cursor: pointer;
+  padding: 8px 0;
 }
 
 .url-output-line {
   display: flex;
   align-items: flex-start;
   padding: 0 16px;
-  min-height: 24px;
   transition: background 0.1s;
 }
 
@@ -339,6 +478,7 @@ const {
   user-select: none;
   line-height: 1.7;
   padding-right: 12px;
+  opacity: 0.5;
 }
 
 .line-content {
@@ -353,52 +493,9 @@ const {
   white-space: pre-wrap;
 }
 
-/* ====== 底部规则栏 ====== */
-.url-rules-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 16px;
-  flex-shrink: 0;
-  border-top: 1px solid var(--border-subtle);
-  background: var(--bg-secondary);
-}
-
-.rules-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  flex-shrink: 0;
-}
-
-.rules-list {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.rule-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
-  font-size: 11px;
-  font-family: var(--font-mono);
-  color: var(--text-muted);
-  background: var(--bg-primary);
-  border-radius: var(--radius-xs);
-}
-
-.rule-chip code {
-  font-family: inherit;
-  font-size: inherit;
-}
-
 /* ====== URL 拆解结果 ====== */
-.url-parse-body {
-  overflow-y: auto;
-  padding: 12px;
+.parse-body {
+  padding: 14px;
 }
 
 .parse-section {
@@ -433,7 +530,7 @@ const {
   font-size: 10px;
   font-weight: 600;
   color: var(--text-muted);
-  background: var(--bg-primary);
+  background: var(--bg-secondary);
   border-radius: 10px;
   line-height: 18px;
 }
@@ -442,9 +539,9 @@ const {
   display: flex;
   flex-direction: column;
   gap: 1px;
-  background: var(--bg-primary);
+  background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  border-radius: 8px;
   overflow: hidden;
 }
 
@@ -521,7 +618,7 @@ const {
   font-size: 10px;
   font-weight: 600;
   color: var(--text-muted);
-  background: var(--bg-secondary);
+  background: var(--bg-primary);
   border-radius: 50%;
   flex-shrink: 0;
 }
@@ -533,23 +630,61 @@ const {
   flex-shrink: 0;
 }
 
+/* ====== Empty State ====== */
+.tool-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 20px;
+  flex: 1;
+}
+
+.empty-icon {
+  color: var(--text-muted);
+  opacity: 0.25;
+  margin-bottom: 12px;
+}
+
+.empty-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin: 0 0 4px 0;
+}
+
+.empty-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
 /* ====== Tooltip ====== */
 .toolbar-tooltip {
   position: fixed;
   z-index: 9999;
-  padding: 5px 12px;
+  padding: 5px 10px;
   font-size: 12px;
   color: var(--text-inverse, #fff);
   background: var(--bg-tooltip, rgba(0, 0, 0, 0.85));
-  border-radius: var(--radius-sm, 4px);
+  border-radius: 4px;
   white-space: nowrap;
   pointer-events: none;
   transform: translateX(-50%);
-  min-width: 60px;
-  text-align: center;
+  line-height: 1.4;
 }
 
-/* ====== 响应式 ====== */
+/* ====== Scrollbar ====== */
+.tool-panel-body::-webkit-scrollbar { width: 5px; }
+.tool-panel-body::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
+.tool-panel-body::-webkit-scrollbar-track { background: transparent; }
+
+.config-textarea::-webkit-scrollbar { width: 4px; }
+.config-textarea::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
+.config-textarea::-webkit-scrollbar-track { background: transparent; }
+
+/* ====== Responsive ====== */
 @media (max-width: 760px) {
   .tool-main { grid-template-columns: 1fr !important; }
 }

@@ -4,6 +4,7 @@ import hljs from 'highlight.js'
 import katex from 'katex'
 import 'katex/dist/katex.min.css'
 import { toast } from '@/composables/useToast'
+import * as FileService from '../../../../../bindings/easy-tools/internal/services/fileservice.js'
 
 const markedInstance = new Marked()
 
@@ -54,35 +55,6 @@ const STORAGE_KEY = 'md-editor-content'
 const STORAGE_NAME_KEY = 'md-editor-filename'
 
 export function useMarkdownEditor() {
-  const tooltip = ref({ show: false, text: '', x: 0, y: 0 })
-  let tooltipTimer: ReturnType<typeof setTimeout> | null = null
-
-  const showTooltip = (text: string, e: MouseEvent) => {
-    if (tooltipTimer) clearTimeout(tooltipTimer)
-    const rect = (e.target as HTMLElement).getBoundingClientRect()
-    const toolbarRect = document.querySelector('.tool-toolbar')?.getBoundingClientRect()
-    if (!toolbarRect) return
-
-    let x = rect.left + rect.width / 2
-    let y = rect.bottom + 4
-
-    const tooltipWidth = text.length * 12 + 16
-    if (x + tooltipWidth / 2 > window.innerWidth) {
-      x = window.innerWidth - tooltipWidth / 2 - 8
-    }
-    if (x - tooltipWidth / 2 < 8) {
-      x = tooltipWidth / 2 + 8
-    }
-
-    tooltip.value = { show: true, text, x, y }
-  }
-
-  const hideTooltip = () => {
-    tooltipTimer = setTimeout(() => {
-      tooltip.value.show = false
-    }, 100)
-  }
-
   const markdownText = ref('')
   const viewMode = ref<'split' | 'edit' | 'preview'>('split')
   const copied = ref(false)
@@ -125,6 +97,7 @@ export function useMarkdownEditor() {
   const insertFormat = (before: string, after: string = '', placeholder: string = '') => {
     const textarea = document.querySelector('.md-textarea') as HTMLTextAreaElement
     if (!textarea) return
+    const scrollTop = textarea.scrollTop
     const start = textarea.selectionStart
     const end = textarea.selectionEnd
     const selected = markdownText.value.substring(start, end)
@@ -134,6 +107,7 @@ export function useMarkdownEditor() {
       textarea.focus()
       const pos = selected ? start + before.length + selected.length + after.length : start + before.length + placeholder.length
       textarea.setSelectionRange(pos, pos)
+      textarea.scrollTop = scrollTop
     })
   }
 
@@ -154,16 +128,7 @@ export function useMarkdownEditor() {
   const insertMathBlock = () => insertFormat('\n$$\n', '\n$$\n', '\\sum_{i=1}^{n} x_i')
   const insertMermaid = () => insertFormat('\n```mermaid\n', '\n```\n', 'flowchart TD\n    A[开始] --> B{判断}\n    B -->|是| C[执行]\n    B -->|否| D[结束]')
 
-  const downloadFile = (content: string, name: string, type: string) => {
-    const blob = new Blob([content], { type })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url; a.download = name; a.click()
-    URL.revokeObjectURL(url)
-    toast.success(`已导出 ${name}`)
-  }
-
-  const exportHtml = () => {
+  const exportHtml = async () => {
     const katexCss = document.querySelector('link[href*="katex"]')?.outerHTML || ''
     const html = `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -185,11 +150,21 @@ a{color:#007AFF}img{max-width:100%}.mermaid-diagram svg{max-width:100%}
 </head>
 <body>${previewHtml.value}</body>
 </html>`
-    downloadFile(html, `${fileName.value.replace('.md', '')}.html`, 'text/html')
+    try {
+      const path = await FileService.SaveFileWithFilter(html, `${fileName.value.replace('.md', '')}.html`, 'HTML 文件', '*.html')
+      if (path) toast.success('HTML 已导出')
+    } catch (e: any) {
+      toast.error(e.message || '导出失败')
+    }
   }
 
-  const exportMarkdown = () => {
-    downloadFile(markdownText.value, fileName.value, 'text/markdown')
+  const exportMarkdown = async () => {
+    try {
+      const path = await FileService.SaveFileWithFilter(markdownText.value, fileName.value, 'Markdown 文件', '*.md')
+      if (path) toast.success('Markdown 已导出')
+    } catch (e: any) {
+      toast.error(e.message || '导出失败')
+    }
   }
 
   const copyHtml = async () => {
@@ -275,10 +250,13 @@ flowchart TD
     }
   }
 
-  const saveToLocal = () => {
-    localStorage.setItem(STORAGE_KEY, markdownText.value)
-    localStorage.setItem(STORAGE_NAME_KEY, fileName.value)
-    toast.success('已保存到本地')
+  const saveToLocal = async () => {
+    try {
+      const path = await FileService.SaveFileWithFilter(markdownText.value, fileName.value, 'Markdown 文件', '*.md')
+      if (path) toast.success('已保存')
+    } catch (e: any) {
+      toast.error(e.message || '保存失败')
+    }
   }
 
   onMounted(() => {
@@ -293,7 +271,6 @@ flowchart TD
   })
 
   return {
-    tooltip, showTooltip, hideTooltip,
     markdownText, viewMode, copied, fileName, previewRef,
     previewHtml, stats,
     insertBold, insertItalic, insertStrikethrough,

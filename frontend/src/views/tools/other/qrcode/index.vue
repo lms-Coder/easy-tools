@@ -27,103 +27,92 @@ const {
     <!-- 标题栏 -->
     <ToolTitleBar title="二维码生成" icon="icon-qrcode">
       <div class="header-content">
-        <span v-if="inputText" class="qr-stat">{{ charCount }} 字符</span>
-        <span v-if="isUrlLike" class="qr-type-tag"><Link :size="11" /> 链接</span>
+        <span v-if="inputText" class="stat-tag">{{ charCount }} 字符</span>
+        <span v-if="isUrlLike" class="type-tag"><Link :size="11" /> 链接</span>
       </div>
     </ToolTitleBar>
 
-    <!-- 工具栏 -->
-    <div class="tool-toolbar">
-      <div class="tool-toolbar-left">
-        <div class="tool-segment">
-          <button
-            v-for="level in errorLevels"
-            :key="level.id"
-            class="tool-segment-btn"
-            :class="{ active: errorCorrectionLevel === level.id }"
-            @click="errorCorrectionLevel = level.id as any"
-            @mouseenter="showTooltip(`容错 ${level.desc}`, $event)"
-            @mouseleave="hideTooltip"
-          >
-            {{ level.name }}
-          </button>
-        </div>
-        <div class="tool-divider"></div>
-        <button class="glass-icon-btn" @click="downloadQR" :disabled="!qrCodeDataUrl" @mouseenter="showTooltip('下载 PNG', $event)" @mouseleave="hideTooltip"><Download :size="15" /></button>
-        <button class="glass-icon-btn" @click="copyQR" :disabled="!qrCodeDataUrl" @mouseenter="showTooltip('复制图片', $event)" @mouseleave="hideTooltip"><Copy :size="15" /></button>
-        <div class="tool-divider"></div>
-        <button class="glass-icon-btn danger" @click="clear" :disabled="!inputText" @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip"><Trash2 :size="15" /></button>
-      </div>
-      <div class="tool-toolbar-right">
-        <span class="tool-stat">{{ size }}px</span>
-      </div>
-    </div>
-
     <!-- 主内容 -->
     <main class="tool-main split">
-      <!-- 左：输入面板 -->
+      <!-- 左：配置面板 -->
       <section class="tool-panel">
         <div class="tool-panel-header">
           <div class="tool-panel-title">
-            <span class="panel-icon blue"><ScanLine :size="12" /></span>
+            <span class="panel-icon blue"><ScanLine :size="14" /></span>
             <span>内容设置</span>
           </div>
+          <div class="panel-actions">
+            <button class="action-btn" @click="clear" :disabled="!inputText"
+              @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
+              <Trash2 :size="13" />
+            </button>
+          </div>
         </div>
-        <div class="tool-panel-body qr-settings-body">
+
+        <div class="tool-panel-body">
           <!-- 内容输入 -->
-          <div class="qr-field">
-            <label class="qr-label">二维码内容</label>
+          <div class="config-section">
+            <label class="config-label">二维码内容</label>
             <textarea
               v-model="inputText"
-              class="qr-textarea"
+              class="config-textarea-fixed"
               placeholder="输入文本、链接、Wi-Fi 配置、电话、邮箱..."
               spellcheck="false"
-              rows="4"
-            ></textarea>
-            <span class="qr-hint">链接请带 http(s)://，Wi-Fi 用 WIFI:T:WPA;S:名称;P:密码;; 格式</span>
+              rows="3"
+            />
+            <span class="config-hint">链接请带 http(s)://，Wi-Fi 用 WIFI:T:WPA;S:名称;P:密码;; 格式</span>
           </div>
 
           <!-- 快速示例 -->
-          <div class="qr-field">
-            <label class="qr-label">快速示例</label>
-            <div class="qr-presets">
+          <div class="config-section">
+            <label class="config-label">快速示例</label>
+            <div class="preset-chips">
               <button
                 v-for="sample in presetSamples"
                 :key="sample.label"
-                class="qr-preset-btn"
+                class="preset-chip"
                 @click="applySample(sample.value)"
-              >
-                {{ sample.label }}
-              </button>
+              >{{ sample.label }}</button>
+            </div>
+          </div>
+
+          <!-- 容错级别 -->
+          <div class="config-section">
+            <label class="config-label">容错级别</label>
+            <div class="level-chips">
+              <button
+                v-for="level in errorLevels"
+                :key="level.id"
+                class="level-chip"
+                :class="{ active: errorCorrectionLevel === level.id }"
+                @click="errorCorrectionLevel = level.id as any"
+                @mouseenter="showTooltip(level.desc, $event)"
+                @mouseleave="hideTooltip"
+              >{{ level.name }}</button>
             </div>
           </div>
 
           <!-- 尺寸和边距 -->
-          <div class="qr-sliders">
-            <div class="qr-slider-row">
-              <label class="qr-label">尺寸 <code class="qr-slider-val">{{ size }}px</code></label>
-              <input v-model.number="size" type="range" min="160" max="640" step="16" class="qr-range" />
-            </div>
-            <div class="qr-slider-row">
-              <label class="qr-label">边距 <code class="qr-slider-val">{{ margin }}</code></label>
-              <input v-model.number="margin" type="range" min="1" max="8" step="1" class="qr-range" />
-            </div>
+          <div class="config-section">
+            <label class="config-label">尺寸 <code class="val-code">{{ size }}px</code></label>
+            <input v-model.number="size" type="range" min="160" max="640" step="16" class="qr-range" />
+            <label class="config-label" style="margin-top: 10px;">边距 <code class="val-code">{{ margin }}</code></label>
+            <input v-model.number="margin" type="range" min="1" max="8" step="1" class="qr-range" />
           </div>
 
           <!-- 颜色 -->
-          <div class="qr-colors">
-            <div class="qr-color-group">
-              <label class="qr-label">前景色</label>
-              <div class="qr-color-row">
-                <input v-model="foregroundColor" type="color" class="qr-color-picker" />
-                <input v-model="foregroundColor" type="text" class="qr-color-text" spellcheck="false" />
+          <div class="config-section grow">
+            <label class="config-label">颜色</label>
+            <div class="color-row-group">
+              <div class="color-group">
+                <span class="color-label">前景</span>
+                <input v-model="foregroundColor" type="color" class="color-picker" />
+                <input v-model="foregroundColor" type="text" class="color-input" spellcheck="false" />
               </div>
-            </div>
-            <div class="qr-color-group">
-              <label class="qr-label">背景色</label>
-              <div class="qr-color-row">
-                <input v-model="backgroundColor" type="color" class="qr-color-picker" />
-                <input v-model="backgroundColor" type="text" class="qr-color-text" spellcheck="false" />
+              <div class="color-group">
+                <span class="color-label">背景</span>
+                <input v-model="backgroundColor" type="color" class="color-picker" />
+                <input v-model="backgroundColor" type="text" class="color-input" spellcheck="false" />
               </div>
             </div>
           </div>
@@ -134,11 +123,18 @@ const {
       <section class="tool-panel">
         <div class="tool-panel-header">
           <div class="tool-panel-title">
-            <span class="panel-icon green"><QrCode :size="12" /></span>
+            <span class="panel-icon green"><Check :size="14" /></span>
             <span>生成结果</span>
           </div>
-          <div class="tool-panel-actions">
-            <button v-if="qrCodeDataUrl" class="glass-icon-btn small" @click="downloadQR" @mouseenter="showTooltip('下载', $event)" @mouseleave="hideTooltip"><Download :size="13" /></button>
+          <div class="panel-actions">
+            <button class="action-btn" @click="copyQR" :disabled="!qrCodeDataUrl"
+              @mouseenter="showTooltip('复制图片', $event)" @mouseleave="hideTooltip">
+              <Copy :size="13" />
+            </button>
+            <button class="action-btn" @click="downloadQR" :disabled="!qrCodeDataUrl"
+              @mouseenter="showTooltip('下载 PNG', $event)" @mouseleave="hideTooltip">
+              <Download :size="13" />
+            </button>
           </div>
         </div>
         <div class="tool-panel-body qr-preview-body">
@@ -164,7 +160,7 @@ const {
             </div>
           </template>
           <div v-else class="tool-empty">
-            <div class="empty-icon"><QrCode :size="24" /></div>
+            <div class="empty-icon"><QrCode :size="28" /></div>
             <p class="empty-title">等待生成</p>
             <p class="empty-desc">输入内容后自动生成二维码</p>
           </div>
@@ -180,7 +176,7 @@ const {
 </template>
 
 <style scoped>
-/* ====== 标题栏 ====== */
+/* ====== Header ====== */
 .header-content {
   display: flex;
   align-items: center;
@@ -188,119 +184,163 @@ const {
   margin-right: 4px;
 }
 
-.qr-stat {
+.stat-tag {
   padding: 2px 8px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xs);
+  border-radius: 10px;
   font-size: 11px;
   font-family: var(--font-mono);
-  color: var(--text-secondary);
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
 }
 
-.qr-type-tag {
+.type-tag {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   padding: 2px 8px;
-  border-radius: var(--radius-xs);
+  border-radius: 10px;
   font-size: 11px;
   font-weight: 600;
   color: var(--accent);
   background: var(--accent-light);
 }
 
-/* ====== 左侧设置面板 ====== */
-.qr-settings-body {
-  padding: 16px !important;
-  overflow-y: auto !important;
+/* ====== Panel Actions ====== */
+.panel-actions {
   display: flex;
-  flex-direction: column;
-  gap: 18px;
+  align-items: center;
+  gap: 2px;
 }
 
-.qr-field {
+.action-btn {
+  width: 28px;
+  height: 28px;
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all var(--transition-fast);
+  padding: 0;
 }
 
-.qr-label {
-  font-size: 12px;
+.action-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
+.action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ====== Config Sections ====== */
+.tool-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow-y: auto;
+}
+
+.config-section {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.config-section.grow {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-bottom: none;
+  min-height: 0;
+}
+
+.config-label {
+  display: block;
+  font-size: 11px;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
-.qr-textarea {
-  width: 100%;
-  padding: 12px 14px;
-  font-family: var(--font-mono);
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--text-primary);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  outline: none;
-  resize: vertical;
-  transition: all 0.15s;
-}
-
-.qr-textarea:hover { border-color: var(--border-default); }
-.qr-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-light); }
-.qr-textarea::placeholder { color: var(--text-muted); }
-
-.qr-hint {
+.config-hint {
+  display: block;
   font-size: 11px;
   color: var(--text-muted);
   line-height: 1.5;
+  margin-top: 4px;
 }
 
-/* 快速示例 */
-.qr-presets {
+.val-code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: none;
+}
+
+/* ====== Textarea ====== */
+.config-textarea-fixed {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  outline: none;
+  resize: vertical;
+  line-height: 1.6;
+  transition: all var(--transition-fast);
+}
+
+.config-textarea-fixed:hover { border-color: var(--border-strong); }
+.config-textarea-fixed:focus { border-color: var(--accent); box-shadow: var(--shadow-focus); }
+.config-textarea-fixed::placeholder { color: var(--text-muted); }
+
+/* ====== Preset Chips ====== */
+.preset-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 4px;
 }
 
-.qr-preset-btn {
-  padding: 5px 12px;
-  font-size: 12px;
+.preset-chip {
+  padding: 3px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  font-size: 11px;
   font-weight: 500;
   color: var(--text-secondary);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+  background: transparent;
   cursor: pointer;
   transition: all 0.15s;
 }
 
-.qr-preset-btn:hover {
-  color: var(--accent);
-  border-color: var(--accent);
-  background: var(--accent-light);
-}
+.preset-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
 
-/* 滑块 */
-.qr-sliders {
+/* ====== Level Chips ====== */
+.level-chips {
   display: flex;
-  flex-direction: column;
-  gap: 14px;
+  gap: 4px;
 }
 
-.qr-slider-row {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.qr-slider-val {
-  font-family: var(--font-mono);
-  font-size: 11px;
+.level-chip {
+  padding: 3px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  font-size: 12px;
   font-weight: 600;
-  color: var(--accent);
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s;
 }
 
+.level-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.level-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ====== Range Slider ====== */
 .qr-range {
   width: 100%;
   height: 6px;
@@ -322,56 +362,53 @@ const {
   cursor: pointer;
 }
 
-/* 颜色 */
-.qr-colors {
+/* ====== Color ====== */
+.color-row-group {
   display: flex;
-  gap: 14px;
+  gap: 10px;
 }
 
-.qr-color-group {
+.color-group {
   flex: 1;
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-}
-
-.qr-color-row {
-  display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
-.qr-color-picker {
-  width: 36px;
-  height: 36px;
+.color-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.color-picker {
+  width: 28px;
+  height: 28px;
   padding: 0;
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+  border-radius: 6px;
   background: transparent;
   cursor: pointer;
   flex-shrink: 0;
 }
 
-.qr-color-text {
+.color-input {
   flex: 1;
-  height: 36px;
-  padding: 0 10px;
+  height: 28px;
+  padding: 0 8px;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 11px;
   color: var(--text-primary);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
   outline: none;
-  transition: all 0.15s;
   min-width: 0;
 }
 
-.qr-color-text:hover { border-color: var(--border-default); }
-.qr-color-text:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-light); }
+.color-input:focus { border-color: var(--accent); box-shadow: var(--shadow-focus); }
 
-/* ====== 右侧预览面板 ====== */
+/* ====== Preview Panel ====== */
 .qr-preview-body {
   display: flex;
   flex-direction: column;
@@ -391,7 +428,7 @@ const {
 .qr-display {
   padding: 20px;
   background: #fff;
-  border-radius: var(--radius-lg);
+  border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
@@ -408,7 +445,7 @@ const {
   margin-top: 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .qr-info-row {
@@ -418,7 +455,7 @@ const {
   padding: 8px 12px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  border-radius: 8px;
 }
 
 .qr-info-label {
@@ -446,25 +483,59 @@ const {
   line-height: 1.4;
 }
 
+/* ====== Empty State ====== */
+.tool-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 20px;
+  flex: 1;
+}
+
+.empty-icon {
+  color: var(--text-muted);
+  opacity: 0.25;
+  margin-bottom: 12px;
+}
+
+.empty-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin: 0 0 4px 0;
+}
+
+.empty-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
 /* ====== Tooltip ====== */
 .toolbar-tooltip {
   position: fixed;
   z-index: 9999;
-  padding: 5px 12px;
+  padding: 5px 10px;
   font-size: 12px;
   color: var(--text-inverse, #fff);
   background: var(--bg-tooltip, rgba(0, 0, 0, 0.85));
-  border-radius: var(--radius-sm, 4px);
+  border-radius: 4px;
   white-space: nowrap;
   pointer-events: none;
   transform: translateX(-50%);
-  min-width: 60px;
-  text-align: center;
+  line-height: 1.4;
 }
 
-/* ====== 响应式 ====== */
+/* ====== Scrollbar ====== */
+.tool-panel-body::-webkit-scrollbar { width: 5px; }
+.tool-panel-body::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
+.tool-panel-body::-webkit-scrollbar-track { background: transparent; }
+
+/* ====== Responsive ====== */
 @media (max-width: 760px) {
   .tool-main { grid-template-columns: 1fr !important; }
-  .qr-colors { flex-direction: column; }
+  .color-row-group { flex-direction: column; }
 }
 </style>

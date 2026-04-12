@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import {
-  Check, X, Search, Code, Copy, Trash2, Eye,
-  ArrowLeftRight, FileCode, ClipboardPaste, HelpCircle,
+  Check, X, Search, Copy, Trash2, Eye,
+  ArrowLeftRight, FileCode, HelpCircle,
   Braces, FlaskConical,
   ChevronDown, ChevronUp, XCircle, CheckCircle2, AlertCircle,
 } from 'lucide-vue-next'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import ToolTitleBar from '@/components/common/ToolTitleBar.vue'
 import ReferenceModal from '@/components/common/ReferenceModal.vue'
 import { useTooltip } from '@/composables/useTooltip'
@@ -20,7 +20,7 @@ const {
   codeLanguage, generatedCode, highlightedCode, replacedText,
   flagsString, highlightedText, explainLines,
   testCases, showTestSuite,
-  applyPreset, copyResult, copyAllMatches, pasteFromClipboard, clearAll,
+  applyPreset, copyResult, copyAllMatches, clearAll,
   addTestCase, removeTestCase, toggleTestCaseType,
 } = useRegex()
 
@@ -45,7 +45,6 @@ const hideTokenTooltip = () => {
 }
 
 const tokens = computed(() => tokenizePattern(pattern.value))
-import { computed } from 'vue'
 </script>
 
 <template>
@@ -66,110 +65,119 @@ import { computed } from 'vue'
       </div>
     </ToolTitleBar>
 
-    <!-- 工具栏 -->
-    <div class="tool-toolbar">
-      <div class="tool-toolbar-left">
-        <!-- 正则输入 -->
-        <div class="regex-input-bar" :class="{ error: !!error, valid: matchCount > 0 && !error }">
-          <span class="regex-slash">/</span>
-          <input type="text" v-model="pattern" class="regex-field" placeholder="输入正则表达式..." spellcheck="false" autocomplete="off" />
-          <span class="regex-slash">/{{ flagsString }}</span>
-          <span v-if="matchCount > 0 && !error" class="regex-badge">{{ matchCount }}</span>
-        </div>
-
-        <div class="tool-divider"></div>
-
-        <!-- Token 解析 -->
-        <div v-if="tokens.length > 0" class="token-tags">
-          <span
-            v-for="(token, i) in tokens" :key="i"
-            class="token-tag"
-            :class="'tt-' + token.type"
-            @mouseenter="showTokenTooltip(token, $event)" @mouseleave="hideTokenTooltip"
-          >{{ token.text }}</span>
-        </div>
-
-        <div v-if="tokens.length > 0" class="tool-divider"></div>
-
-        <!-- Flags -->
-        <div class="flag-chips">
-          <button
-            v-for="flag in flagDefs" :key="flag.key"
-            class="flag-chip" :class="{ active: (flags as any)[flag.key] }"
-            @click="(flags as any)[flag.key] = !(flags as any)[flag.key]"
-            @mouseenter="showTooltip(flag.title, $event)" @mouseleave="hideTooltip"
-          >{{ flag.label }}</button>
-        </div>
-
-        <div class="tool-divider"></div>
-
-        <button class="glass-icon-btn danger" @click="clearAll" :disabled="!pattern && !testText" @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
-          <Trash2 :size="15" />
-        </button>
-      </div>
-
-      <div class="tool-toolbar-right">
-        <button class="glass-icon-btn small" @click="addTestCase" @mouseenter="showTooltip('测试用例', $event)" @mouseleave="hideTooltip">
-          <FlaskConical :size="14" />
-        </button>
-        <div class="tool-divider"></div>
-        <div class="tool-segment">
-          <button class="tool-segment-btn" :class="{ active: activeTab === 'match' }" @click="activeTab = 'match'" @mouseenter="showTooltip('匹配', $event)" @mouseleave="hideTooltip">
-            <Eye :size="14" />
-          </button>
-          <button class="tool-segment-btn" :class="{ active: activeTab === 'replace' }" @click="activeTab = 'replace'" @mouseenter="showTooltip('替换', $event)" @mouseleave="hideTooltip">
-            <ArrowLeftRight :size="14" />
-          </button>
-          <button class="tool-segment-btn" :class="{ active: activeTab === 'code' }" @click="activeTab = 'code'" @mouseenter="showTooltip('代码生成', $event)" @mouseleave="hideTooltip">
-            <FileCode :size="14" />
-          </button>
-        </div>
-      </div>
-    </div>
-
     <!-- 主内容 -->
     <main class="tool-main split">
-      <!-- 左侧：测试文本 -->
+      <!-- 左侧：配置 + 测试文本 -->
       <section class="tool-panel">
         <div class="tool-panel-header">
           <div class="tool-panel-title">
-            <span class="panel-icon blue"><Code :size="12" /></span>
-            <span>测试文本</span>
-            <span v-if="testText" class="panel-stat">{{ testText.length }} 字符</span>
+            <span class="panel-icon blue"><Braces :size="14" /></span>
+            <span>正则配置</span>
           </div>
-          <div class="tool-panel-actions">
-            <button class="glass-icon-btn small" @click="pasteFromClipboard" @mouseenter="showTooltip('粘贴', $event)" @mouseleave="hideTooltip">
-              <ClipboardPaste :size="13" />
+          <div class="panel-actions">
+            <button class="action-btn" @click="clearAll" :disabled="!pattern && !testText"
+              @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
+              <Trash2 :size="13" />
             </button>
           </div>
         </div>
-        <div class="tool-panel-body" style="padding:0">
-          <textarea v-model="testText" class="regex-textarea" placeholder="在此输入或粘贴要测试的文本..." spellcheck="false"></textarea>
+
+        <div class="tool-panel-body">
+          <!-- 正则输入 -->
+          <div class="config-section">
+            <label class="config-label">正则表达式</label>
+            <div class="regex-input-bar" :class="{ error: !!error, valid: matchCount > 0 && !error }">
+              <span class="regex-slash">/</span>
+              <input type="text" v-model="pattern" class="regex-field" placeholder="输入正则表达式..." spellcheck="false" autocomplete="off" />
+              <span class="regex-slash">/{{ flagsString }}</span>
+              <span v-if="matchCount > 0 && !error" class="regex-badge">{{ matchCount }}</span>
+            </div>
+          </div>
+
+          <!-- Flags -->
+          <div class="config-section">
+            <label class="config-label">标志位</label>
+            <div class="flag-chips">
+              <button
+                v-for="flag in flagDefs" :key="flag.key"
+                class="flag-chip" :class="{ active: (flags as any)[flag.key] }"
+                @click="(flags as any)[flag.key] = !(flags as any)[flag.key]"
+                @mouseenter="showTooltip(flag.title, $event)" @mouseleave="hideTooltip"
+              >{{ flag.label }}</button>
+            </div>
+          </div>
+
+          <!-- Token 解析 -->
+          <div v-if="tokens.length > 0" class="config-section">
+            <label class="config-label">表达式解析</label>
+            <div class="token-tags">
+              <span
+                v-for="(token, i) in tokens" :key="i"
+                class="token-tag"
+                :class="'tt-' + token.type"
+                @mouseenter="showTokenTooltip(token, $event)" @mouseleave="hideTokenTooltip"
+              >{{ token.text }}</span>
+            </div>
+          </div>
+
+          <!-- 常用预设 -->
+          <div class="config-section">
+            <label class="config-label">常用正则</label>
+            <div class="preset-bar">
+              <button v-for="preset in presets" :key="preset.name" class="preset-chip" :class="{ active: pattern === preset.pattern }" @click="applyPreset(preset)">{{ preset.name }}</button>
+            </div>
+          </div>
+
+          <!-- 测试文本 -->
+          <div class="config-section grow" style="position: relative;">
+            <label class="config-label">测试文本</label>
+            <div class="test-text-area">
+              <textarea v-model="testText" class="regex-textarea" placeholder="在此输入或粘贴要测试的文本..." spellcheck="false"></textarea>
+              <div class="test-text-footer" v-if="testText">
+                <span class="text-stat">{{ testText.length }} 字符</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <!-- 右侧 -->
+      <!-- 右侧：结果 -->
       <section class="tool-panel">
         <div class="tool-panel-header">
           <div class="tool-panel-title">
-            <span class="panel-icon green"><Search :size="12" /></span>
-            <span>{{ activeTab === 'match' ? '匹配结果' : activeTab === 'replace' ? '替换结果' : '代码生成' }}</span>
+            <span class="panel-icon green"><Check :size="14" /></span>
+            <span>结果</span>
             <span v-if="activeTab === 'match' && matchCount > 0" class="panel-stat accent">{{ matchCount }} 匹配</span>
           </div>
-          <div class="tool-panel-actions">
-            <button v-if="activeTab === 'match' && matchCount > 0" class="glass-icon-btn small" @click="copyAllMatches" @mouseenter="showTooltip('复制所有匹配', $event)" @mouseleave="hideTooltip">
+          <div class="panel-actions">
+            <div class="preview-tabs">
+              <button :class="['seg-btn xs', { active: activeTab === 'match' }]" @click="activeTab = 'match'">
+                <Eye :size="11" /> 匹配
+              </button>
+              <button :class="['seg-btn xs', { active: activeTab === 'replace' }]" @click="activeTab = 'replace'">
+                <ArrowLeftRight :size="11" /> 替换
+              </button>
+              <button :class="['seg-btn xs', { active: activeTab === 'code' }]" @click="activeTab = 'code'">
+                <FileCode :size="11" /> 代码
+              </button>
+            </div>
+            <div class="panel-divider"></div>
+            <button v-if="activeTab === 'match' && matchCount > 0" class="action-btn" @click="copyAllMatches"
+              @mouseenter="showTooltip('复制所有匹配', $event)" @mouseleave="hideTooltip">
               <Copy :size="13" />
             </button>
-            <button v-if="activeTab === 'replace' && replacedText" class="glass-icon-btn small" @click="copyResult(replacedText)" @mouseenter="showTooltip('复制', $event)" @mouseleave="hideTooltip">
+            <button v-if="activeTab === 'replace' && replacedText" class="action-btn" @click="copyResult(replacedText)"
+              @mouseenter="showTooltip('复制', $event)" @mouseleave="hideTooltip">
               <Copy :size="13" />
             </button>
-            <button v-if="activeTab === 'code' && generatedCode" class="glass-icon-btn small" @click="copyResult(generatedCode)" @mouseenter="showTooltip('复制代码', $event)" @mouseleave="hideTooltip">
+            <button v-if="activeTab === 'code' && generatedCode" class="action-btn" @click="copyResult(generatedCode)"
+              @mouseenter="showTooltip('复制代码', $event)" @mouseleave="hideTooltip">
               <Copy :size="13" />
             </button>
           </div>
         </div>
 
-        <div class="tool-panel-body" style="padding:0; overflow:auto">
+        <div class="tool-panel-body">
           <!-- ====== 匹配模式 ====== -->
           <template v-if="activeTab === 'match'">
             <!-- 错误 -->
@@ -233,7 +241,7 @@ import { computed } from 'vue'
             <div v-else class="tool-empty">
               <div class="empty-icon"><Braces :size="24" /></div>
               <p class="empty-title">输入正则和测试文本</p>
-              <p class="empty-desc">在上方输入正则表达式，左侧输入测试文本</p>
+              <p class="empty-desc">在左侧输入正则表达式和测试文本</p>
             </div>
           </template>
 
@@ -298,13 +306,11 @@ import { computed } from 'vue'
           <span v-else-if="tc.pass === false" class="test-fail"><XCircle :size="14" /></span>
           <button class="test-remove-btn" @click="removeTestCase(tc.id)"><X :size="12" /></button>
         </div>
+        <button class="add-case-btn" @click="addTestCase">
+          <FlaskConical :size="12" />
+          <span>添加用例</span>
+        </button>
       </div>
-    </div>
-
-    <!-- 常用正则 -->
-    <div class="regex-presets-bar">
-      <span class="presets-label">常用</span>
-      <button v-for="preset in presets" :key="preset.name" class="preset-chip" :class="{ active: pattern === preset.pattern }" @click="applyPreset(preset)">{{ preset.name }}</button>
     </div>
 
     <!-- 帮助 -->
@@ -317,7 +323,7 @@ import { computed } from 'vue'
 </template>
 
 <style scoped>
-/* ====== 标题栏 ====== */
+/* ====== Header ====== */
 .header-content {
   display: flex;
   align-items: center;
@@ -330,16 +336,125 @@ import { computed } from 'vue'
   align-items: center;
   gap: 5px;
   padding: 2px 8px;
-  border-radius: var(--radius-xs);
+  border-radius: 10px;
   font-size: 11px;
   font-weight: 500;
   color: var(--text-muted);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
+  background: var(--bg-tertiary);
 }
 
-.tool-status.success { color: var(--success); background: var(--success-light); border-color: transparent; }
-.tool-status.error { color: var(--error); background: var(--error-light); border-color: transparent; }
+.tool-status.success { color: var(--success); background: var(--success-light); }
+.tool-status.error { color: var(--error); background: var(--error-light); }
+
+/* ====== Panel Actions ====== */
+.panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.panel-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--border-subtle);
+  margin: 0 4px;
+}
+
+.action-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all var(--transition-fast);
+  padding: 0;
+}
+
+.action-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
+.action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ====== Segment Buttons ====== */
+.seg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 12px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.seg-btn:hover { border-color: var(--border-default); background: var(--bg-hover); color: var(--text-primary); }
+
+.seg-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.seg-btn.xs { padding: 3px 8px; font-size: 11px; height: 24px; }
+
+.preview-tabs {
+  display: flex;
+  gap: 2px;
+}
+
+/* ====== Config Sections ====== */
+.tool-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow-y: auto;
+}
+
+.config-section {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.config-section.grow {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-bottom: none;
+  min-height: 0;
+}
+
+.config-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.panel-stat {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  padding: 1px 6px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-xs);
+}
+
+.panel-stat.accent {
+  color: var(--accent);
+  background: var(--accent-light);
+}
 
 /* ====== 正则输入栏 ====== */
 .regex-input-bar {
@@ -348,16 +463,14 @@ import { computed } from 'vue'
   gap: 4px;
   padding: 0 10px;
   height: 30px;
-  min-width: 0;
-  max-width: 420px;
-  flex: 1 1 0%;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
   transition: all 0.15s;
 }
 
-.regex-input-bar:hover { border-color: var(--border-default); }
+.regex-input-bar:hover { border-color: var(--border-strong); }
 .regex-input-bar:focus-within { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-light); }
 .regex-input-bar.error { border-color: var(--error); }
 .regex-input-bar.error:focus-within { box-shadow: 0 0 0 2px var(--error-light); }
@@ -400,34 +513,33 @@ import { computed } from 'vue'
 }
 
 /* ====== Flags ====== */
-.flag-chips { display: flex; gap: 3px; }
+.flag-chips { display: flex; gap: 4px; }
 
 .flag-chip {
-  width: 26px; height: 26px;
+  width: 28px; height: 24px;
   display: flex; align-items: center; justify-content: center;
-  border: 1px solid var(--border-subtle); border-radius: var(--radius-xs);
+  border: 1px solid var(--border-default); border-radius: 6px;
   background: var(--bg-secondary);
   font-family: var(--font-mono); font-size: 12px; font-weight: 600;
   color: var(--text-muted); cursor: pointer; transition: all 0.15s;
 }
 
-.flag-chip:hover { border-color: var(--border-default); color: var(--text-primary); }
+.flag-chip:hover { border-color: var(--border-strong); color: var(--text-primary); }
 .flag-chip.active { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
 
-/* ====== Token 标签（工具栏内） ====== */
+/* ====== Token 标签 ====== */
 .token-tags {
   display: flex;
-  align-items: center;
-  gap: 2px;
-  overflow: hidden;
+  flex-wrap: wrap;
+  gap: 3px;
 }
 
 .token-tag {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 600;
-  padding: 2px 5px;
-  border-radius: 3px;
+  padding: 2px 6px;
+  border-radius: 4px;
   cursor: default;
   white-space: nowrap;
   transition: filter 0.1s;
@@ -446,37 +558,70 @@ import { computed } from 'vue'
 .tt-literal       { color: var(--text-primary); background: transparent; }
 .tt-modifier      { color: #64D2FF; background: rgba(100,210,255,0.1); }
 
-/* ====== 面板 ====== */
-.panel-stat {
-  font-size: 10px;
-  font-family: var(--font-mono);
-  color: var(--text-muted);
-  padding: 1px 6px;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-xs);
+/* ====== 常用预设 ====== */
+.preset-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
-.panel-stat.accent {
-  color: var(--accent);
-  background: var(--accent-light);
+.preset-chip {
+  padding: 3px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.preset-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.preset-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ====== 测试文本区域 ====== */
+.test-text-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  overflow: hidden;
+  min-height: 0;
 }
 
 .regex-textarea {
+  flex: 1;
   width: 100%;
-  height: 100%;
-  padding: 14px 16px;
+  padding: 10px 12px;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.7;
   border: none;
   outline: none;
   resize: none;
-  background: transparent;
+  background: var(--bg-input);
   color: var(--text-primary);
   tab-size: 2;
 }
 
 .regex-textarea::placeholder { color: var(--text-muted); }
+
+.test-text-footer {
+  display: flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-top: 1px solid var(--border-subtle);
+  background: var(--bg-secondary);
+}
+
+.text-stat {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
 
 /* ====== 高亮区 ====== */
 .regex-highlight-area {
@@ -498,7 +643,7 @@ import { computed } from 'vue'
   border-bottom: 2px solid var(--accent);
 }
 
-/* ====== 解释区（匹配 tab 内嵌） ====== */
+/* ====== 解释区 ====== */
 .explain-section {
   padding: 10px 16px;
   border-bottom: 1px solid var(--border-subtle);
@@ -531,12 +676,10 @@ import { computed } from 'vue'
   font-size: 11px;
   line-height: 1.5;
   color: var(--text-secondary);
-  border-radius: var(--radius-xs);
+  border-radius: 4px;
 }
 
-.explain-item:hover {
-  background: var(--bg-hover);
-}
+.explain-item:hover { background: var(--bg-hover); }
 
 /* ====== 匹配详情区 ====== */
 .match-section {
@@ -577,7 +720,7 @@ import { computed } from 'vue'
   padding: 8px 10px;
   background: var(--bg-primary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.15s;
   flex-wrap: wrap;
@@ -590,7 +733,7 @@ import { computed } from 'vue'
   display: flex; align-items: center; justify-content: center;
   font-family: var(--font-mono); font-size: 10px; font-weight: 700;
   color: var(--accent); background: var(--accent-light);
-  border-radius: var(--radius-xs); flex-shrink: 0;
+  border-radius: 4px; flex-shrink: 0;
 }
 
 .match-val {
@@ -602,13 +745,13 @@ import { computed } from 'vue'
 .match-pos {
   font-size: 10px; font-family: var(--font-mono); font-weight: 600;
   color: var(--text-muted); background: var(--bg-secondary);
-  padding: 2px 6px; border-radius: var(--radius-xs); flex-shrink: 0;
+  padding: 2px 6px; border-radius: 4px; flex-shrink: 0;
 }
 
 .match-copy-btn {
   width: 22px; height: 22px;
   display: flex; align-items: center; justify-content: center;
-  border: none; border-radius: var(--radius-xs);
+  border: none; border-radius: 4px;
   background: transparent; color: var(--text-muted);
   cursor: pointer; flex-shrink: 0; opacity: 0; transition: all 0.15s;
 }
@@ -621,7 +764,7 @@ import { computed } from 'vue'
 .match-group-tag {
   display: inline-flex; align-items: center; gap: 3px;
   padding: 2px 8px; background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle); border-radius: var(--radius-xs);
+  border: 1px solid var(--border-subtle); border-radius: 4px;
   font-family: var(--font-mono); font-size: 10px; color: var(--text-secondary);
 }
 
@@ -633,13 +776,13 @@ import { computed } from 'vue'
 .regex-error-card {
   display: flex; gap: 12px; margin: 16px;
   padding: 14px 16px; background: var(--error-light);
-  border: 1px solid var(--error); border-radius: var(--radius-lg);
+  border: 1px solid var(--error); border-radius: 12px;
 }
 
 .regex-error-icon {
   width: 36px; height: 36px;
   display: flex; align-items: center; justify-content: center;
-  background: var(--error); color: #fff; border-radius: var(--radius-sm); flex-shrink: 0;
+  background: var(--error); color: #fff; border-radius: 6px; flex-shrink: 0;
 }
 
 .regex-error-body { flex: 1; min-width: 0; }
@@ -647,6 +790,16 @@ import { computed } from 'vue'
 .regex-error-msg { margin: 4px 0 0; font-family: var(--font-mono); font-size: 12px; color: var(--error); line-height: 1.5; opacity: 0.85; }
 
 /* ====== 紧凑空状态 ====== */
+.tool-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 20px;
+  flex: 1;
+}
+
 .tool-empty.compact {
   display: flex;
   align-items: center;
@@ -659,19 +812,38 @@ import { computed } from 'vue'
   gap: 8px;
 }
 
+.empty-icon {
+  color: var(--text-muted);
+  opacity: 0.25;
+  margin-bottom: 12px;
+}
+
+.empty-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin: 0 0 4px 0;
+}
+
+.empty-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
 /* ====== 替换 ====== */
 .replace-section { padding: 14px 16px; }
 .replace-label { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
 
 .replace-input {
-  width: 100%; height: 36px; padding: 0 12px;
-  font-family: var(--font-mono); font-size: 13px;
-  color: var(--text-primary); background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle); border-radius: var(--radius-md);
+  width: 100%; height: 32px; padding: 0 12px;
+  font-family: var(--font-mono); font-size: 12px;
+  color: var(--text-primary); background: var(--bg-input);
+  border: 1px solid var(--border-default); border-radius: 6px;
   outline: none; transition: all 0.15s;
 }
 
-.replace-input:hover { border-color: var(--border-default); }
+.replace-input:hover { border-color: var(--border-strong); }
 .replace-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-light); }
 .replace-input::placeholder { color: var(--text-muted); }
 
@@ -683,10 +855,9 @@ import { computed } from 'vue'
 .replace-output {
   margin: 0; padding: 14px 16px;
   background: var(--bg-primary); border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg); font-family: var(--font-mono); font-size: 13px;
+  border-radius: 10px; font-family: var(--font-mono); font-size: 12px;
   line-height: 1.7; color: var(--text-primary);
   white-space: pre-wrap; word-break: break-all;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 /* ====== 代码 ====== */
@@ -694,24 +865,24 @@ import { computed } from 'vue'
 .code-lang-bar { display: flex; flex-wrap: wrap; gap: 4px; }
 
 .lang-chip {
-  padding: 5px 12px; background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle); border-radius: 999px;
+  padding: 4px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
   font-size: 11px; font-weight: 500; color: var(--text-secondary);
+  background: var(--bg-secondary);
   cursor: pointer; transition: all 0.15s; white-space: nowrap;
 }
 
 .lang-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
-.lang-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 1px 4px color-mix(in srgb, var(--accent) 30%, transparent); }
+.lang-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
 .code-output-wrap { flex: 1; overflow: auto; }
 
 .code-output {
   margin: 0; padding: 16px 18px;
-  background: color-mix(in srgb, var(--bg-primary) 97%, #000);
-  border: 1px solid var(--border-subtle); border-radius: var(--radius-lg);
+  background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 10px;
   font-family: var(--font-mono); font-size: 12px; line-height: 1.7;
   color: var(--text-primary); white-space: pre; overflow-x: auto;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 /* highlight.js */
@@ -754,7 +925,7 @@ import { computed } from 'vue'
 
 .test-case-row {
   display: flex; align-items: center; gap: 6px;
-  padding: 4px 8px; border-radius: var(--radius-sm);
+  padding: 4px 8px; border-radius: 6px;
   border: 1px solid transparent; transition: all 0.15s;
 }
 
@@ -764,7 +935,7 @@ import { computed } from 'vue'
 .test-type-btn {
   width: 22px; height: 22px;
   display: flex; align-items: center; justify-content: center;
-  border: 1px solid var(--border-subtle); border-radius: var(--radius-xs);
+  border: 1px solid var(--border-subtle); border-radius: 4px;
   background: var(--success-light); color: var(--success);
   font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0;
 }
@@ -776,7 +947,7 @@ import { computed } from 'vue'
   flex: 1; height: 26px; padding: 0 8px;
   font-family: var(--font-mono); font-size: 12px;
   color: var(--text-primary); background: var(--bg-primary);
-  border: 1px solid var(--border-subtle); border-radius: var(--radius-xs);
+  border: 1px solid var(--border-subtle); border-radius: 4px;
   outline: none; min-width: 0;
 }
 
@@ -787,7 +958,7 @@ import { computed } from 'vue'
 .test-remove-btn {
   width: 20px; height: 20px;
   display: flex; align-items: center; justify-content: center;
-  border: none; border-radius: var(--radius-xs);
+  border: none; border-radius: 4px;
   background: transparent; color: var(--text-muted);
   cursor: pointer; flex-shrink: 0; opacity: 0; transition: all 0.15s;
 }
@@ -795,40 +966,46 @@ import { computed } from 'vue'
 .test-case-row:hover .test-remove-btn { opacity: 1; }
 .test-remove-btn:hover { color: var(--error); background: var(--error-light); }
 
-/* ====== 底部预设栏 ====== */
-.regex-presets-bar {
-  display: flex; align-items: center; gap: 6px;
-  padding: 8px 16px; background: var(--bg-secondary);
-  border-top: 1px solid var(--border-subtle);
-  flex-shrink: 0; overflow-x: auto;
+.add-case-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-top: 4px;
 }
 
-.presets-label { font-size: 11px; font-weight: 600; color: var(--text-muted); flex-shrink: 0; }
-
-.preset-chip {
-  padding: 4px 12px; background: transparent;
-  border: 1px solid var(--border-subtle); border-radius: 999px;
-  font-size: 11px; font-weight: 500; color: var(--text-secondary);
-  cursor: pointer; transition: all 0.15s; white-space: nowrap; flex-shrink: 0;
-}
-
-.preset-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
-.preset-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 1px 4px color-mix(in srgb, var(--accent) 30%, transparent); }
+.add-case-btn:hover { background: var(--bg-hover); border-color: var(--accent); color: var(--accent); }
 
 /* ====== Tooltip ====== */
 .toolbar-tooltip {
-  position: fixed; z-index: 9999; padding: 5px 12px;
+  position: fixed; z-index: 9999; padding: 5px 10px;
   font-size: 12px; color: var(--text-inverse, #fff);
   background: var(--bg-tooltip, rgba(0, 0, 0, 0.85));
-  border-radius: var(--radius-sm, 4px);
+  border-radius: 4px;
   white-space: nowrap; pointer-events: none;
-  transform: translateX(-50%); min-width: 60px; text-align: center;
+  transform: translateX(-50%);
+  line-height: 1.4;
 }
 
-/* ====== 响应式 ====== */
+/* ====== Scrollbar ====== */
+.tool-panel-body::-webkit-scrollbar { width: 5px; }
+.tool-panel-body::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
+.tool-panel-body::-webkit-scrollbar-track { background: transparent; }
+
+.regex-textarea::-webkit-scrollbar { width: 4px; }
+.regex-textarea::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
+.regex-textarea::-webkit-scrollbar-track { background: transparent; }
+
+/* ====== Responsive ====== */
 @media (max-width: 760px) {
   .tool-main { grid-template-columns: 1fr !important; }
-  .tool-toolbar-left { flex-wrap: wrap; }
-  .regex-presets-bar { flex-wrap: wrap; }
 }
 </style>

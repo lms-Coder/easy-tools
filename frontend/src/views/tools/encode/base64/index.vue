@@ -19,7 +19,10 @@ import {
 } from 'lucide-vue-next'
 import ToolTitleBar from '@/components/common/ToolTitleBar.vue'
 import FilePreview from '@/components/common/FilePreview.vue'
+import { useTooltip } from '@/composables/useTooltip'
 import { useBase64 } from './useBase64'
+
+const { tooltip, showTooltip, hideTooltip } = useTooltip()
 
 const formatBytes = (bytes: number): string => {
   if (bytes < 1024) return `${bytes} B`
@@ -54,13 +57,11 @@ const {
 // Fullscreen preview src: reuse the same data
 const fullscreenSrc = computed(() => {
   if (hasFile.value) {
-    // Encode mode
     const cat = encodePreviewType.value
     if (cat === 'image' || cat === 'pdf') return fileInfo.value?.dataUrl || null
     if (cat !== 'other') return previewArrayBuffer.value
     return null
   }
-  // Decode mode
   if (previewUrl.value && previewUrl.value !== 'office') return previewUrl.value
   return previewArrayBuffer.value
 })
@@ -85,143 +86,137 @@ import { computed } from 'vue'
     <!-- 标题栏 -->
     <ToolTitleBar title="Base64 编解码" icon="icon-swap" />
 
-    <!-- 工具栏 -->
-    <div class="tool-toolbar">
-      <div class="tool-toolbar-left">
-        <div class="tool-segment">
-          <button class="tool-segment-btn" :class="{ active: mode === 'encode' }" @click="mode = 'encode'">
-            <Upload :size="14" />
-            <span>编码</span>
-          </button>
-          <button class="tool-segment-btn" :class="{ active: mode === 'decode' }" @click="mode = 'decode'">
-            <FileText :size="14" />
-            <span>解码</span>
-          </button>
-        </div>
-
-        <div class="tool-divider"></div>
-
-        <label class="toggle-label">
-          <span class="toggle-text">URL Safe</span>
-          <button class="toggle-switch" :class="{ on: urlSafe }" @click="urlSafe = !urlSafe">
-            <span class="toggle-dot"></span>
-          </button>
-        </label>
-
-        <div class="tool-divider"></div>
-
-        <button class="action-btn" @click="pasteFromClipboard">
-          <ClipboardPaste :size="14" />
-          <span>粘贴</span>
-        </button>
-        <button class="action-btn" @click="swap" :disabled="!outputText">
-          <ArrowRightLeft :size="14" />
-          <span>交换</span>
-        </button>
-        <button class="action-btn" @click="clearAll" :disabled="!inputText && !outputText">
-          <Trash2 :size="14" />
-          <span>清空</span>
-        </button>
-      </div>
-
-      <div class="tool-toolbar-right">
-        <button v-if="hasFile && mode === 'decode'" class="action-btn" @click="downloadFromBase64">
-          <Download :size="14" />
-          <span>下载文件</span>
-        </button>
-        <button v-else-if="outputText && !isPreviewable" class="action-btn" @click="copyOutput">
-          <Copy v-if="!copied" :size="14" />
-          <Check v-else :size="14" />
-          <span>{{ copied ? '已复制' : '复制结果' }}</span>
-        </button>
-      </div>
-    </div>
+    <!-- Tooltip -->
+    <div v-if="tooltip.show" class="toolbar-tooltip" :style="{ left: tooltip.x + 'px', top: tooltip.y + 'px' }">{{ tooltip.text }}</div>
 
     <!-- 隐藏文件输入 -->
     <input ref="fileInputRef" type="file" style="display:none" @change="handleFileSelect" />
 
     <!-- 主体 -->
     <main class="tool-main split">
-      <!-- 左侧：输入 -->
+      <!-- 左侧：配置 + 输入 -->
       <section class="tool-panel">
         <div class="tool-panel-header">
           <div class="tool-panel-title">
             <span class="panel-icon blue"><Upload v-if="mode === 'encode'" :size="14" /><FileText v-else :size="14" /></span>
             <span>{{ mode === 'encode' ? '输入' : 'Base64 字符串' }}</span>
           </div>
-          <div class="tool-panel-actions">
+          <div class="panel-actions">
             <span class="byte-info">{{ hasFile ? formatBytes(fileInfo!.size) : formatBytes(inputByteSize) }}</span>
-            <button class="glass-icon-btn small" @click="importFile" title="导入文件">
-              <FileUp :size="14" />
+            <button class="action-btn" @click="importFile"
+              @mouseenter="showTooltip('导入文件', $event)" @mouseleave="hideTooltip">
+              <FileUp :size="13" />
             </button>
-            <button class="glass-icon-btn small" @click="clearAll" :disabled="!inputText && !outputText" title="清空">
-              <Trash2 :size="14" />
+            <button class="action-btn" @click="pasteFromClipboard"
+              @mouseenter="showTooltip('粘贴', $event)" @mouseleave="hideTooltip">
+              <ClipboardPaste :size="13" />
+            </button>
+            <button class="action-btn" @click="clearAll" :disabled="!inputText && !outputText"
+              @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
+              <Trash2 :size="13" />
             </button>
           </div>
         </div>
-        <div class="tool-panel-body base64-input-body" style="position: relative;">
-          <!-- 拖拽覆盖层 -->
-          <div v-if="isDragOver" class="drag-overlay">
-            <FileUp :size="24" />
-            <span>释放以上传文件</span>
-          </div>
 
-          <!-- 编码模式 + 有文件 -->
-          <template v-else-if="mode === 'encode' && hasFile">
-            <!-- 文件信息卡片 -->
-            <div class="file-card">
-              <div class="file-card-icon">
-                <component :is="getFileIcon(fileInfo!.type)" :size="24" />
-              </div>
-              <div class="file-card-info">
-                <div class="file-card-name">{{ fileInfo!.name }}</div>
-                <div class="file-card-meta">{{ formatBytes(fileInfo!.size) }} · 已编码</div>
-              </div>
-              <button class="file-card-remove" @click="clearAll" title="移除文件">
-                <X :size="14" />
+        <div class="tool-panel-body">
+          <!-- 模式切换 -->
+          <div class="config-section">
+            <label class="config-label">模式</label>
+            <div class="mode-toggle">
+              <button :class="['seg-btn xs', { active: mode === 'encode' }]" @click="mode = 'encode'">
+                <Upload :size="11" /> 编码
+              </button>
+              <button :class="['seg-btn xs', { active: mode === 'decode' }]" @click="mode = 'decode'">
+                <FileText :size="11" /> 解码
               </button>
             </div>
+          </div>
 
-            <!-- 预览区域 -->
-            <div v-if="isPreviewable" class="preview-section">
-              <div class="preview-head">
-                <span class="preview-label">
-                  <Eye :size="12" />
-                  <span>预览</span>
-                </span>
-                <div class="preview-actions">
-                  <button class="glass-icon-btn small" @click="openFullscreen" title="全屏预览">
-                    <Maximize2 :size="12" />
-                  </button>
-                  <button class="glass-icon-btn small" @click="showPreview = !showPreview" :title="showPreview ? '隐藏预览' : '显示预览'">
-                    <EyeOff v-if="showPreview" :size="12" />
-                    <Eye v-else :size="12" />
-                  </button>
-                </div>
-              </div>
-              <div v-if="showPreview" class="preview-body">
-                <img v-if="encodePreviewType === 'image'" :src="fileInfo!.dataUrl" class="preview-img" @click="openFullscreen" />
-                <embed v-else-if="encodePreviewType === 'pdf'" :src="fileInfo!.dataUrl" class="preview-embed" />
-                <FilePreview
-                  v-else-if="previewArrayBuffer"
-                  :src="previewArrayBuffer"
-                  :file-type="encodePreviewType"
-                  :file-name="fileInfo!.name"
-                  @rendered="onPreviewRendered"
-                  @error="onPreviewError"
-                />
+          <!-- 选项 -->
+          <div class="config-section">
+            <div class="config-row">
+              <label class="config-label">选项</label>
+              <div class="options-group">
+                <label class="toggle-label" @click="urlSafe = !urlSafe">
+                  <span :class="['toggle-check', { on: urlSafe }]">
+                    <Check v-if="urlSafe" :size="8" />
+                  </span>
+                  <span>URL Safe</span>
+                </label>
+                <button class="action-btn small" @click="swap" :disabled="!outputText"
+                  @mouseenter="showTooltip('交换', $event)" @mouseleave="hideTooltip">
+                  <ArrowRightLeft :size="12" />
+                </button>
               </div>
             </div>
-          </template>
+          </div>
 
-          <!-- 文本输入 -->
-          <textarea
-            v-else-if="!isDragOver"
-            v-model="inputText"
-            class="base64-textarea"
-            :placeholder="mode === 'encode' ? '输入文本，或拖拽文件到此处...' : '输入要解码的 Base64 字符串...'"
-            spellcheck="false"
-          ></textarea>
+          <!-- 输入区域 -->
+          <div class="config-section grow" style="position: relative;">
+            <!-- 拖拽覆盖层 -->
+            <div v-if="isDragOver" class="drag-overlay">
+              <FileUp :size="20" />
+              <span>释放以上传文件</span>
+            </div>
+
+            <!-- 编码模式 + 有文件 -->
+            <template v-else-if="mode === 'encode' && hasFile">
+              <!-- 文件信息卡片 -->
+              <div class="file-card">
+                <div class="file-card-icon">
+                  <component :is="getFileIcon(fileInfo!.type)" :size="20" />
+                </div>
+                <div class="file-card-info">
+                  <div class="file-card-name">{{ fileInfo!.name }}</div>
+                  <div class="file-card-meta">{{ formatBytes(fileInfo!.size) }} · 已编码</div>
+                </div>
+                <button class="file-card-remove" @click="clearAll">
+                  <X :size="12" />
+                </button>
+              </div>
+
+              <!-- 预览区域 -->
+              <div v-if="isPreviewable" class="preview-section">
+                <div class="preview-head">
+                  <span class="preview-label">
+                    <Eye :size="12" />
+                    <span>预览</span>
+                  </span>
+                  <div class="preview-actions">
+                    <button class="action-btn mini" @click="openFullscreen"
+                      @mouseenter="showTooltip('全屏', $event)" @mouseleave="hideTooltip">
+                      <Maximize2 :size="11" />
+                    </button>
+                    <button class="action-btn mini" @click="showPreview = !showPreview">
+                      <EyeOff v-if="showPreview" :size="11" />
+                      <Eye v-else :size="11" />
+                    </button>
+                  </div>
+                </div>
+                <div v-if="showPreview" class="preview-body">
+                  <img v-if="encodePreviewType === 'image'" :src="fileInfo!.dataUrl" class="preview-img" @click="openFullscreen" />
+                  <embed v-else-if="encodePreviewType === 'pdf'" :src="fileInfo!.dataUrl" class="preview-embed" />
+                  <FilePreview
+                    v-else-if="previewArrayBuffer"
+                    :src="previewArrayBuffer"
+                    :file-type="encodePreviewType"
+                    :file-name="fileInfo!.name"
+                    @rendered="onPreviewRendered"
+                    @error="onPreviewError"
+                  />
+                </div>
+              </div>
+            </template>
+
+            <!-- 文本输入 -->
+            <textarea
+              v-else-if="!isDragOver"
+              v-model="inputText"
+              class="config-textarea"
+              :placeholder="mode === 'encode' ? '输入文本，或拖拽文件到此处...' : '输入要解码的 Base64 字符串...'"
+              spellcheck="false"
+            />
+          </div>
         </div>
       </section>
 
@@ -232,18 +227,20 @@ import { computed } from 'vue'
             <span class="panel-icon green"><FileText v-if="mode === 'encode'" :size="14" /><Upload v-else :size="14" /></span>
             <span>{{ mode === 'encode' ? 'Base64 结果' : '解码结果' }}</span>
           </div>
-          <div class="tool-panel-actions">
+          <div class="panel-actions">
             <span v-if="outputText" class="byte-info">{{ formatBytes(outputByteSize) }}</span>
-            <button v-if="hasFile && mode === 'decode'" class="glass-icon-btn small" @click="downloadFromBase64" title="下载文件">
-              <Download :size="14" />
+            <div class="panel-divider"></div>
+            <button v-if="hasFile && mode === 'decode'" class="action-btn" @click="downloadFromBase64"
+              @mouseenter="showTooltip('下载文件', $event)" @mouseleave="hideTooltip">
+              <Download :size="13" />
             </button>
-            <button v-else-if="outputText" class="glass-icon-btn small" @click="copyOutput" title="复制">
-              <Copy v-if="!copied" :size="14" />
-              <Check v-else :size="14" />
+            <button v-else-if="outputText" class="action-btn" @click="copyOutput"
+              @mouseenter="showTooltip('复制', $event)" @mouseleave="hideTooltip">
+              <Check v-if="copied" :size="13" /><Copy v-else :size="13" />
             </button>
           </div>
         </div>
-        <div class="tool-panel-body base64-output-body">
+        <div class="tool-panel-body">
           <!-- 解码模式 + 可预览内容 -->
           <template v-if="mode === 'decode' && isPreviewable">
             <div class="preview-section">
@@ -252,8 +249,9 @@ import { computed } from 'vue'
                   <Eye :size="12" />
                   <span>文件预览</span>
                 </span>
-                <button class="glass-icon-btn small" @click="openFullscreen" title="全屏预览">
-                  <Maximize2 :size="12" />
+                <button class="action-btn mini" @click="openFullscreen"
+                  @mouseenter="showTooltip('全屏预览', $event)" @mouseleave="hideTooltip">
+                  <Maximize2 :size="11" />
                 </button>
               </div>
               <div class="preview-body">
@@ -271,9 +269,9 @@ import { computed } from 'vue'
           </template>
 
           <!-- 错误 -->
-          <div v-else-if="error" class="tool-error">
-            <div class="tool-error-header"><span>!</span> <span>转换错误</span></div>
-            <p class="tool-error-msg">{{ error }}</p>
+          <div v-else-if="error" class="output-error">
+            <div class="output-error-head"><span>!</span> <span>转换错误</span></div>
+            <p class="output-error-msg">{{ error }}</p>
           </div>
 
           <!-- 结果 -->
@@ -295,7 +293,7 @@ import { computed } from 'vue'
         <div class="fs-content" @click.stop>
           <div class="fs-header">
             <span class="fs-title">文件预览</span>
-            <button class="glass-icon-btn" @click="closeFullscreen" title="关闭">
+            <button class="glass-icon-btn" @click="closeFullscreen">
               <X :size="14" />
             </button>
           </div>
@@ -317,33 +315,168 @@ import { computed } from 'vue'
 </template>
 
 <style scoped>
-/* ====== 输入面板 ====== */
-.base64-input-body {
+/* ====== Panel Actions ====== */
+.panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.panel-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--border-subtle);
+  margin: 0 4px;
+}
+
+.action-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all var(--transition-fast);
+  padding: 0;
+}
+
+.action-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
+.action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.action-btn.mini { width: 22px; height: 22px; }
+.action-btn.small { width: 24px; height: 24px; }
+
+/* ====== Segment Buttons ====== */
+.seg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 12px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.seg-btn:hover { border-color: var(--border-default); background: var(--bg-hover); color: var(--text-primary); }
+
+.seg-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.seg-btn.xs { padding: 3px 8px; font-size: 11px; height: 24px; }
+
+.mode-toggle {
+  display: flex;
+  gap: 2px;
+}
+
+/* ====== Config Sections ====== */
+.tool-panel-body {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  gap: 0;
+  overflow-y: auto;
+}
+
+.config-section {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.config-section.grow {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-bottom: none;
+  position: relative;
   min-height: 0;
 }
 
-.base64-textarea {
+.config-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.config-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.config-row .config-label { margin-bottom: 0; }
+
+.options-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.toggle-check {
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--border-default);
+  border-radius: 3px;
+  background: var(--bg-input);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.toggle-check.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ====== Textarea ====== */
+.config-textarea {
   flex: 1;
   width: 100%;
-  min-height: 0;
-  padding: 14px 16px;
+  min-height: 100px;
+  padding: 8px 10px;
+  font-size: 12px;
   font-family: var(--font-mono);
-  font-size: 13px;
-  line-height: 1.7;
-  border: none;
+  color: var(--text-primary);
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
   outline: none;
   resize: none;
-  background: transparent;
-  color: var(--text-primary);
-  tab-size: 2;
+  line-height: 1.6;
+  transition: all var(--transition-fast);
 }
 
-.base64-textarea::placeholder {
-  color: var(--text-muted);
-}
+.config-textarea:hover { border-color: var(--border-strong); }
+.config-textarea:focus { border-color: var(--accent); box-shadow: var(--shadow-focus); }
+.config-textarea::placeholder { color: var(--text-muted); }
 
 /* ====== 拖拽覆盖层 ====== */
 .drag-overlay {
@@ -356,7 +489,7 @@ import { computed } from 'vue'
   gap: 8px;
   background: var(--accent-light);
   border: 2px dashed var(--accent);
-  border-radius: var(--radius-md);
+  border-radius: 6px;
   z-index: 10;
   pointer-events: none;
   font-size: 13px;
@@ -370,17 +503,16 @@ import { computed } from 'vue'
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  border-bottom: 1px solid var(--border-subtle);
   flex-shrink: 0;
 }
 
 .file-card-icon {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-md);
+  border-radius: 8px;
   background: var(--accent-light);
   color: var(--accent);
   flex-shrink: 0;
@@ -392,7 +524,7 @@ import { computed } from 'vue'
 }
 
 .file-card-name {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-primary);
   overflow: hidden;
@@ -407,13 +539,13 @@ import { computed } from 'vue'
 }
 
 .file-card-remove {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: var(--radius-xs);
+  border-radius: 4px;
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;
@@ -465,7 +597,7 @@ import { computed } from 'vue'
   min-height: 0;
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  border-radius: 8px;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -486,18 +618,11 @@ import { computed } from 'vue'
 }
 
 /* ====== 输出面板 ====== */
-.base64-output-body {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  min-height: 0;
-}
-
 .base64-output-text {
   margin: 0;
   padding: 14px 16px;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.7;
   color: var(--text-primary);
   white-space: pre-wrap;
@@ -506,63 +631,94 @@ import { computed } from 'vue'
 
 /* ====== 字节统计 ====== */
 .byte-info {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-muted);
   font-family: var(--font-mono);
-  margin-right: 4px;
+  padding: 1px 6px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  margin-right: 2px;
 }
 
-/* ====== Toggle 开关 ====== */
-.toggle-label {
+/* ====== Output Error ====== */
+.output-error {
+  padding: 12px 14px;
+}
+
+.output-error-head {
   display: flex;
   align-items: center;
   gap: 6px;
-  cursor: pointer;
-  user-select: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ef4444;
+  margin-bottom: 4px;
 }
 
-.toggle-text {
+.output-error-msg {
   font-size: 12px;
   color: var(--text-secondary);
+  margin: 0;
+  font-family: var(--font-mono);
 }
 
-.toggle-switch {
-  position: relative;
-  width: 32px;
-  height: 18px;
-  border-radius: 9px;
-  border: none;
-  background: var(--border-default);
-  cursor: pointer;
-  transition: background var(--transition-fast);
-  padding: 0;
+/* ====== Empty State ====== */
+.tool-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 20px;
+  flex: 1;
 }
 
-.toggle-switch.on {
-  background: var(--accent);
+.empty-icon {
+  color: var(--text-muted);
+  opacity: 0.25;
+  margin-bottom: 12px;
 }
 
-.toggle-dot {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: #fff;
-  transition: transform var(--transition-fast);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+.empty-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin: 0 0 4px 0;
 }
 
-.toggle-switch.on .toggle-dot {
-  transform: translateX(14px);
+.empty-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
 }
 
-/* ====== 响应式 ====== */
+/* ====== Tooltip ====== */
+.toolbar-tooltip {
+  position: fixed;
+  z-index: 9999;
+  padding: 5px 10px;
+  font-size: 12px;
+  color: var(--text-inverse, #fff);
+  background: var(--bg-tooltip, rgba(0, 0, 0, 0.85));
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translateX(-50%);
+  line-height: 1.4;
+}
+
+/* ====== Scrollbar ====== */
+.tool-panel-body::-webkit-scrollbar { width: 5px; }
+.tool-panel-body::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
+.tool-panel-body::-webkit-scrollbar-track { background: transparent; }
+
+.config-textarea::-webkit-scrollbar { width: 4px; }
+.config-textarea::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
+.config-textarea::-webkit-scrollbar-track { background: transparent; }
+
+/* ====== Responsive ====== */
 @media (max-width: 760px) {
-  .tool-main {
-    grid-template-columns: 1fr !important;
-  }
+  .tool-main { grid-template-columns: 1fr !important; }
 }
 </style>
 
@@ -585,7 +741,7 @@ import { computed } from 'vue'
   height: 90vh;
   background: var(--bg-card);
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
+  border-radius: 12px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -614,7 +770,7 @@ import { computed } from 'vue'
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-sm);
+  border-radius: 6px;
   cursor: pointer;
   background: transparent;
   border: 1px solid transparent;

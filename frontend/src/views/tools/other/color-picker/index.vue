@@ -49,113 +49,111 @@ const onHslInput = () => setHSL(Number(hInput.value), Number(sInput.value), Numb
       </div>
     </ToolTitleBar>
 
-    <div class="tool-toolbar">
-      <div class="tool-toolbar-left">
-        <span class="toolbar-hint">选取颜色，查看各格式值，点击即可复制</span>
-      </div>
-      <div class="tool-toolbar-right">
-        <button class="action-btn primary" @click="addRecent" @mouseenter="showTooltip('加入最近使用', $event)" @mouseleave="hideTooltip">
-          + 收藏
-        </button>
-      </div>
-    </div>
-
-    <main class="tool-main" style="grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);">
-      <!-- 左侧：预览 + 预设色板 -->
+    <main class="tool-main" style="grid-template-columns: minmax(340px, 420px) minmax(0, 1fr);">
+      <!-- 左侧：调色板 -->
       <section class="tool-panel">
         <div class="tool-panel-header">
           <div class="tool-panel-title">
-            <span class="panel-icon blue"><Check :size="12" /></span>
+            <span class="panel-icon blue"><Check :size="14" /></span>
             <span>调色板</span>
           </div>
+          <div class="panel-actions">
+            <button class="fav-btn" @click="addRecent"
+              @mouseenter="showTooltip('加入收藏', $event)" @mouseleave="hideTooltip">
+              + 收藏
+            </button>
+          </div>
         </div>
-        <div class="tool-panel-body" style="overflow: auto;">
-          <div class="color-form">
-            <!-- 大色块预览 -->
+
+        <div class="tool-panel-body">
+          <!-- 大色块预览 -->
+          <div class="config-section">
             <div class="color-preview-box" :style="{ background: hex, opacity: alpha / 100 }">
               <div class="preview-checker"></div>
               <div class="preview-overlay" :style="{ background: hex, opacity: alpha / 100 }"></div>
             </div>
+          </div>
 
-            <!-- 透明度 -->
-            <div class="input-row">
-              <label class="input-label">透明度</label>
-              <div class="slider-wrap">
-                <input type="range" v-model.number="alpha" min="0" max="100" class="alpha-slider" />
-              </div>
-              <span class="input-value">{{ alpha }}%</span>
+          <!-- 透明度 -->
+          <div class="config-section">
+            <div class="config-row">
+              <label class="config-label">透明度</label>
+              <span class="alpha-val">{{ alpha }}%</span>
             </div>
+            <input type="range" v-model.number="alpha" min="0" max="100" class="alpha-slider" />
+          </div>
 
-            <!-- HEX 输入 -->
-            <div class="input-row">
-              <label class="input-label">HEX</label>
-              <input type="text" v-model="hexInput" class="color-input mono" @change="onHexInput" spellcheck="false" />
+          <!-- HEX 输入 -->
+          <div class="config-section">
+            <label class="config-label">HEX</label>
+            <div class="hex-row">
+              <input type="text" v-model="hexInput" class="tool-input mono" @change="onHexInput" spellcheck="false" />
               <input type="color" v-model="hex" class="native-picker" @change="addRecent" />
             </div>
+          </div>
 
-            <!-- RGB 输入 -->
-            <div class="input-group">
-              <label class="input-label">RGB</label>
-              <div class="rgb-inputs">
-                <div class="rgb-field">
-                  <span class="rgb-prefix">R</span>
-                  <input type="number" v-model.number="rInput" min="0" max="255" class="color-input small" @change="onRgbInput" />
-                </div>
-                <div class="rgb-field">
-                  <span class="rgb-prefix">G</span>
-                  <input type="number" v-model.number="gInput" min="0" max="255" class="color-input small" @change="onRgbInput" />
-                </div>
-                <div class="rgb-field">
-                  <span class="rgb-prefix">B</span>
-                  <input type="number" v-model.number="bInput" min="0" max="255" class="color-input small" @change="onRgbInput" />
-                </div>
+          <!-- RGB 输入 -->
+          <div class="config-section">
+            <label class="config-label">RGB</label>
+            <div class="rgb-inputs">
+              <div class="rgb-field">
+                <span class="rgb-prefix">R</span>
+                <input type="number" v-model.number="rInput" min="0" max="255" class="tool-input small" @change="onRgbInput" />
+              </div>
+              <div class="rgb-field">
+                <span class="rgb-prefix">G</span>
+                <input type="number" v-model.number="gInput" min="0" max="255" class="tool-input small" @change="onRgbInput" />
+              </div>
+              <div class="rgb-field">
+                <span class="rgb-prefix">B</span>
+                <input type="number" v-model.number="bInput" min="0" max="255" class="tool-input small" @change="onRgbInput" />
               </div>
             </div>
+          </div>
 
-            <!-- HSL 输入 -->
-            <div class="input-group">
-              <label class="input-label">HSL</label>
-              <div class="rgb-inputs">
-                <div class="rgb-field">
-                  <span class="rgb-prefix">H</span>
-                  <input type="number" v-model.number="hInput" min="0" max="360" class="color-input small" @change="onHslInput" />
-                </div>
-                <div class="rgb-field">
-                  <span class="rgb-prefix">S</span>
-                  <input type="number" v-model.number="sInput" min="0" max="100" class="color-input small" @change="onHslInput" />
-                </div>
-                <div class="rgb-field">
-                  <span class="rgb-prefix">L</span>
-                  <input type="number" v-model.number="lInput" min="0" max="100" class="color-input small" @change="onHslInput" />
-                </div>
+          <!-- HSL 输入 -->
+          <div class="config-section">
+            <label class="config-label">HSL</label>
+            <div class="rgb-inputs">
+              <div class="rgb-field">
+                <span class="rgb-prefix">H</span>
+                <input type="number" v-model.number="hInput" min="0" max="360" class="tool-input small" @change="onHslInput" />
+              </div>
+              <div class="rgb-field">
+                <span class="rgb-prefix">S</span>
+                <input type="number" v-model.number="sInput" min="0" max="100" class="tool-input small" @change="onHslInput" />
+              </div>
+              <div class="rgb-field">
+                <span class="rgb-prefix">L</span>
+                <input type="number" v-model.number="lInput" min="0" max="100" class="tool-input small" @change="onHslInput" />
               </div>
             </div>
           </div>
 
           <!-- 最近使用 -->
-          <div v-if="recentColors.length" class="preset-section">
-            <div class="preset-header">最近使用</div>
+          <div v-if="recentColors.length" class="config-section grow">
+            <label class="config-label">最近使用</label>
             <div class="color-grid">
               <button
                 v-for="c in recentColors" :key="c"
                 class="color-swatch small" :class="{ active: hex.toUpperCase() === c }"
                 :style="{ background: c }" :title="c"
                 @click="applyPreset(c)"
-              ></button>
+              />
             </div>
           </div>
         </div>
       </section>
 
       <!-- 右侧：格式输出 + 预设色 -->
-      <section class="tool-panel">
+      <section class="tool-panel right-panel">
         <div class="tool-panel-header">
           <div class="tool-panel-title">
-            <span class="panel-icon green"><Check :size="12" /></span>
+            <span class="panel-icon green"><Check :size="14" /></span>
             <span>格式输出</span>
           </div>
         </div>
-        <div class="tool-panel-body" style="overflow: auto;">
+        <div class="tool-panel-body">
           <!-- 格式列表 -->
           <div class="format-list">
             <div v-for="fmt in formats" :key="fmt.label" class="format-row" @click="copyValue(fmt.label, fmt.value)">
@@ -171,7 +169,7 @@ const onHslInput = () => setHSL(Number(hInput.value), Number(sInput.value), Numb
           </div>
 
           <!-- 预设色板 -->
-          <div class="preset-section" style="margin-top: 20px;">
+          <div class="preset-section">
             <div class="preset-header">预设色板</div>
             <div class="color-grid">
               <button
@@ -179,7 +177,7 @@ const onHslInput = () => setHSL(Number(hInput.value), Number(sInput.value), Numb
                 class="color-swatch" :class="{ active: hex.toUpperCase() === c }"
                 :style="{ background: c }" :title="c"
                 @click="applyPreset(c)"
-              ></button>
+              />
             </div>
           </div>
         </div>
@@ -191,6 +189,7 @@ const onHslInput = () => setHSL(Number(hInput.value), Number(sInput.value), Numb
 </template>
 
 <style scoped>
+/* ====== Header ====== */
 .header-content {
   display: flex;
   align-items: center;
@@ -201,7 +200,7 @@ const onHslInput = () => setHSL(Number(hInput.value), Number(sInput.value), Numb
 .preview-dot {
   width: 18px;
   height: 18px;
-  border-radius: var(--radius-sm);
+  border-radius: 6px;
   border: 2px solid var(--border-subtle);
   flex-shrink: 0;
 }
@@ -213,48 +212,85 @@ const onHslInput = () => setHSL(Number(hInput.value), Number(sInput.value), Numb
   color: var(--text-secondary);
 }
 
-.toolbar-hint {
-  font-size: 11px;
-  color: var(--text-muted);
+/* ====== Panel Actions ====== */
+.panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
 
-.action-btn {
+.fav-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  height: 28px;
-  padding: 0 12px;
-  font-size: 12px;
+  gap: 3px;
+  height: 24px;
+  padding: 0 10px;
+  font-size: 11px;
   font-weight: 500;
-  color: var(--text-secondary);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+  color: var(--accent);
+  background: var(--accent-light);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.15s;
 }
 
-.action-btn.primary {
-  color: var(--accent);
-  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
-  background: var(--accent-light);
-}
+.fav-btn:hover { border-color: var(--accent); }
 
-.action-btn.primary:hover { border-color: var(--accent); }
-
-/* ====== 表单 ====== */
-.color-form {
+/* ====== Config Sections ====== */
+.tool-panel-body {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 14px;
+  gap: 0;
+  overflow-y: auto !important;
+  min-height: 0;
 }
 
+.tool-main > .tool-panel {
+  min-height: 0;
+}
+
+.right-panel .tool-panel-body {
+  flex: 1;
+}
+
+.config-section {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.config-section.grow {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-bottom: none;
+  min-height: 0;
+}
+
+.config-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.config-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.config-row .config-label { margin-bottom: 0; }
+
+/* ====== Color Preview ====== */
 .color-preview-box {
   position: relative;
   width: 100%;
-  height: 80px;
-  border-radius: var(--radius-md);
+  height: 64px;
+  border-radius: 8px;
   border: 1px solid var(--border-subtle);
   overflow: hidden;
 }
@@ -276,30 +312,11 @@ const onHslInput = () => setHSL(Number(hInput.value), Number(sInput.value), Numb
   inset: 0;
 }
 
-.input-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.input-label {
+/* ====== Alpha Slider ====== */
+.alpha-val {
+  font-family: var(--font-mono);
   font-size: 11px;
-  font-weight: 600;
   color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  flex-shrink: 0;
-  width: 36px;
-}
-
-.slider-wrap {
-  flex: 1;
 }
 
 .alpha-slider {
@@ -308,8 +325,10 @@ const onHslInput = () => setHSL(Number(hInput.value), Number(sInput.value), Numb
   -webkit-appearance: none;
   appearance: none;
   background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
   border-radius: 2px;
   outline: none;
+  margin-top: 6px;
 }
 
 .alpha-slider::-webkit-slider-thumb {
@@ -323,45 +342,44 @@ const onHslInput = () => setHSL(Number(hInput.value), Number(sInput.value), Numb
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-.input-value {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--text-muted);
-  width: 36px;
-  text-align: right;
+/* ====== Inputs ====== */
+.hex-row {
+  display: flex;
+  gap: 6px;
 }
 
-.color-input {
+.tool-input {
   flex: 1;
-  height: 30px;
-  padding: 0 10px;
-  font-size: 13px;
+  height: 28px;
+  padding: 0 8px;
+  font-size: 12px;
   color: var(--text-primary);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
   outline: none;
-  transition: all 0.15s;
+  transition: all var(--transition-fast);
   min-width: 0;
 }
 
-.color-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-light); }
-.color-input.mono { font-family: var(--font-mono); }
-.color-input.small { width: 60px; flex: none; }
+.tool-input:focus { border-color: var(--accent); box-shadow: var(--shadow-focus); }
+.tool-input.mono { font-family: var(--font-mono); }
+.tool-input.small { flex: 1; min-width: 0; }
 
 .native-picker {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   padding: 2px;
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+  border-radius: 6px;
   cursor: pointer;
   background: var(--bg-secondary);
+  flex-shrink: 0;
 }
 
 .rgb-inputs {
   display: flex;
-  gap: 6px;
+  gap: 4px;
 }
 
 .rgb-field {
@@ -378,25 +396,27 @@ const onHslInput = () => setHSL(Number(hInput.value), Number(sInput.value), Numb
   font-family: var(--font-mono);
   width: 12px;
   text-align: center;
+  flex-shrink: 0;
 }
 
-/* ====== 格式列表 ====== */
+/* ====== Format List ====== */
 .format-list {
   display: flex;
   flex-direction: column;
   gap: 1px;
   background: var(--bg-primary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  border-radius: 8px;
   overflow: hidden;
-  margin: 0 14px;
+  margin: 14px;
+  flex-shrink: 0;
 }
 
 .format-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 12px;
+  padding: 8px 12px;
   cursor: pointer;
   transition: background 0.1s;
 }
@@ -416,7 +436,7 @@ const onHslInput = () => setHSL(Number(hInput.value), Number(sInput.value), Numb
   color: var(--accent);
   background: var(--accent-light);
   padding: 2px 6px;
-  border-radius: var(--radius-xs);
+  border-radius: 4px;
   flex-shrink: 0;
   font-family: var(--font-mono);
 }
@@ -431,13 +451,13 @@ const onHslInput = () => setHSL(Number(hInput.value), Number(sInput.value), Numb
 }
 
 .format-copy-btn {
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: var(--radius-xs);
+  border-radius: 4px;
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;
@@ -447,11 +467,12 @@ const onHslInput = () => setHSL(Number(hInput.value), Number(sInput.value), Numb
 }
 
 .format-row:hover .format-copy-btn { opacity: 1; }
-.format-copy-btn:hover { background: var(--bg-secondary); color: var(--accent); }
+.format-copy-btn:hover { background: var(--bg-hover); color: var(--accent); }
 
-/* ====== 预设色板 ====== */
+/* ====== Preset Section ====== */
 .preset-section {
   padding: 0 14px 14px;
+  flex-shrink: 0;
 }
 
 .preset-header {
@@ -471,7 +492,7 @@ const onHslInput = () => setHSL(Number(hInput.value), Number(sInput.value), Numb
 
 .color-swatch {
   aspect-ratio: 1;
-  border-radius: var(--radius-xs);
+  border-radius: 4px;
   border: 2px solid transparent;
   cursor: pointer;
   transition: all 0.12s;
@@ -485,19 +506,23 @@ const onHslInput = () => setHSL(Number(hInput.value), Number(sInput.value), Numb
 .toolbar-tooltip {
   position: fixed;
   z-index: 9999;
-  padding: 5px 12px;
+  padding: 5px 10px;
   font-size: 12px;
   color: var(--text-inverse, #fff);
   background: var(--bg-tooltip, rgba(0, 0, 0, 0.85));
-  border-radius: var(--radius-sm, 4px);
+  border-radius: 4px;
   white-space: nowrap;
   pointer-events: none;
   transform: translateX(-50%);
-  min-width: 60px;
-  text-align: center;
+  line-height: 1.4;
 }
 
-/* ====== 响应式 ====== */
+/* ====== Scrollbar ====== */
+.tool-panel-body::-webkit-scrollbar { width: 5px; }
+.tool-panel-body::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
+.tool-panel-body::-webkit-scrollbar-track { background: transparent; }
+
+/* ====== Responsive ====== */
 @media (max-width: 760px) {
   .tool-main { grid-template-columns: 1fr !important; }
   .color-grid { grid-template-columns: repeat(8, 1fr); }

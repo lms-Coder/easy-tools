@@ -42,6 +42,7 @@ func main() {
 	linuxCmdService := services.NewLinuxCommandService()
 	cryptoService := services.NewCryptoService()
 	envService := services.NewEnvService()
+	fileService := services.NewFileService(nil)
 
 	// 4. 创建应用
 	var win *application.WebviewWindow
@@ -73,6 +74,7 @@ func main() {
 			application.NewService(linuxCmdService),
 			application.NewService(cryptoService),
 			application.NewService(envService),
+			application.NewService(fileService),
 		},
 	})
 
@@ -80,6 +82,7 @@ func main() {
 	configService.SetApp(app)
 	windowService.SetApp(app)
 	diffService.SetApp(app)
+	fileService.SetApp(app)
 
 	// 6. 创建主窗口
 	win = app.Window.NewWithOptions(application.WebviewWindowOptions{

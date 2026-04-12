@@ -35,72 +35,70 @@ const {
       </div>
     </ToolTitleBar>
 
-    <!-- 工具栏 -->
-    <div class="tool-toolbar">
-      <div class="tool-toolbar-left">
-        <div class="tool-segment">
-          <button
-            v-for="hash in hashTypes"
-            :key="hash.id"
-            class="tool-segment-btn"
-            :class="{ active: selectedHashes.includes(hash.id) }"
-            @click="toggleHashType(hash.id)"
-            @mouseenter="showTooltip(hash.name, $event)" @mouseleave="hideTooltip"
-          >
-            {{ hash.name }}
-          </button>
-        </div>
-
-        <div class="tool-divider"></div>
-
-        <button class="glass-icon-btn" @click="paste" @mouseenter="showTooltip('粘贴', $event)" @mouseleave="hideTooltip">
-          <ClipboardPaste :size="15" />
-        </button>
-        <button class="glass-icon-btn danger" @click="clear" :disabled="!inputText" @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
-          <Trash2 :size="15" />
-        </button>
-
-        <div class="tool-divider"></div>
-
-        <span class="toolbar-hint">点击算法名切换显示，输入文本自动计算哈希值</span>
-      </div>
-
-      <div class="tool-toolbar-right">
-        <label class="hash-toggle" :class="{ active: uppercase }" @click="uppercase = !uppercase" @mouseenter="showTooltip('大写', $event)" @mouseleave="hideTooltip">
-          <span class="toggle-label">Aa</span>
-        </label>
-        <label class="hash-toggle" @click="calculateAllHashes" @mouseenter="showTooltip('重新计算', $event)" @mouseleave="hideTooltip">
-          <RotateCw :size="13" />
-        </label>
-        <span v-if="inputText" class="tool-stat">{{ inputText.length }} 字符</span>
-      </div>
-    </div>
-
     <!-- 主内容 -->
     <main class="tool-main split">
-      <!-- 左：输入面板 -->
+      <!-- 左：配置 + 输入 -->
       <section class="tool-panel">
         <div class="tool-panel-header">
           <div class="tool-panel-title">
-            <span class="panel-icon blue"><HashIcon :size="12" /></span>
+            <span class="panel-icon blue"><HashIcon :size="14" /></span>
             <span>输入</span>
           </div>
-          <div class="tool-panel-actions">
-            <button class="glass-icon-btn small" @click="paste" @mouseenter="showTooltip('粘贴', $event)" @mouseleave="hideTooltip">
+          <div class="panel-actions">
+            <button class="action-btn" @click="calculateAllHashes"
+              @mouseenter="showTooltip('重新计算', $event)" @mouseleave="hideTooltip">
+              <RotateCw :size="13" />
+            </button>
+            <button class="action-btn" @click="paste"
+              @mouseenter="showTooltip('粘贴', $event)" @mouseleave="hideTooltip">
               <ClipboardPaste :size="13" />
             </button>
-            <button class="glass-icon-btn small" @click="inputText = ''" :disabled="!inputText" @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
+            <button class="action-btn" @click="clear" :disabled="!inputText"
+              @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
               <Trash2 :size="13" />
             </button>
           </div>
         </div>
-        <div class="tool-panel-body" style="padding:0">
-          <textarea
-            v-model="inputText"
-            class="hash-textarea"
-            placeholder="输入需要计算哈希的文本..."
-            spellcheck="false"
-          ></textarea>
+
+        <div class="tool-panel-body">
+          <!-- 算法选择 -->
+          <div class="config-section">
+            <label class="config-label">选择算法</label>
+            <div class="algo-chips">
+              <button
+                v-for="hash in hashTypes"
+                :key="hash.id"
+                class="algo-chip"
+                :class="{ active: selectedHashes.includes(hash.id) }"
+                @click="toggleHashType(hash.id)"
+              >{{ hash.name }}</button>
+            </div>
+          </div>
+
+          <!-- 选项 -->
+          <div class="config-section">
+            <div class="config-row">
+              <label class="config-label">选项</label>
+              <label class="toggle-label" @click="uppercase = !uppercase">
+                <span :class="['toggle-check', { on: uppercase }]">
+                  <Check v-if="uppercase" :size="8" />
+                </span>
+                <span>大写</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 输入文本 -->
+          <div class="config-section grow">
+            <label class="config-label">输入文本</label>
+            <textarea
+              v-model="inputText"
+              class="config-textarea"
+              placeholder="输入需要计算哈希的文本..."
+              spellcheck="false"
+            />
+            <div v-if="inputText" class="text-stat">{{ inputText.length }} 字符</div>
+          </div>
         </div>
       </section>
 
@@ -108,11 +106,11 @@ const {
       <section class="tool-panel">
         <div class="tool-panel-header">
           <div class="tool-panel-title">
-            <span class="panel-icon green"><Check :size="12" /></span>
+            <span class="panel-icon green"><Check :size="14" /></span>
             <span>哈希结果</span>
           </div>
         </div>
-        <div class="tool-panel-body" style="overflow: auto">
+        <div class="tool-panel-body">
           <div v-if="resultCount" class="hash-results">
             <div
               v-for="hashId in selectedHashes"
@@ -123,13 +121,13 @@ const {
               <div class="hash-card-head">
                 <span class="hash-name">{{ hashTypes.find(h => h.id === hashId)?.name }}</span>
                 <button
-                  class="glass-icon-btn small"
-                  :class="{ 'copied-btn': copiedHash === hashId }"
+                  class="hash-copy-btn"
+                  :class="{ copied: copiedHash === hashId }"
                   @click="copyHash(hashId)"
                   @mouseenter="showTooltip('复制', $event)" @mouseleave="hideTooltip"
                 >
-                  <Copy v-if="copiedHash !== hashId" :size="13" />
-                  <Check v-else :size="13" />
+                  <Copy v-if="copiedHash !== hashId" :size="12" />
+                  <Check v-else :size="12" />
                 </button>
               </div>
               <code class="hash-value">{{ getDisplayHash(hashResults[hashId]) }}</code>
@@ -137,7 +135,7 @@ const {
           </div>
 
           <div v-else class="tool-empty">
-            <div class="empty-icon"><HashIcon :size="24" /></div>
+            <div class="empty-icon"><HashIcon :size="28" /></div>
             <p class="empty-title">等待输入</p>
             <p class="empty-desc">输入文本后自动计算哈希值</p>
           </div>
@@ -151,6 +149,7 @@ const {
 </template>
 
 <style scoped>
+/* ====== Header ====== */
 .header-content {
   display: flex;
   align-items: center;
@@ -160,7 +159,7 @@ const {
 
 .algo-tag {
   padding: 2px 8px;
-  border-radius: var(--radius-xs);
+  border-radius: 10px;
   font-size: 11px;
   font-weight: 600;
   color: var(--accent);
@@ -169,85 +168,171 @@ const {
 
 .result-tag {
   padding: 2px 8px;
-  border-radius: var(--radius-xs);
+  border-radius: 10px;
   font-size: 11px;
   font-weight: 500;
   color: var(--success);
   background: var(--success-light);
 }
 
-/* ====== 大小写/刷新切换 ====== */
-.hash-toggle {
-  display: inline-flex;
+/* ====== Panel Actions ====== */
+.panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.action-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 28px;
-  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
   cursor: pointer;
-  font-size: 12px;
+  border-radius: 6px;
+  transition: all var(--transition-fast);
+  padding: 0;
+}
+
+.action-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
+.action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ====== Config Sections ====== */
+.tool-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow-y: auto;
+}
+
+.config-section {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.config-section.grow {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-bottom: none;
+  min-height: 0;
+}
+
+.config-label {
+  display: block;
+  font-size: 11px;
   font-weight: 600;
   color: var(--text-muted);
-  background: transparent;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.config-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.config-row .config-label { margin-bottom: 0; }
+
+/* ====== Algo Chips ====== */
+.algo-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.algo-chip {
+  padding: 3px 10px;
   border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+  cursor: pointer;
   transition: all 0.15s;
-}
-
-.hash-toggle:hover { background: var(--bg-hover); color: var(--text-primary); }
-.hash-toggle.active { color: var(--accent); border-color: var(--accent); background: var(--accent-light); }
-
-.toggle-label {
-  font-family: var(--font-mono);
-  font-size: 11px;
-}
-
-.toolbar-hint {
-  font-size: 11px;
-  color: var(--text-muted);
   white-space: nowrap;
 }
 
-/* ====== 统计 ====== */
-.tool-stat {
+.algo-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.algo-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ====== Toggle ====== */
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   font-size: 11px;
-  font-family: var(--font-mono);
-  color: var(--text-muted);
-  padding: 2px 8px;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-xs);
+  color: var(--text-secondary);
+  cursor: pointer;
 }
 
-/* ====== 输入区 ====== */
-.hash-textarea {
+.toggle-check {
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--border-default);
+  border-radius: 3px;
+  background: var(--bg-input);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.toggle-check.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ====== Textarea ====== */
+.config-textarea {
+  flex: 1;
   width: 100%;
-  height: 100%;
-  padding: 14px 16px;
+  min-height: 100px;
+  padding: 8px 10px;
+  font-size: 12px;
   font-family: var(--font-mono);
-  font-size: 13px;
-  line-height: 1.7;
-  border: none;
+  color: var(--text-primary);
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
   outline: none;
   resize: none;
-  background: transparent;
-  color: var(--text-primary);
-  tab-size: 2;
+  line-height: 1.6;
+  transition: all var(--transition-fast);
 }
 
-.hash-textarea::placeholder { color: var(--text-muted); }
+.config-textarea:hover { border-color: var(--border-strong); }
+.config-textarea:focus { border-color: var(--accent); box-shadow: var(--shadow-focus); }
+.config-textarea::placeholder { color: var(--text-muted); }
+
+.text-stat {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  margin-top: 4px;
+}
 
 /* ====== 结果卡片 ====== */
 .hash-results {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 12px;
+  gap: 8px;
+  padding: 14px;
 }
 
 .hash-card {
-  padding: 12px 14px;
+  padding: 10px 12px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  border-radius: 8px;
   transition: border-color 0.15s;
 }
 
@@ -268,39 +353,88 @@ const {
   text-transform: uppercase;
 }
 
+.hash-copy-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.hash-copy-btn:hover { background: var(--bg-hover); color: var(--accent); }
+.hash-copy-btn.copied { color: var(--success); background: var(--success-light); }
+
 .hash-value {
   display: block;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-primary);
   word-break: break-all;
   line-height: 1.6;
   user-select: all;
 }
 
-.copied-btn {
-  color: var(--success) !important;
-  border-color: var(--success) !important;
-  background: var(--success-light) !important;
+/* ====== Empty State ====== */
+.tool-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 20px;
+  flex: 1;
+}
+
+.empty-icon {
+  color: var(--text-muted);
+  opacity: 0.25;
+  margin-bottom: 12px;
+}
+
+.empty-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin: 0 0 4px 0;
+}
+
+.empty-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
 }
 
 /* ====== Tooltip ====== */
 .toolbar-tooltip {
   position: fixed;
   z-index: 9999;
-  padding: 5px 12px;
+  padding: 5px 10px;
   font-size: 12px;
   color: var(--text-inverse, #fff);
   background: var(--bg-tooltip, rgba(0, 0, 0, 0.85));
-  border-radius: var(--radius-sm, 4px);
+  border-radius: 4px;
   white-space: nowrap;
   pointer-events: none;
   transform: translateX(-50%);
-  min-width: 60px;
-  text-align: center;
+  line-height: 1.4;
 }
 
-/* ====== 响应式 ====== */
+/* ====== Scrollbar ====== */
+.tool-panel-body::-webkit-scrollbar { width: 5px; }
+.tool-panel-body::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
+.tool-panel-body::-webkit-scrollbar-track { background: transparent; }
+
+.config-textarea::-webkit-scrollbar { width: 4px; }
+.config-textarea::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
+.config-textarea::-webkit-scrollbar-track { background: transparent; }
+
+/* ====== Responsive ====== */
 @media (max-width: 760px) {
   .tool-main { grid-template-columns: 1fr !important; }
 }
