@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, Teleport } from 'vue'
 import { ChevronDown } from 'lucide-vue-next'
 
 const props = withDefaults(defineProps<{
@@ -14,23 +14,27 @@ const props = withDefaults(defineProps<{
   size: 'md',
 })
 
+defineOptions({ inheritAttrs: false })
+
 const emit = defineEmits<{
   'update:modelValue': [value: string | number]
 }>()
 
 const open = ref(false)
-const triggerRef = ref<HTMLElement | null>(null)
+const wrapperRef = ref<HTMLElement | null>(null)
 const dropdownRef = ref<HTMLElement | null>(null)
 
 const dropdownStyle = computed(() => {
-  if (!open.value || !triggerRef.value) return {}
-  const rect = triggerRef.value.getBoundingClientRect()
+  if (!open.value || !wrapperRef.value) return {}
+  const rect = wrapperRef.value.getBoundingClientRect()
   const below = window.innerHeight - rect.bottom > 120
   return {
+    position: 'fixed' as const,
+    zIndex: 10000,
     top: below ? `${rect.bottom + 4}px` : undefined,
     bottom: below ? undefined : `${window.innerHeight - rect.top + 4}px`,
     left: `${rect.left}px`,
-    minWidth: `${rect.width}px`,
+    width: `${rect.width}px`,
   }
 })
 
@@ -50,7 +54,11 @@ function select(opt: { label: string; value: string | number }) {
 }
 
 function onClickOutside(e: MouseEvent) {
-  if (open.value && triggerRef.value && !triggerRef.value.contains(e.target as Node)) {
+  if (!open.value) return
+  const target = e.target as Node
+  const insideTrigger = wrapperRef.value?.contains(target)
+  const insideDropdown = dropdownRef.value?.contains(target)
+  if (!insideTrigger && !insideDropdown) {
     open.value = false
   }
 }
@@ -73,31 +81,89 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="triggerRef" :class="['ui-select', `ui-select-${size}`, { 'ui-select-open': open, 'ui-select-disabled': disabled }]">
+  <div
+    ref="wrapperRef"
+    :class="['ui-select', `ui-select-${size}`, { 'ui-select-open': open, 'ui-select-disabled': disabled }]"
+    v-bind="$attrs"
+  >
     <button class="ui-select-trigger" @click="toggle" :disabled="disabled">
       <span class="ui-select-value">{{ selected }}</span>
       <ChevronDown class="ui-select-arrow" :size="size === 'sm' ? 12 : 14" />
     </button>
-    <Transition name="ui-select-fade">
-      <div ref="dropdownRef" v-if="open" class="ui-select-dropdown" :style="dropdownStyle">
-        <div
-          v-for="opt in options"
-          :key="opt.value"
-          :class="['ui-select-option', { 'ui-select-option-active': opt.value === modelValue }]"
-          @click="select(opt)"
-        >
-          {{ opt.label }}
-        </div>
-      </div>
-    </Transition>
   </div>
+  <Teleport to="body">
+    <div v-if="open" ref="dropdownRef" class="ui-select-dropdown" :style="dropdownStyle">
+      <div
+        v-for="opt in options"
+        :key="opt.value"
+        :class="['ui-select-option', { 'ui-select-option-active': opt.value === modelValue }]"
+        @click="select(opt)"
+      >
+        <span class="ui-select-option-label">{{ opt.label }}</span>
+        <span v-if="opt.value === modelValue" class="ui-select-option-check">✓</span>
+      </div>
+    </div>
+  </Teleport>
 </template>
+
+<style>
+/* Dropdown — Teleport 到 body，不能用 scoped */
+.ui-select-dropdown {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.02);
+  padding: 4px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.ui-select-dropdown::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ui-select-dropdown::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 2px;
+}
+
+.ui-select-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: var(--text-primary);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.ui-select-option:hover {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.ui-select-option-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ui-select-option-check {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+}
+</style>
 
 <style scoped>
 .ui-select {
-  position: relative;
-  display: inline-flex;
-  flex-direction: column;
+  display: block;
 }
 
 .ui-select-disabled {
@@ -109,7 +175,6 @@ onUnmounted(() => {
 .ui-select-trigger {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 4px;
   width: 100%;
   border: 1px solid var(--border-default);
@@ -120,7 +185,6 @@ onUnmounted(() => {
   cursor: pointer;
   transition: all var(--transition-fast);
   outline: none;
-  padding: 0;
 }
 
 .ui-select-trigger:hover {
@@ -164,59 +228,5 @@ onUnmounted(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
-}
-
-/* Dropdown */
-.ui-select-dropdown {
-  position: fixed;
-  z-index: 10000;
-  z-index: 1000;
-  background: var(--bg-card);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.02);
-  padding: 4px;
-  overflow: hidden;
-}
-
-.ui-select-option {
-  padding: 5px 10px;
-  font-size: 12px;
-  color: var(--text-primary);
-  border-radius: var(--radius-xs);
-  cursor: pointer;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: background var(--transition-fast);
-}
-
-.ui-select-option:hover {
-  background: var(--accent-light);
-  color: var(--accent);
-}
-
-.ui-select-option-active {
-  font-weight: 600;
-  color: var(--accent);
-}
-
-.ui-select-option-active::after {
-  content: '✓';
-  float: right;
-  margin-left: 12px;
-  font-size: 11px;
-}
-
-/* Transition */
-.ui-select-fade-enter-active,
-.ui-select-fade-leave-active {
-  transition: opacity 0.12s ease, transform 0.12s ease;
-}
-
-.ui-select-fade-enter-from,
-.ui-select-fade-leave-to {
-  opacity: 0;
-  transform: translateY(-4px);
 }
 </style>

@@ -5,12 +5,15 @@ import * as ConfigService from '../../bindings/easy-tools/internal/services/conf
 
 const THEME_CHANGE_EVENT = 'app:ThemeChanged'
 const PRIMARY_COLOR_CHANGE_EVENT = 'app:PrimaryColorChanged'
+const FONT_FAMILY_CHANGE_EVENT = 'app:FontFamilyChanged'
 
 const currentTheme = ref<Theme>('light')
 const currentPrimaryColor = ref('#3b82f6')
+const currentFontFamily = ref('')
 let initialized = false
 let themeUnsubscriber: (() => void) | null = null
 let primaryColorUnsubscriber: (() => void) | null = null
+let fontFamilyUnsubscriber: (() => void) | null = null
 
 function hexToRgb(hex: string): { r: number; g: number; b: number } {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
@@ -78,6 +81,21 @@ function applyPrimaryColorCSSAndSync(color: string): void {
   try { Events.Emit(PRIMARY_COLOR_CHANGE_EVENT, color) } catch (e) { console.error(e) }
 }
 
+function applyFontFamilyCSS(family: string): void {
+  currentFontFamily.value = family
+  if (family) {
+    document.documentElement.style.setProperty('--font-family', family)
+  } else {
+    document.documentElement.style.removeProperty('--font-family')
+  }
+}
+
+function applyFontFamilyCSSAndSync(family: string): void {
+  applyFontFamilyCSS(family)
+  try { ConfigService.SetFontFamily(family) } catch (e) { console.error(e) }
+  try { Events.Emit(FONT_FAMILY_CHANGE_EVENT, family) } catch (e) { console.error(e) }
+}
+
 async function setTheme(theme: Theme, animate: boolean, x?: number, y?: number): Promise<void> {
   if (!animate) {
     applyThemeCSSAndSync(theme)
@@ -112,6 +130,9 @@ function initTheme(): void {
 
   applyThemeCSS(currentTheme.value)
   applyPrimaryColorCSS(currentPrimaryColor.value)
+  if (currentFontFamily.value) {
+    applyFontFamilyCSS(currentFontFamily.value)
+  }
 
   // 仅子窗口监听主题变更广播（主窗口通过 setTheme 直接切换，不需要监听）
   const isSubWindow = window.location.hash.includes('/tool/')
@@ -157,6 +178,15 @@ function initTheme(): void {
       })
     }
   } catch (e) { console.error(e) }
+
+  // 监听其他窗口的字体变更广播
+  try {
+    if (!fontFamilyUnsubscriber) {
+      fontFamilyUnsubscriber = Events.On(FONT_FAMILY_CHANGE_EVENT, (ev: any) => {
+        applyFontFamilyCSS(ev.data as string)
+      })
+    }
+  } catch (e) { console.error(e) }
 }
 
 function setThemeFromConfig(theme: Theme): void {
@@ -167,20 +197,27 @@ function setPrimaryColorFromConfig(color: string): void {
   currentPrimaryColor.value = color
 }
 
+function setFontFamilyFromConfig(family: string): void {
+  currentFontFamily.value = family
+}
+
 export function useTheme() {
   const isDark = computed(() => currentTheme.value === 'dark')
 
   return {
     currentTheme,
     currentPrimaryColor,
+    currentFontFamily,
     isDark,
     applyTheme: applyThemeCSSAndSync,
     applyPrimaryColor: applyPrimaryColorCSSAndSync,
+    applyFontFamily: applyFontFamilyCSSAndSync,
     setTheme,
     toggleTheme,
     initTheme,
     setThemeFromConfig,
     setPrimaryColorFromConfig,
+    setFontFamilyFromConfig,
     hexToRgb,
     lightenColor,
     darkenColor,

@@ -3,6 +3,7 @@ export type Theme = 'light' | 'dark'
 export interface ThemeConfig {
   current: Theme
   primaryColor: string
+  fontFamily: string
 }
 
 export interface LayoutConfig {

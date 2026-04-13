@@ -41,14 +41,11 @@ func Init() (*DB, error) {
 
 		log.Printf("Database path: %s", dbPath)
 
-		rawDB, err := sql.Open("sqlite", dbPath)
+		rawDB, err := sql.Open("sqlite", dbPath+"?_pragma=busy_timeout(5000)&_pragma=journal_mode(WAL)&_pragma=foreign_keys(1)&_pragma=synchronous(NORMAL)")
 		if err != nil {
 			initErr = err
 			return
 		}
-
-		rawDB.Exec("PRAGMA journal_mode=WAL")
-		rawDB.Exec("PRAGMA foreign_keys = ON")
 
 		if err := rawDB.Ping(); err != nil {
 			rawDB.Close()

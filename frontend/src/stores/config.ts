@@ -16,7 +16,7 @@ const DEFAULT_VERSION = '0.1.0'
 export const useConfigStore = defineStore('config', () => {
   const config = ref<Config>({
     app: { name: DEFAULT_APP_NAME, version: DEFAULT_VERSION },
-    theme: { current: 'light', primaryColor: '#3b82f6' },
+    theme: { current: 'light', primaryColor: '#3b82f6', fontFamily: '' },
     layout: { sidebarCollapsed: false },
     tools: [],
     categories: [],
@@ -38,6 +38,7 @@ export const useConfigStore = defineStore('config', () => {
   const systemConfig = computed<SystemConfig>(() => config.value.system)
   const sidebarCollapsed = computed(() => config.value.layout.sidebarCollapsed)
   const primaryColor = computed(() => config.value.theme.primaryColor)
+  const fontFamily = computed(() => config.value.theme.fontFamily)
 
   const toolsByCategory = computed((): ToolCategory[] => {
     const categoryMap = new Map<string, ToolConfig[]>()
@@ -71,10 +72,11 @@ export const useConfigStore = defineStore('config', () => {
       await ConfigService.SyncTools(toolsToSync)
 
       // 2. 并行加载所有配置
-      const [appNameStr, primaryColorStr, themeStr, sidebarCollapsedBool, sysConfig, toolsList, categoriesList, usageSummary] = await Promise.all([
+      const [appNameStr, primaryColorStr, themeStr, fontFamilyStr, sidebarCollapsedBool, sysConfig, toolsList, categoriesList, usageSummary] = await Promise.all([
         ConfigService.GetAppName(),
         ConfigService.GetPrimaryColor(),
         ConfigService.GetTheme(),
+        ConfigService.GetFontFamily(),
         ConfigService.GetSidebarCollapsed(),
         ConfigService.GetSystemConfig(),
         ConfigService.GetTools(),
@@ -88,6 +90,7 @@ export const useConfigStore = defineStore('config', () => {
       // 主题
       if (themeStr) config.value.theme.current = themeStr as 'light' | 'dark'
       if (primaryColorStr) config.value.theme.primaryColor = primaryColorStr
+      if (fontFamilyStr) config.value.theme.fontFamily = fontFamilyStr
 
       // 布局
       config.value.layout.sidebarCollapsed = sidebarCollapsedBool
@@ -167,6 +170,11 @@ export const useConfigStore = defineStore('config', () => {
   async function setPrimaryColor(color: string): Promise<void> {
     config.value.theme.primaryColor = color
     try { await ConfigService.SetPrimaryColor(color) } catch (e) { console.error(e) }
+  }
+
+  async function setFontFamily(family: string): Promise<void> {
+    config.value.theme.fontFamily = family
+    try { await ConfigService.SetFontFamily(family) } catch (e) { console.error(e) }
   }
 
   // Layout
@@ -285,12 +293,14 @@ export const useConfigStore = defineStore('config', () => {
     systemConfig,
     sidebarCollapsed,
     primaryColor,
+    fontFamily,
     toolsByCategory,
     allToolsByCategory,
     initConfig,
     getToolById,
     setTheme,
     setPrimaryColor,
+    setFontFamily,
     toggleSidebar,
     setSidebarCollapsed,
     setToolEnabled,

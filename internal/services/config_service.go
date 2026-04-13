@@ -62,6 +62,12 @@ func (s *ConfigService) SetAppName(name string) error {
 	return s.setSetting("app_name", name)
 }
 
+// Font family methods
+func (s *ConfigService) GetFontFamily() string { return s.getSetting("font_family") }
+func (s *ConfigService) SetFontFamily(family string) error {
+	return s.setSetting("font_family", family)
+}
+
 // Layout methods
 func (s *ConfigService) GetSidebarCollapsed() bool {
 	return s.getSetting("sidebar_collapsed") == "true"

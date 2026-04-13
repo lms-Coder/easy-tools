@@ -123,7 +123,7 @@ const {
             <label class="config-label">选项</label>
             <div class="options-row">
               <div class="indent-group">
-                <Select v-model="indentSize" size="sm" :options="[
+                <Select v-model="indentSize" size="sm" style="width:100px" :options="[
                   { label: '2空格', value: 2 },
                   { label: '4空格', value: 4 },
                   { label: 'Tab', value: 1 },

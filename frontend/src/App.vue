@@ -52,7 +52,7 @@ onMounted(async () => {
   await configStore.initConfig()
 
   // 2. 用加载的主题数据同步到 theme composable
-  themeStore.syncFromConfig(configStore.themeConfig.current, configStore.themeConfig.primaryColor)
+  themeStore.syncFromConfig(configStore.themeConfig.current, configStore.themeConfig.primaryColor, configStore.themeConfig.fontFamily)
 
   // 3. 应用主题到 DOM
   themeStore.initialize()

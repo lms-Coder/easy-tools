@@ -6,6 +6,8 @@ import { useConfigStore } from '@/stores/config'
 import { toast } from '@/composables/useToast'
 import { getIcon } from '@/utils/icons'
 import Dialog from '@/components/common/Dialog.vue'
+import Select from '@/components/ui/Select.vue'
+import Input from '@/components/ui/Input.vue'
 import {
   ArrowLeft,
   Sun,
@@ -99,6 +101,23 @@ const presetColors = [
   '#ef4444', '#06b6d4', '#f97316', '#6366f1'
 ]
 
+const fontOptions = [
+  { value: '', label: '系统默认' },
+  { value: "'PingFang SC', 'Microsoft YaHei', sans-serif", label: '苹方 / 微软雅黑' },
+  { value: "'Source Han Sans SC', 'Noto Sans SC', sans-serif", label: '思源黑体' },
+  { value: "'Source Han Serif SC', 'Noto Serif SC', serif", label: '思源宋体' },
+  { value: "'LXGW WenKai', 'LXGW WenKai Screen', sans-serif", label: '霞鹜文楷' },
+  { value: "'HarmonyOS Sans SC', 'HarmonyOS Sans', sans-serif", label: '鸿蒙黑体' },
+  { value: "'SimSun', 'Songti SC', serif", label: '宋体' },
+  { value: "'SimHei', 'Heiti SC', sans-serif", label: '黑体' },
+  { value: "'KaiTi', 'STKaiti', serif", label: '楷体' },
+  { value: "'FangSong', 'STFangsong', serif", label: '仿宋' },
+  { value: "'Segoe UI', 'Helvetica Neue', sans-serif", label: 'Segoe UI' },
+  { value: "Georgia, 'Noto Serif', serif", label: 'Georgia' },
+  { value: "'Trebuchet MS', 'Gill Sans', sans-serif", label: 'Trebuchet MS' },
+]
+
+const currentFont = ref('')
 const currentColor = ref('#3b82f6')
 const localAppName = ref('')
 
@@ -122,6 +141,17 @@ const selectColor = async (color: string) => {
   catch (e) { console.error(e) }
 }
 
+const selectFont = async (v: string | number) => {
+  const font = String(v)
+  if (font === currentFont.value) return
+  currentFont.value = font
+  try {
+    configStore.setFontFamily(font)
+    themeStore.applyFontFamily(font)
+  }
+  catch (e) { console.error(e) }
+}
+
 const showResetDialog = ref(false)
 const showClearDialog = ref(false)
 
@@ -132,6 +162,9 @@ const resetAppearance = async () => {
   currentColor.value = '#3b82f6'
   configStore.setPrimaryColor('#3b82f6')
   themeStore.applyPrimaryColor('#3b82f6')
+  currentFont.value = ''
+  configStore.setFontFamily('')
+  themeStore.applyFontFamily('')
   toast.success('已重置')
 }
 
@@ -145,6 +178,7 @@ const goBack = () => router.push('/')
 onMounted(async () => {
   await loadAppName()
   currentColor.value = configStore.primaryColor
+  currentFont.value = configStore.fontFamily
 })
 </script>
 
@@ -186,11 +220,11 @@ onMounted(async () => {
                   <span class="setting-label">应用名称</span>
                   <span class="setting-desc">显示在窗口标题栏</span>
                 </div>
-                <input
+                <Input
                   v-model="localAppName"
-                  type="text"
-                  class="setting-input"
                   placeholder="输入名称"
+                  clearable
+                  style="width:180px"
                   @blur="saveAppName"
                   @keydown.enter="saveAppName"
                 />
@@ -212,6 +246,25 @@ onMounted(async () => {
                     {{ opt.label }}
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 字体 -->
+          <div class="group-card">
+            <div class="group-title">字体</div>
+            <div class="group-body">
+              <div class="group-row">
+                <div class="setting-info">
+                  <span class="setting-label">界面字体</span>
+                  <span class="setting-desc">选择应用显示字体</span>
+                </div>
+                <Select :model-value="currentFont" :options="fontOptions" size="sm" @update:model-value="selectFont" style="width:160px" />
+              </div>
+              <div class="font-preview-row">
+                <span class="font-preview-text" :style="currentFont ? { fontFamily: currentFont } : {}">
+                  AaBbCc 你好世界 0123456789
+                </span>
               </div>
             </div>
           </div>
@@ -658,29 +711,6 @@ onMounted(async () => {
   color: var(--text-muted);
 }
 
-/* ====== Input ====== */
-.setting-input {
-  width: 180px;
-  height: 28px;
-  padding: 0 10px;
-  font-size: 13px;
-  color: var(--text-primary);
-  background: var(--bg-input);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  outline: none;
-  transition: all var(--transition-fast);
-}
-
-.setting-input:hover {
-  border-color: var(--border-strong);
-}
-
-.setting-input:focus {
-  border-color: var(--accent);
-  box-shadow: var(--shadow-focus);
-}
-
 /* ====== Segment control ====== */
 .segment-control {
   display: flex;
@@ -713,6 +743,20 @@ onMounted(async () => {
   background: var(--bg-card);
   color: var(--text-primary);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+/* ====== Font preview ====== */
+.font-preview-row {
+  padding: 10px 0 0;
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 4px;
+}
+
+.font-preview-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  letter-spacing: 0.3px;
 }
 
 /* ====== Color picker ====== */

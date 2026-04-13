@@ -6,14 +6,17 @@ export const useThemeStore = defineStore('theme', () => {
   const {
     currentTheme,
     currentPrimaryColor,
+    currentFontFamily,
     isDark: isDarkRef,
     applyTheme,
     applyPrimaryColor,
+    applyFontFamily,
     setTheme,
     toggleTheme,
     initTheme,
     setThemeFromConfig,
     setPrimaryColorFromConfig,
+    setFontFamilyFromConfig,
   } = useTheme()
 
   const isDark = computed(() => isDarkRef.value)
@@ -39,20 +42,23 @@ export const useThemeStore = defineStore('theme', () => {
   }
 
   // 从 config store 传入已加载的配置
-  function syncFromConfig(theme: 'light' | 'dark', primaryColor: string): void {
+  function syncFromConfig(theme: 'light' | 'dark', primaryColor: string, fontFamily: string): void {
     setThemeFromConfig(theme)
     setPrimaryColorFromConfig(primaryColor)
+    setFontFamilyFromConfig(fontFamily)
   }
 
   return {
     currentTheme,
     currentPrimaryColor,
+    currentFontFamily,
     isDark,
     toggle,
     set,
     setWithAnimation,
     initialize,
     applyPrimaryColor,
+    applyFontFamily,
     syncFromConfig,
   }
 })
