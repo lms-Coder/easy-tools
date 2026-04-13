@@ -145,7 +145,7 @@ code{background:#f6f8fa;padding:2px 6px;border-radius:4px;font-size:0.9em}
 pre{background:#f6f8fa;padding:16px;border-radius:6px;overflow-x:auto}pre code{background:none;padding:0}
 blockquote{border-left:4px solid #ddd;margin:0;padding-left:16px;color:#666}
 table{border-collapse:collapse;width:100%;margin:16px 0}th,td{border:1px solid #ddd;padding:8px 12px}th{background:#f5f5f5}
-a{color:#007AFF}img{max-width:100%}.mermaid-diagram svg{max-width:100%}
+a{color:#3b82f6}img{max-width:100%}.mermaid-diagram svg{max-width:100%}
 </style>
 </head>
 <body>${previewHtml.value}</body>

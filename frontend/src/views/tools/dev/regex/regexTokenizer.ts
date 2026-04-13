@@ -23,16 +23,16 @@ export interface RegexToken {
 
 // 颜色映射 — 用于 token 高亮
 export const tokenColors: Record<TokenType, { color: string; bg: string }> = {
-  charClass:     { color: '#007AFF', bg: 'rgba(0,122,255,0.1)' },
-  quantifier:    { color: '#FF9F0A', bg: 'rgba(255,159,10,0.1)' },
-  anchor:        { color: '#34C759', bg: 'rgba(52,199,89,0.1)' },
-  group:         { color: '#AF52DE', bg: 'rgba(175,82,222,0.1)' },
-  lookaround:    { color: '#BF5AF2', bg: 'rgba(191,90,242,0.1)' },
-  escape:        { color: '#FF3B30', bg: 'rgba(255,59,48,0.08)' },
-  backreference: { color: '#5856D6', bg: 'rgba(88,86,214,0.1)' },
-  alternation:   { color: '#FF2D55', bg: 'rgba(255,45,85,0.1)' },
-  literal:       { color: '#1d1d1f', bg: 'transparent' },
-  modifier:      { color: '#64D2FF', bg: 'rgba(100,210,255,0.1)' },
+  charClass:     { color: '#3b82f6', bg: 'rgba(59,130,246,0.1)' },
+  quantifier:    { color: '#f59e0b', bg: 'rgba(245,158,11,0.1)' },
+  anchor:        { color: '#10b981', bg: 'rgba(16,185,129,0.1)' },
+  group:         { color: '#8b5cf6', bg: 'rgba(139,92,246,0.1)' },
+  lookaround:    { color: '#a855f7', bg: 'rgba(168,85,247,0.1)' },
+  escape:        { color: '#ef4444', bg: 'rgba(239,68,68,0.08)' },
+  backreference: { color: '#6366f1', bg: 'rgba(99,102,241,0.1)' },
+  alternation:   { color: '#f43f5e', bg: 'rgba(244,63,94,0.1)' },
+  literal:       { color: '#475569', bg: 'transparent' },
+  modifier:      { color: '#22d3ee', bg: 'rgba(34,211,238,0.1)' },
 }
 
 // 中文描述映射

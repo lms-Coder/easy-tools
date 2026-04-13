@@ -309,7 +309,7 @@ const {
   font-family: var(--font-mono);
 }
 
-.panel-icon.purple { color: #5856D6; background: rgba(88, 86, 214, 0.1); }
+.panel-icon.purple { color: #6366f1; background: rgba(99, 102, 241, 0.1); }
 
 /* ===== Panel Actions ===== */
 .panel-actions {

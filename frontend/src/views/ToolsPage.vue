@@ -6,13 +6,13 @@ import { toast } from '@/composables/useToast'
 import { openTool } from '@/utils/toolWindow'
 import { getIcon } from '@/utils/icons'
 import {
-  LayoutGrid,
   ArrowLeft,
   Search,
   Star,
   Flame,
   Code,
 } from 'lucide-vue-next'
+import IconParkAllApplication from '@/components/icons/IconParkAllApplication.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -30,19 +30,19 @@ const totalCount = computed(() => configStore.enabledTools.length)
 const categories = computed(() => configStore.toolsByCategory)
 
 const categoryColors: Record<string, string> = {
-  '开发工具': '#007AFF',
-  '编码转换': '#34C759',
-  '时间处理': '#FF9F0A',
-  '文本处理': '#5AC8FA',
-  '系统工具': '#5856D6',
-  '安全工具': '#FF3B30',
-  '其他': '#AF52DE'
+  '开发工具': '#3b82f6',
+  '编码转换': '#10b981',
+  '时间处理': '#f59e0b',
+  '文本处理': '#06b6d4',
+  '系统工具': '#6366f1',
+  '安全工具': '#ef4444',
+  '其他': '#8b5cf6'
 }
 
 const categoriesWithColors = computed(() => {
   return categories.value.map((cat, index) => ({
     ...cat,
-    color: categoryColors[cat.name] || ['#007AFF', '#34C759', '#FF9F0A', '#AF52DE'][index % 4]
+    color: categoryColors[cat.name] || ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'][index % 4]
   }))
 })
 
@@ -78,7 +78,7 @@ function getToolIcon(iconName?: string) {
 }
 
 function getCategoryColor(category: string): string {
-  return categoryColors[category] || '#007AFF'
+  return categoryColors[category] || '#3b82f6'
 }
 
 function selectCategory(categoryName = '') {
@@ -111,14 +111,13 @@ function goBack() {
     <aside class="sidebar">
       <div class="sidebar-header">
         <button class="back-btn" @click="goBack">
-          <ArrowLeft :size="16" />
+          <ArrowLeft :size="14" />
+          <span>返回首页</span>
         </button>
-        <span class="sidebar-title">工具箱</span>
-      </div>
-
-      <div class="sidebar-search">
-        <Search :size="13" class="search-icon" />
-        <input v-model="searchQuery" type="text" placeholder="搜索工具..." />
+        <div class="sidebar-search">
+          <Search :size="13" class="search-icon" />
+          <input v-model="searchQuery" type="text" placeholder="搜索工具..." />
+        </div>
       </div>
 
       <nav class="sidebar-nav">
@@ -127,7 +126,7 @@ function goBack() {
           :class="{ active: !selectedCategory }"
           @click="selectCategory()"
         >
-          <LayoutGrid :size="15" class="nav-icon" />
+          <IconParkAllApplication class="nav-icon" style="width: 14px; height: 14px;" />
           <span class="nav-label">全部</span>
           <span class="nav-count">{{ totalCount }}</span>
         </button>
@@ -152,16 +151,18 @@ function goBack() {
             <Flame :size="11" class="fire-icon" />
             常用
           </div>
-          <button
+          <div
             v-for="(tool, index) in popularTools.slice(0, 5)"
             :key="tool?.id"
-            class="nav-item popular"
+            class="popular-item"
             @click="tool && goToTool(tool)"
           >
-            <span class="nav-rank">{{ index + 1 }}</span>
-            <component :is="getToolIcon(tool?.icon)" class="nav-tool-icon" :size="13" />
-            <span class="nav-label">{{ tool?.name }}</span>
-          </button>
+            <span class="popular-rank" :class="{ top: index < 3 }">{{ index + 1 }}</span>
+            <div class="popular-icon">
+              <component :is="getToolIcon(tool?.icon)" :size="11" />
+            </div>
+            <span class="popular-name">{{ tool?.name }}</span>
+          </div>
         </div>
       </nav>
     </aside>
@@ -194,10 +195,12 @@ function goBack() {
                       @click="goToTool(tool)"
                     >
                       <div class="tool-icon-box" :style="{ background: `${cat.color}15`, color: cat.color }">
-                        <component :is="getToolIcon(tool.icon)" :size="20" />
+                        <component :is="getToolIcon(tool.icon)" :size="17" />
                       </div>
-                      <span class="tool-name">{{ tool.name }}</span>
-                      <span class="tool-desc">{{ tool.desc || tool.description || '实用工具' }}</span>
+                      <div class="tool-card-info">
+                        <span class="tool-name">{{ tool.name }}</span>
+                        <span class="tool-desc">{{ tool.desc || tool.description || '实用工具' }}</span>
+                      </div>
                       <div class="tool-tip">
                         <div class="tip-title">{{ tool.name }}</div>
                         <div class="tip-desc">{{ tool.desc || tool.description || '实用工具' }}</div>
@@ -233,7 +236,7 @@ function goBack() {
 /* ====== 页面布局 ====== */
 .tools-page {
   display: grid;
-  grid-template-columns: 220px 1fr;
+  grid-template-columns: 200px 1fr;
   height: 100%;
   overflow: hidden;
   background: var(--bg-primary);
@@ -243,37 +246,39 @@ function goBack() {
 .sidebar {
   display: flex;
   flex-direction: column;
-  background: var(--bg-secondary);
-  border-right: 1px solid var(--border-subtle);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border-right: 1px solid var(--glass-border-weak);
   overflow: hidden;
+  min-width: 0;
 }
 
 .sidebar-header {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px 16px 12px;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 14px 12px;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .back-btn {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  padding: 0;
+  gap: 8px;
+  padding: 4px 6px;
   background: transparent;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
+  border: none;
+  border-radius: 6px;
+  color: var(--text-muted);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all 150ms ease;
+  font-size: 12px;
+  width: fit-content;
 }
 
 .back-btn:hover {
   background: var(--bg-hover);
-  border-color: var(--border-strong);
-  color: var(--text-primary);
+  color: var(--text-secondary);
 }
 
 .sidebar-title {
@@ -285,19 +290,17 @@ function goBack() {
 .sidebar-search {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 0 12px 10px;
-  padding: 0 10px;
-  height: 30px;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  transition: all var(--transition-fast);
+  gap: 6px;
+  padding: 7px 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  transition: all 150ms ease;
 }
 
 .sidebar-search:focus-within {
   border-color: var(--accent);
-  box-shadow: var(--shadow-focus);
+  box-shadow: 0 0 0 2px var(--accent-light);
 }
 
 .search-icon {
@@ -322,11 +325,18 @@ function goBack() {
 .sidebar-nav {
   flex: 1;
   overflow-y: auto;
-  padding: 0 12px 12px;
+  padding: 8px 10px;
+  scrollbar-width: none;
 }
 
+.sidebar-nav::-webkit-scrollbar { display: none; }
+
 .nav-section {
-  margin-top: 14px;
+  margin-bottom: 14px;
+}
+
+.nav-section:first-child {
+  margin-bottom: 8px;
 }
 
 .nav-section-title {
@@ -334,11 +344,11 @@ function goBack() {
   align-items: center;
   gap: 5px;
   padding: 6px 8px 4px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.4px;
 }
 
 .fire-icon {
@@ -353,13 +363,15 @@ function goBack() {
   width: 100%;
   padding: 7px 10px;
   margin-bottom: 1px;
+  margin-left: 4px;
   background: transparent;
   border: 1px solid transparent;
-  border-radius: var(--radius-sm);
-  font-size: 13px;
+  border-left: 2.5px solid transparent;
+  border-radius: 0 6px 6px 0;
+  font-size: 12px;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all 150ms ease;
   text-align: left;
 }
 
@@ -370,19 +382,19 @@ function goBack() {
 
 .nav-item.active {
   background: var(--accent-light);
-  border-color: var(--accent);
+  border-left-color: var(--accent);
   color: var(--accent);
   font-weight: 500;
 }
 
 .nav-icon {
-  font-size: 15px;
+  font-size: 14px;
   flex-shrink: 0;
 }
 
 .nav-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   flex-shrink: 0;
 }
@@ -398,42 +410,65 @@ function goBack() {
   font-size: 10px;
   font-weight: 500;
   color: var(--text-muted);
-  background: var(--bg-tertiary);
+  background: var(--bg-secondary);
   padding: 1px 6px;
-  border-radius: var(--radius-xs);
+  border-radius: 4px;
   min-width: 18px;
   text-align: center;
 }
 
 .nav-item.active .nav-count {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-light);
+  color: var(--accent);
 }
 
-.nav-item.popular {
-  gap: 8px;
+.popular-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 150ms ease;
+  margin-left: 4px;
 }
 
-.nav-rank {
-  width: 14px;
+.popular-item:hover {
+  background: var(--bg-hover);
+}
+
+.popular-rank {
   font-size: 10px;
   font-weight: 600;
   color: var(--text-muted);
+  width: 14px;
   text-align: center;
   flex-shrink: 0;
 }
 
-.nav-item.popular:first-child .nav-rank {
+.popular-rank.top {
   color: var(--warning);
 }
 
-.nav-tool-icon {
-  font-size: 13px;
-  color: var(--text-secondary);
+.popular-icon {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  font-size: 11px;
   flex-shrink: 0;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
 }
 
-/* ====== 主内容 - macOS Finder 风格 ====== */
+.popular-name {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* ====== 主内容 ====== */
 .main-content {
   display: flex;
   flex-direction: column;
@@ -447,15 +482,14 @@ function goBack() {
   gap: 10px;
   padding: 14px 20px 10px;
   flex-shrink: 0;
-  border-bottom: 1px solid var(--border-subtle);
-  background: var(--bg-header);
 }
 
 .toolbar-title {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
   color: var(--text-primary);
   margin: 0;
+  letter-spacing: -0.3px;
 }
 
 .toolbar-count {
@@ -468,8 +502,11 @@ function goBack() {
 .content-area {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 20px 20px;
+  padding: 4px 20px 20px;
+  scrollbar-width: none;
 }
+
+.content-area::-webkit-scrollbar { display: none; }
 
 .tool-groups {
   display: flex;
@@ -481,19 +518,19 @@ function goBack() {
 .group-section {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
 }
 
 .group-header {
   display: flex;
   align-items: center;
   gap: 7px;
-  padding: 0 4px;
+  padding: 0 2px;
 }
 
 .group-dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
 }
@@ -508,89 +545,86 @@ function goBack() {
   font-size: 10px;
   font-weight: 500;
   color: var(--text-muted);
-  background: var(--bg-tertiary);
-  padding: 1px 6px;
-  border-radius: var(--radius-xs);
 }
 
 /* ====== 工具网格 ====== */
 .tool-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
 }
 
 /* ====== 工具卡片 ====== */
 .tool-card {
   position: relative;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 18px 8px 14px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: 14px;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border-weak);
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: all 150ms ease;
+  backdrop-filter: var(--glass-blur-sm);
   overflow: visible;
   z-index: 1;
 }
 
 .tool-card:hover {
   z-index: 10;
-  background: var(--bg-hover);
   border-color: var(--border-default);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.04);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
 }
 
 .tool-card:active {
-  transform: translateY(0) scale(0.97);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  transition-duration: 0.1s;
+  transform: translateY(0) scale(0.98);
+  transition-duration: 0.08s;
 }
 
 .tool-card .tool-icon-box {
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
-  font-size: 20px;
-  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  border-radius: 10px;
+  font-size: 17px;
+  flex-shrink: 0;
+  transition: transform 150ms ease;
 }
 
 .tool-card:hover .tool-icon-box {
-  transform: scale(1.1);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  transform: scale(1.06);
+}
+
+.tool-card-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .tool-card .tool-name {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text-primary);
-  text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 100%;
   line-height: 1.3;
 }
 
 .tool-card .tool-desc {
   font-size: 10px;
   color: var(--text-muted);
-  text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 100%;
   line-height: 1.2;
-  margin-top: -4px;
+  margin-top: 2px;
 }
 
 .tool-card .tool-tip {
@@ -598,19 +632,19 @@ function goBack() {
   top: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%) scale(0.92);
-  min-width: 140px;
-  max-width: 200px;
+  min-width: 160px;
+  max-width: 220px;
   padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(16px) saturate(1.4);
   -webkit-backdrop-filter: blur(16px) saturate(1.4);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: all 0.18s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: all 150ms ease;
   z-index: 20;
 }
 
@@ -620,8 +654,8 @@ function goBack() {
   bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
-  border: 6px solid transparent;
-  border-bottom-color: rgba(255, 255, 255, 0.3);
+  border: 5px solid transparent;
+  border-bottom-color: rgba(255, 255, 255, 0.4);
 }
 
 .tool-card .tool-tip::before {
@@ -630,8 +664,8 @@ function goBack() {
   bottom: calc(100% - 1px);
   left: 50%;
   transform: translateX(-50%);
-  border: 5px solid transparent;
-  border-bottom-color: rgba(255, 255, 255, 0.72);
+  border: 4px solid transparent;
+  border-bottom-color: rgba(255, 255, 255, 0.85);
   z-index: 1;
 }
 
@@ -645,7 +679,7 @@ function goBack() {
   font-size: 12px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 4px;
+  margin-bottom: 3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -793,7 +827,7 @@ function goBack() {
 }
 
 html.dark .tool-card .tool-tip {
-  background: rgba(30, 30, 40, 0.72);
+  background: rgba(30, 41, 59, 0.85);
   border-color: rgba(255, 255, 255, 0.08);
 }
 
@@ -802,6 +836,18 @@ html.dark .tool-card .tool-tip::after {
 }
 
 html.dark .tool-card .tool-tip::before {
-  border-bottom-color: rgba(30, 30, 40, 0.72);
+  border-bottom-color: rgba(30, 41, 59, 0.85);
+}
+
+html.dark .tool-card .tool-desc {
+  color: var(--text-muted);
+}
+
+html.dark .tip-title {
+  color: var(--text-primary);
+}
+
+html.dark .tip-desc {
+  color: #94a3b8;
 }
 </style>

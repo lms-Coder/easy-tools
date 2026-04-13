@@ -16,7 +16,7 @@ const DEFAULT_VERSION = '0.1.0'
 export const useConfigStore = defineStore('config', () => {
   const config = ref<Config>({
     app: { name: DEFAULT_APP_NAME, version: DEFAULT_VERSION },
-    theme: { current: 'light', primaryColor: '#007AFF' },
+    theme: { current: 'light', primaryColor: '#3b82f6' },
     layout: { sidebarCollapsed: false },
     tools: [],
     categories: [],

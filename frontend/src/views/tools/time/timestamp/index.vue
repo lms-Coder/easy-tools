@@ -362,7 +362,7 @@ const {
 }
 
 .ts-section-icon.blue {
-  background: rgba(0, 122, 255, 0.1);
+  background: rgba(59, 130, 246, 0.1);
   color: var(--accent);
 }
 
@@ -410,7 +410,7 @@ const {
   font-weight: 600;
   padding: 2px 7px;
   border-radius: 10px;
-  background: rgba(0, 122, 255, 0.1);
+  background: rgba(59, 130, 246, 0.1);
   color: var(--accent);
   flex-shrink: 0;
 }

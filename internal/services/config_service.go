@@ -362,7 +362,7 @@ func (s *ConfigService) GetUsageStatsSummary() *UsageStatsSummary {
 	db.QueryRow(`SELECT COUNT(*) FROM usage_history WHERE used_at >= ?`, monthAgo).Scan(&summary.MonthCount)
 
 	// 使用排行 TOP5
-	rows, err := db.Query(`SELECT tool_id, total_count, last_used FROM tool_stats ORDER BY total_count DESC LIMIT 5`)
+	rows, err := db.Query(`SELECT tool_id, total_count, last_used FROM tool_stats ORDER BY total_count DESC`)
 	if err == nil {
 		defer rows.Close()
 		for rows.Next() {

@@ -535,7 +535,7 @@ const {
 .mode-tag.warning { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
 .mode-tag.error { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
 
-.panel-icon.purple { color: #5856D6; background: rgba(88, 86, 214, 0.1); }
+.panel-icon.purple { color: #6366f1; background: rgba(99, 102, 241, 0.1); }
 
 /* ====== Panel Actions ====== */
 .panel-actions {

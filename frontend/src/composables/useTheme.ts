@@ -7,7 +7,7 @@ const THEME_CHANGE_EVENT = 'app:ThemeChanged'
 const PRIMARY_COLOR_CHANGE_EVENT = 'app:PrimaryColorChanged'
 
 const currentTheme = ref<Theme>('light')
-const currentPrimaryColor = ref('#007AFF')
+const currentPrimaryColor = ref('#3b82f6')
 let initialized = false
 let themeUnsubscriber: (() => void) | null = null
 let primaryColorUnsubscriber: (() => void) | null = null
@@ -20,7 +20,7 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } {
         g: parseInt(result[2], 16),
         b: parseInt(result[3], 16),
       }
-    : { r: 0, g: 122, b: 255 }
+    : { r: 59, g: 130, b: 246 }
 }
 
 function lightenColor(hex: string, amount: number): string {

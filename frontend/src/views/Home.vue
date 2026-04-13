@@ -169,28 +169,28 @@ const stats = computed(() => [
 
 // 主题相关
 const isDark = computed(() => themeStore.currentTheme === 'dark')
-const textSecondary = computed(() => isDark.value ? '#98989d' : '#6e6e73')
-const textMuted = computed(() => isDark.value ? '#636366' : '#86868b')
+const textSecondary = computed(() => isDark.value ? '#64748b' : '#475569')
+const textMuted = computed(() => isDark.value ? '#94a3b8' : '#94a3b8')
 const borderSubtle = computed(() => isDark.value ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)')
-const accentColor = computed(() => isDark.value ? '#0a84ff' : '#007aff')
+const accentColor = computed(() => isDark.value ? '#60a5fa' : '#3b82f6')
 
 // 工具分类数据
 const CATEGORY_COLORS: Record<string, string> = {
-  '开发工具': '#007AFF',
-  '编码转换': '#34C759',
-  '时间处理': '#FF9F0A',
-  '文本处理': '#5AC8FA',
-  '安全工具': '#FF3B30',
-  '系统工具': '#5856D6',
-  '其他': '#AF52DE',
+  '开发工具': '#3b82f6',
+  '编码转换': '#10b981',
+  '时间处理': '#f59e0b',
+  '文本处理': '#06b6d4',
+  '安全工具': '#ef4444',
+  '系统工具': '#6366f1',
+  '其他': '#8b5cf6',
 }
 
 const allCategories = computed(() => {
   return configStore.toolsByCategory.map(cat => ({
     name: cat.name,
     count: cat.tools.length,
-    color: CATEGORY_COLORS[cat.name] || '#007AFF',
-    tools: cat.tools.slice(0, 4)
+    color: CATEGORY_COLORS[cat.name] || '#3b82f6',
+    tools: cat.tools
   }))
 })
 
@@ -212,11 +212,11 @@ const pieOption = computed(() => {
   return {
     tooltip: {
       trigger: 'item',
-      backgroundColor: isDark.value ? '#2c2c2e' : '#ffffff',
-      borderColor: isDark.value ? '#48484a' : '#e5e5ea',
+      backgroundColor: isDark.value ? '#1e293b' : '#ffffff',
+      borderColor: isDark.value ? '#334155' : '#e2e8f0',
       borderWidth: 1,
       textStyle: {
-        color: isDark.value ? '#f5f5f7' : '#1d1d1f',
+        color: isDark.value ? '#f1f5f9' : '#0f172a',
         fontSize: 12
       },
       formatter: (params: any) => {
@@ -225,27 +225,37 @@ const pieOption = computed(() => {
     },
     series: [{
       type: 'pie',
-      radius: ['45%', '75%'],
+      radius: ['42%', '72%'],
       center: ['50%', '50%'],
-      avoidLabelOverlap: false,
+      avoidLabelOverlap: true,
       itemStyle: {
-        borderRadius: 6,
-        borderColor: isDark.value ? '#2c2c2e' : '#ffffff',
+        borderRadius: 5,
+        borderColor: isDark.value ? 'rgba(30,41,59,0.7)' : 'rgba(255,255,255,0.72)',
         borderWidth: 2
       },
       label: {
         show: true,
         formatter: '{b}\n{c}个',
         fontSize: 11,
-        color: isDark.value ? '#a1a1a6' : '#6e6e73',
-        lineHeight: 16
+        color: isDark.value ? '#94a3b8' : '#64748b',
+        lineHeight: 15
       },
       labelLine: {
         show: true,
-        length: 8,
-        length2: 12,
+        length: 10,
+        length2: 14,
         lineStyle: {
-          color: isDark.value ? '#48484a' : '#d1d1d6'
+          color: isDark.value ? 'rgba(148,163,184,0.2)' : 'rgba(148,163,184,0.35)',
+          width: 1
+        }
+      },
+      emphasis: {
+        scaleSize: 3,
+        itemStyle: {
+          shadowBlur: 0
+        },
+        label: {
+          fontWeight: 600
         }
       },
       data
@@ -278,115 +288,120 @@ const trendOption = computed(() => {
   return {
     tooltip: {
       trigger: 'axis',
+      backgroundColor: isDark.value ? '#1e293b' : '#ffffff',
+      borderColor: isDark.value ? '#334155' : '#e2e8f0',
+      borderWidth: 1,
+      textStyle: {
+        color: isDark.value ? '#f1f5f9' : '#0f172a',
+        fontSize: 12
+      },
+      axisPointer: {
+        type: 'line',
+        lineStyle: {
+          color: isDark.value ? 'rgba(148,163,184,0.15)' : 'rgba(148,163,184,0.25)',
+          type: 'dashed'
+        }
+      },
       formatter: '{b}: {c}次'
     },
-    grid: { left: 8, right: 8, top: 16, bottom: 8, containLabel: true },
+    grid: { left: 4, right: 4, top: 16, bottom: 0, containLabel: true },
     xAxis: {
       type: 'category',
       data: days,
+      boundaryGap: false,
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: {
+        color: textMuted.value,
+        fontSize: 11,
+        interval: 0,
+        margin: 10
+      }
+    },
+    yAxis: {
+      type: 'value',
+      show: true,
+      max: Math.ceil(maxValue * 1.3),
+      splitNumber: 3,
       axisLine: { show: false },
       axisTick: { show: false },
       axisLabel: {
         color: textMuted.value,
         fontSize: 10,
-        interval: 0
+        margin: 8
+      },
+      splitLine: {
+        lineStyle: {
+          color: isDark.value ? 'rgba(148,163,184,0.08)' : 'rgba(148,163,184,0.12)',
+          type: 'dashed'
+        }
       }
-    },
-    yAxis: {
-      type: 'value',
-      show: false,
-      max: Math.ceil(maxValue * 1.2) // 留出顶部空间
     },
     series: [{
       type: 'line',
       smooth: true,
       data,
       lineStyle: {
-        color: accentColor.value,
-        width: 2.5
+        width: 2.5,
+        color: {
+          type: 'linear',
+          x: 0, y: 0, x2: 1, y2: 0,
+          colorStops: [
+            { offset: 0, color: isDark.value ? '#818cf8' : '#3b82f6' },
+            { offset: 1, color: isDark.value ? '#60a5fa' : '#6366f1' }
+          ]
+        }
       },
       areaStyle: {
         color: {
           type: 'linear',
           x: 0, y: 0, x2: 0, y2: 1,
           colorStops: [
-            { offset: 0, color: isDark.value ? 'rgba(10, 132, 255, 0.25)' : 'rgba(0, 122, 255, 0.18)' },
+            { offset: 0, color: isDark.value ? 'rgba(99,102,241,0.15)' : 'rgba(59,130,246,0.08)' },
+            { offset: 0.6, color: isDark.value ? 'rgba(96,165,250,0.05)' : 'rgba(99,102,241,0.03)' },
             { offset: 1, color: 'transparent' }
           ]
         }
       },
       symbol: 'circle',
-      symbolSize: 4,
+      symbolSize: 5,
+      showSymbol: true,
       itemStyle: {
         color: accentColor.value,
-        borderWidth: 1.5,
-        borderColor: isDark.value ? '#2c2c2e' : '#ffffff'
-      }
-    }]
-  }
-})
-
-// 使用排行图 - TOP5
-const rankOption = computed(() => {
-  const ranking = configStore.usageStatsSummary?.ranking?.slice(0, 5) || []
-  const data = ranking.map(item => ({
-    name: configStore.getToolById(item.toolId)?.name || '未知',
-    value: item.useCount
-  }))
-
-  if (data.length === 0) {
-    // 没有数据时显示默认
-    return {
-      grid: { left: 8, right: 16, top: 8, bottom: 8, containLabel: true },
-      xAxis: { type: 'value', show: false, max: 10 },
-      yAxis: {
-        type: 'category',
-        data: ['暂无', '暂无', '暂无', '暂无', '暂无'],
-        axisLine: { show: false },
-        axisTick: { show: false },
-        axisLabel: { color: textMuted.value, fontSize: 11 }
-      },
-      series: [{
-        type: 'bar',
-        data: [0, 0, 0, 0, 0],
-        barWidth: 8,
-        itemStyle: { color: borderSubtle.value, borderRadius: [0, 4, 4, 0] }
-      }]
-    }
-  }
-
-  return {
-    grid: { left: 8, right: 36, top: 8, bottom: 8, containLabel: true },
-    xAxis: {
-      type: 'value',
-      show: false,
-      max: Math.ceil(Math.max(...data.map(d => d.value)) * 1.2) || 10
-    },
-    yAxis: {
-      type: 'category',
-      data: data.map(d => d.name).reverse(),
-      axisLine: { show: false },
-      axisTick: { show: false },
-      axisLabel: { color: textSecondary.value, fontSize: 11 }
-    },
-    series: [{
-      type: 'bar',
-      data: data.map(d => d.value).reverse(),
-      barWidth: 8,
-      itemStyle: {
-        color: accentColor.value,
-        borderRadius: [0, 4, 4, 0]
+        borderWidth: 2,
+        borderColor: isDark.value ? '#0f172a' : '#ffffff'
       },
       label: {
         show: true,
-        position: 'right',
-        color: textMuted.value,
+        position: 'top',
+        color: textSecondary.value,
         fontSize: 10,
-        formatter: '{c}'
+        fontWeight: 500,
+        formatter: (params: any) => params.value > 0 ? params.value : ''
       }
     }]
   }
 })
+
+// 使用排行 - TOP5
+const rankData = computed(() => {
+  const ranking = configStore.usageStatsSummary?.ranking || []
+  if (ranking.length === 0) return []
+  const maxCount = Math.max(...ranking.map(r => r.useCount), 1)
+  return ranking.map((item, idx) => {
+    const tool = configStore.getToolById(item.toolId)
+    return {
+      id: item.toolId,
+      name: tool?.name || '未知',
+      category: tool?.category || '',
+      count: item.useCount,
+      percent: Math.round((item.useCount / maxCount) * 100)
+    }
+  })
+})
+
+// 左栏底部卡片 tab 切换
+const activeTab = ref<'trend' | 'rank'>('rank')
 
 // 最近使用工具 - 最多4个（排除已禁用的）
 const recentTools = computed(() => {
@@ -421,6 +436,13 @@ const formatTime = (dateStr: string) => {
 // 方法
 const goToTools = () => router.push('/tools')
 
+const getCategoryColor = (category: string) => CATEGORY_COLORS[category] || '#3b82f6'
+
+const colorMix = (category: string, percent: number) => {
+  const color = getCategoryColor(category)
+  return `color-mix(in srgb, ${color} ${percent}%, transparent)`
+}
+
 const goToTool = async (tool: any) => {
   if (!tool || !tool.id) {
     toast.error('工具信息不完整')
@@ -439,6 +461,8 @@ const goToTool = async (tool: any) => {
           <h1 class="greeting-title">{{ greetingText }}</h1>
           <p class="greeting-sub"><span>{{ typedSub }}</span><span class="cursor" v-if="typedSub.length < currentSub.length">|</span></p>
         </div>
+
+        <div class="hero-deco"></div>
 
         <div class="time-block">
           <div class="time-display">{{ currentTime }}</div>
@@ -497,8 +521,8 @@ const goToTool = async (tool: any) => {
                 class="recent-item"
                 @click="goToTool(item)"
               >
-                <div class="recent-icon">
-                  <component :is="getIcon(item.icon)" v-if="item.icon" :size="13" />
+                <div class="recent-icon" :style="{ background: colorMix(item.category ?? '', 12), color: getCategoryColor(item.category ?? '') }">
+                  <component :is="getIcon(item.icon)" v-if="item.icon" :size="14" />
                   <span v-else class="icon-fallback">{{ item.name[0] }}</span>
                 </div>
                 <div class="recent-info">
@@ -513,23 +537,40 @@ const goToTool = async (tool: any) => {
             </div>
           </div>
 
-          <!-- 使用趋势 -->
+          <!-- 使用趋势 / 排行（tab 切换） -->
           <div class="content-group flex-1">
             <div class="group-header">
-              <h3 class="group-title">近7天使用</h3>
+              <div class="tab-switch">
+                <button
+                  class="tab-btn" :class="{ active: activeTab === 'rank' }"
+                  @click="activeTab = 'rank'"
+                >使用排行</button>
+                <button
+                  class="tab-btn" :class="{ active: activeTab === 'trend' }"
+                  @click="activeTab = 'trend'"
+                >近7天使用</button>
+              </div>
             </div>
-            <div class="group-content chart-content">
+            <div class="group-content chart-content" v-show="activeTab === 'trend'">
               <v-chart class="chart" :option="trendOption" autoresize />
             </div>
-          </div>
-
-          <!-- 使用排行 -->
-          <div class="content-group flex-1" v-if="rankOption">
-            <div class="group-header">
-              <h3 class="group-title">使用排行</h3>
+            <div class="group-content rank-content" v-show="activeTab === 'rank'" v-if="rankData.length > 0" style="flex: 1; overflow-y: auto;">
+              <div
+                v-for="(item, idx) in rankData"
+                :key="item.id"
+                class="rank-item"
+                @click="goToTool(item)"
+              >
+                <span class="rank-num" :class="{ 'rank-top': idx < 3 }">{{ idx + 1 }}</span>
+                <span class="rank-name">{{ item.name }}</span>
+                <div class="rank-bar-bg">
+                  <div class="rank-bar" :style="{ width: item.percent + '%' }"></div>
+                </div>
+                <span class="rank-count">{{ item.count }}</span>
+              </div>
             </div>
-            <div class="group-content chart-content">
-              <v-chart class="chart" :option="rankOption" autoresize />
+            <div class="group-content" v-show="activeTab === 'rank'" v-else>
+              <div class="empty-hint">暂无排行数据</div>
             </div>
           </div>
         </div>
@@ -550,29 +591,26 @@ const goToTool = async (tool: any) => {
           <div class="content-group">
             <div class="group-header">
               <h3 class="group-title">热门分类</h3>
-              <button class="view-all-btn" @click="goToTools">
-                全部 <ChevronRight :size="11" />
-              </button>
             </div>
-            <div class="group-content list-content">
+            <div class="group-content cat-list-content">
               <div
                 v-for="cat in categoryData"
                 :key="cat.name"
                 class="category-item"
-                :style="{ '--cat-color': cat.color }"
               >
                 <div class="category-row">
                   <div class="category-info">
                     <div class="category-dot" :style="{ background: cat.color }"></div>
                     <span class="category-name">{{ cat.name }}</span>
                   </div>
-                  <span class="category-count">{{ cat.count }}个</span>
+                  <span class="category-count" :style="{ color: cat.color }">{{ cat.count }}个</span>
                 </div>
                 <div class="category-tools">
                   <span
                     v-for="tool in cat.tools"
                     :key="tool.id"
                     class="tool-tag"
+                    :style="{ '--tag-color': cat.color }"
                     @click="goToTool(tool)"
                   >
                     {{ tool.name }}
@@ -599,9 +637,10 @@ const goToTool = async (tool: any) => {
 
 /* ====== Header ====== */
 .hero-section {
-  padding: 12px 24px 10px;
+  padding: 20px 28px 16px;
   flex-shrink: 0;
-  border-bottom: 1px solid var(--border-subtle);
+  position: relative;
+  overflow: hidden;
 }
 
 .hero-content {
@@ -610,25 +649,38 @@ const goToTool = async (tool: any) => {
   align-items: center;
 }
 
+.hero-deco {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 80px;
+  background: radial-gradient(ellipse, var(--accent) 0%, transparent 70%);
+  opacity: 0.06;
+  pointer-events: none;
+}
+
 .greeting-block {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 3px;
 }
 
 .greeting-title {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
 }
 
 .greeting-sub {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-secondary);
   margin: 0;
-  min-height: 1.4em;
+  min-height: 1.5em;
 }
 
 .greeting-sub .cursor {
@@ -647,20 +699,20 @@ const goToTool = async (tool: any) => {
 }
 
 .time-display {
-  font-size: 26px;
-  font-weight: 300;
+  font-size: 36px;
+  font-weight: 200;
   color: var(--text-primary);
   line-height: 1;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.5px;
+  letter-spacing: -1.5px;
 }
 
 .date-display {
   display: flex;
-  gap: 6px;
-  margin-top: 3px;
+  gap: 8px;
+  margin-top: 5px;
   justify-content: flex-end;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-muted);
   font-weight: 500;
 }
@@ -684,7 +736,7 @@ const goToTool = async (tool: any) => {
 .top-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-shrink: 0;
 }
 
@@ -698,32 +750,40 @@ const goToTool = async (tool: any) => {
 .stat-card {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border-weak);
+  border-radius: 12px;
+  backdrop-filter: var(--glass-blur-sm);
+  transition: all 150ms ease;
+}
+
+.stat-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
 }
 
 .stat-icon {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-sm);
-  font-size: 16px;
+  border-radius: 10px;
+  font-size: 17px;
   flex-shrink: 0;
 }
 
 .stat-info {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
 }
 
 .stat-value {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1;
@@ -736,72 +796,75 @@ const goToTool = async (tool: any) => {
   font-weight: 500;
 }
 
-/* 工具箱磁贴 - macOS 控制中心风格 */
+/* 工具箱入口 - 品牌色玻璃拟态 */
 .tools-tile {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 16px;
-  background: var(--accent);
-  border: none;
-  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  background: color-mix(in srgb, var(--accent) 10%, var(--glass-bg));
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  border-radius: 12px;
+  backdrop-filter: var(--glass-blur-sm);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all 150ms ease;
   flex-shrink: 0;
   min-width: 140px;
 }
 
 .tools-tile:hover {
-  background: var(--accent-hover);
-  filter: brightness(1.05);
+  background: color-mix(in srgb, var(--accent) 18%, var(--glass-bg));
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  box-shadow: 0 2px 12px color-mix(in srgb, var(--accent) 15%, transparent);
+  transform: translateY(-1px);
 }
 
 .tools-tile:active {
-  transform: scale(0.98);
+  transform: translateY(0) scale(0.98);
 }
 
 .tile-icon {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-sm);
+  border-radius: 10px;
   font-size: 17px;
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
   flex-shrink: 0;
 }
 
 .tile-body {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
   text-align: left;
 }
 
 .tile-title {
   font-size: 13px;
   font-weight: 600;
-  color: #fff;
+  color: var(--accent);
   line-height: 1;
 }
 
 .tile-sub {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--text-muted);
   font-weight: 500;
 }
 
 .tile-arrow {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-muted);
   margin-left: auto;
-  transition: all var(--transition-fast);
+  transition: all 150ms ease;
 }
 
 .tools-tile:hover .tile-arrow {
-  color: #fff;
+  color: var(--accent);
   transform: translateX(2px);
 }
 
@@ -879,6 +942,38 @@ const goToTool = async (tool: any) => {
   font-size: 11px;
 }
 
+/* ====== Tab Switch ====== */
+.tab-switch {
+  display: inline-flex;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  padding: 2px;
+  gap: 1px;
+}
+
+.tab-btn {
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 150ms ease;
+  white-space: nowrap;
+}
+
+.tab-btn.active {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.tab-btn:hover:not(.active) {
+  color: var(--text-secondary);
+}
+
 .group-content {
   padding: 6px;
 }
@@ -902,27 +997,30 @@ const goToTool = async (tool: any) => {
 .recent-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 7px 10px;
-  border-radius: var(--radius-sm);
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all 150ms ease;
 }
 
 .recent-item:hover {
   background: var(--bg-hover);
+  transform: translateX(2px);
+}
+
+.recent-item:active {
+  transform: translateX(2px) scale(0.99);
 }
 
 .recent-icon {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--accent-light);
-  color: var(--accent);
-  border-radius: var(--radius-xs);
-  font-size: 13px;
+  border-radius: 8px;
+  font-size: 14px;
   flex-shrink: 0;
 }
 
@@ -935,12 +1033,12 @@ const goToTool = async (tool: any) => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 1px;
   min-width: 0;
 }
 
 .recent-name {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text-primary);
   overflow: hidden;
@@ -949,14 +1047,15 @@ const goToTool = async (tool: any) => {
 }
 
 .recent-category {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-muted);
 }
 
 .recent-time {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-muted);
   font-weight: 500;
+  flex-shrink: 0;
 }
 
 .empty-hint {
@@ -966,11 +1065,93 @@ const goToTool = async (tool: any) => {
   color: var(--text-muted);
 }
 
+/* ====== Rank List ====== */
+.rank-content {
+  padding: 4px 6px 6px;
+  scrollbar-width: none;
+}
+
+.rank-content::-webkit-scrollbar {
+  display: none;
+}
+
+.rank-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.rank-item:hover {
+  background: var(--bg-hover);
+}
+
+.rank-num {
+  font-size: 11px;
+  color: var(--text-muted);
+  width: 14px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.rank-top {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.rank-name {
+  font-size: 12px;
+  color: var(--text-primary);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rank-bar-bg {
+  width: 70px;
+  height: 5px;
+  background: var(--bg-secondary);
+  border-radius: 3px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.rank-bar {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--accent);
+  opacity: 0.7;
+  transition: width 300ms ease;
+}
+
+.rank-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  width: 20px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
 /* ====== Category List ====== */
+.cat-list-content {
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.cat-list-content::-webkit-scrollbar {
+  display: none;
+}
+
 .category-item {
-  padding: 8px 10px;
-  border-radius: var(--radius-sm);
-  transition: all var(--transition-fast);
+  padding: 7px 10px;
+  border-radius: 6px;
+  transition: background 150ms ease;
 }
 
 .category-item:hover {
@@ -981,7 +1162,7 @@ const goToTool = async (tool: any) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
 }
 
 .category-info {
@@ -997,40 +1178,40 @@ const goToTool = async (tool: any) => {
 }
 
 .category-name {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .category-count {
   font-size: 11px;
-  color: var(--text-muted);
-  font-weight: 500;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .category-tools {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 4px;
 }
 
 .tool-tag {
   display: inline-flex;
-  padding: 3px 8px;
-  font-size: 11px;
+  padding: 2px 7px;
+  font-size: 10px;
   font-weight: 500;
   color: var(--text-secondary);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xs);
+  background: color-mix(in srgb, var(--tag-color, var(--accent)) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--tag-color, var(--accent)) 15%, transparent);
+  border-radius: 4px;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all 150ms ease;
 }
 
 .tool-tag:hover {
-  color: var(--accent);
-  border-color: var(--accent);
-  background: var(--accent-light);
+  color: var(--tag-color, var(--accent));
+  border-color: var(--tag-color, var(--accent));
+  background: color-mix(in srgb, var(--tag-color, var(--accent)) 15%, transparent);
 }
 
 /* ====== Responsive ====== */

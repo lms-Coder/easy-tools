@@ -150,6 +150,8 @@ onUnmounted(() => {
   z-index: 100;
   background: var(--bg-header);
   border-bottom: 1px solid var(--border-subtle);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
 }
 
 /* ====== 左侧标题 ====== */

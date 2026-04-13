@@ -28,6 +28,25 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  position: relative;
+}
+
+/* Background gradient decoration for depth */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(59, 130, 246, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(139, 92, 246, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+html.dark body::before {
+  background:
+    radial-gradient(ellipse at 15% 10%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+    radial-gradient(ellipse at 85% 90%, rgba(139, 92, 246, 0.06) 0%, transparent 40%);
 }
 
 #app {
@@ -36,35 +55,39 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 
 /* ========================================
    原生风格组件 - Native Style Components
    ======================================== */
 
-/* 基础卡片 */
+/* Glass cards - with backdrop-filter */
 .glass {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border-weak);
   border-radius: var(--radius-md);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
 }
 
 .glass:hover {
-  background: var(--bg-hover);
-  border-color: var(--border-default);
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border);
 }
 
-/* 弱背景 */
+/* Weak background */
 .glass-weak {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
+  background: var(--glass-bg-weak);
+  border: 1px solid var(--glass-border-weak);
   border-radius: var(--radius-md);
 }
 
-/* 强背景 */
+/* Strong background */
 .glass-strong {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-default);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
 }
 
@@ -841,7 +864,7 @@ body {
 .tool-node-info .node-value { color: var(--text-primary); }
 .tool-node-info .node-timestamp { color: var(--text-secondary); flex-shrink: 0; }
 
-/* 滚动条 - macOS Overlay 风格 */
+/* Scrollbar - glass theme */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -852,23 +875,35 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(120, 120, 128, 0.15);
+  background: rgba(100, 116, 139, 0.15);
   border-radius: 999px;
   transition: background 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(120, 120, 128, 0.4);
+  background: rgba(100, 116, 139, 0.35);
 }
 
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
 
+html.dark ::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.15);
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.35);
+}
+
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(120, 120, 128, 0.25) transparent;
+  scrollbar-color: rgba(100, 116, 139, 0.2) transparent;
+}
+
+html.dark * {
+  scrollbar-color: rgba(148, 163, 184, 0.2) transparent;
 }
 
 /* 隐藏滚动条 */

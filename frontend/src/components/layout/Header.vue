@@ -74,6 +74,8 @@ const handleThemeToggle = () => {
   background-color: var(--bg-primary);
   border-bottom: 1px solid var(--border-subtle);
   user-select: none;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
 }
 
 .header-left {

@@ -15,6 +15,7 @@ import {
   Settings,
   Info,
   Check,
+  Search,
 } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -22,6 +23,7 @@ const themeStore = useThemeStore()
 const configStore = useConfigStore()
 
 const activeCategory = ref('appearance')
+const toolSearch = ref('')
 
 const categories = [
   { id: 'appearance', name: '外观', icon: Palette },
@@ -33,20 +35,30 @@ const categories = [
 const setActiveCategory = (id: string) => activeCategory.value = id
 
 const categoryColors: Record<string, string> = {
-  '开发工具': '#007AFF',
-  '编码转换': '#34C759',
-  '时间处理': '#FF9F0A',
-  '文本处理': '#5AC8FA',
-  '系统工具': '#5856D6',
-  '安全工具': '#FF3B30',
-  '其他': '#AF52DE'
+  '开发工具': '#3b82f6',
+  '编码转换': '#10b981',
+  '时间处理': '#f59e0b',
+  '文本处理': '#06b6d4',
+  '系统工具': '#6366f1',
+  '安全工具': '#ef4444',
+  '其他': '#8b5cf6'
 }
 
 const toolCategories = computed(() => {
-  return configStore.allToolsByCategory.map(cat => ({
-    ...cat,
-    color: categoryColors[cat.name] || '#007AFF'
-  }))
+  const keyword = toolSearch.value.trim().toLowerCase()
+  return configStore.allToolsByCategory
+    .map(cat => ({
+      ...cat,
+      color: categoryColors[cat.name] || '#3b82f6',
+      tools: keyword
+        ? cat.tools.filter(t =>
+            t.name.toLowerCase().includes(keyword) ||
+            t.id.toLowerCase().includes(keyword) ||
+            (t.description || t.desc || '').toLowerCase().includes(keyword)
+          )
+        : cat.tools
+    }))
+    .filter(cat => cat.tools.length > 0)
 })
 
 const getToolIcon = (iconName: string) => getIcon(iconName)
@@ -83,11 +95,11 @@ const themeOptions: { value: 'light' | 'dark'; label: string; icon: typeof Sun }
 ]
 
 const presetColors = [
-  '#007AFF', '#34C759', '#FF9F0A', '#AF52DE',
-  '#FF3B30', '#5AC8FA', '#FFCC00', '#5856D6'
+  '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6',
+  '#ef4444', '#06b6d4', '#f97316', '#6366f1'
 ]
 
-const currentColor = ref('#007AFF')
+const currentColor = ref('#3b82f6')
 const localAppName = ref('')
 
 const loadAppName = async () => {
@@ -117,9 +129,9 @@ const resetAppearance = async () => {
   localAppName.value = 'Easy Tools'
   configStore.setAppName('Easy Tools')
   if (themeStore.currentTheme !== 'light') themeStore.set('light')
-  currentColor.value = '#007AFF'
-  configStore.setPrimaryColor('#007AFF')
-  themeStore.applyPrimaryColor('#007AFF')
+  currentColor.value = '#3b82f6'
+  configStore.setPrimaryColor('#3b82f6')
+  themeStore.applyPrimaryColor('#3b82f6')
   toast.success('已重置')
 }
 
@@ -138,171 +150,173 @@ onMounted(async () => {
 
 <template>
   <div class="settings-page">
-    <!-- 左侧边栏 - macOS 风格 -->
-    <aside class="sidebar">
+    <!-- 左侧导航栏 -->
+    <aside class="settings-sidebar">
       <div class="sidebar-header">
         <button class="back-btn" @click="goBack">
-          <ArrowLeft :size="16" />
+          <ArrowLeft :size="14" />
+          <span>返回</span>
         </button>
-        <span class="sidebar-title">设置</span>
       </div>
-
       <nav class="sidebar-nav">
         <button
           v-for="cat in categories"
           :key="cat.id"
-          class="nav-item"
+          class="sidebar-nav-item"
           :class="{ active: activeCategory === cat.id }"
           @click="setActiveCategory(cat.id)"
         >
-          <component :is="cat.icon" class="nav-icon" :size="15" />
-          <span class="nav-label">{{ cat.name }}</span>
+          {{ cat.name }}
         </button>
       </nav>
     </aside>
 
-    <!-- 主内容 - macOS 分组列表风格 -->
+    <!-- 主内容区域 -->
     <main class="main-content scrollbar-hide">
+      <div class="content-wrapper">
       <Transition name="tab-switch" mode="out-in">
         <!-- 外观设置 -->
-        <div v-if="activeCategory === 'appearance'" class="settings-panel" key="appearance">
-          <div class="content-header">
-            <h2 class="content-title">外观</h2>
-          </div>
-
-          <div class="section-label">
-            <span class="section-dot" style="background: #5856D6"></span>
-            通用
-          </div>
-          <div class="grouped-list">
-            <div class="setting-item">
-              <div class="setting-info">
-                <span class="setting-label">应用名称</span>
-                <span class="setting-desc">显示在窗口标题栏</span>
+        <div v-if="activeCategory === 'appearance'" key="appearance">
+          <!-- 通用 -->
+          <div class="group-card">
+            <div class="group-title">通用</div>
+            <div class="group-body">
+              <div class="group-row">
+                <div class="setting-info">
+                  <span class="setting-label">应用名称</span>
+                  <span class="setting-desc">显示在窗口标题栏</span>
+                </div>
+                <input
+                  v-model="localAppName"
+                  type="text"
+                  class="setting-input"
+                  placeholder="输入名称"
+                  @blur="saveAppName"
+                  @keydown.enter="saveAppName"
+                />
               </div>
-              <input
-                v-model="localAppName"
-                type="text"
-                class="setting-input"
-                placeholder="输入名称"
-                @blur="saveAppName"
-                @keydown.enter="saveAppName"
-              />
+              <div class="group-row">
+                <div class="setting-info">
+                  <span class="setting-label">主题</span>
+                  <span class="setting-desc">选择界面主题</span>
+                </div>
+                <div class="segment-control">
+                  <button
+                    v-for="opt in themeOptions"
+                    :key="opt.value"
+                    class="segment-btn"
+                    :class="{ active: themeStore.currentTheme === opt.value }"
+                    @click="(e) => themeStore.setWithAnimation(opt.value, e)"
+                  >
+                    <component :is="opt.icon" :size="14" />
+                    {{ opt.label }}
+                  </button>
+                </div>
+              </div>
             </div>
+          </div>
 
-            <div class="setting-item">
-              <div class="setting-info">
-                <span class="setting-label">主题</span>
-                <span class="setting-desc">选择界面主题</span>
-              </div>
-              <div class="segment-control">
-                <button
-                  v-for="opt in themeOptions"
-                  :key="opt.value"
-                  class="segment-btn"
-                  :class="{ active: themeStore.currentTheme === opt.value }"
-                  @click="(e) => themeStore.setWithAnimation(opt.value, e)"
+          <!-- 主题色 -->
+          <div class="group-card">
+            <div class="group-title">主题色</div>
+            <div class="group-body color-body">
+              <div class="color-preview-row">
+                <div
+                  v-for="color in presetColors"
+                  :key="color"
+                  class="color-swatch"
+                  :class="{ active: currentColor === color }"
+                  :style="{ '--swatch': color }"
+                  @click="selectColor(color)"
                 >
-                  <component :is="opt.icon" :size="14" />
-                  {{ opt.label }}
-                </button>
+                  <div class="swatch-circle">
+                    <Check v-if="currentColor === color" class="swatch-check" :size="16" />
+                  </div>
+                  <span class="swatch-label">{{ color }}</span>
+                </div>
+              </div>
+              <div class="color-custom-row">
+                <span class="setting-label">自定义颜色</span>
+                <div class="custom-color-wrap">
+                  <input
+                    type="color"
+                    class="custom-color-input"
+                    :value="currentColor"
+                    @input="(e: Event) => selectColor((e.target as HTMLInputElement).value)"
+                  />
+                  <span class="custom-color-value">{{ currentColor }}</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="section-label">
-            <span class="section-dot" style="background: var(--accent)"></span>
-            主题色
-          </div>
-          <div class="color-preview-row">
-            <div
-              v-for="color in presetColors"
-              :key="color"
-              class="color-swatch"
-              :class="{ active: currentColor === color }"
-              :style="{ '--swatch': color }"
-              @click="selectColor(color)"
-            >
-              <div class="swatch-circle">
-                <Check v-if="currentColor === color" class="swatch-check" :size="16" />
+          <!-- 重置 -->
+          <div class="group-card">
+            <div class="group-title">重置</div>
+            <div class="group-body">
+              <div class="group-row">
+                <div class="setting-info">
+                  <span class="setting-label">恢复默认外观</span>
+                  <span class="setting-desc">重置所有外观设置为默认值</span>
+                </div>
+                <button class="text-btn danger" @click="showResetDialog = true">重置</button>
               </div>
-              <span class="swatch-label">{{ color }}</span>
-            </div>
-          </div>
-          <div class="color-custom-row">
-            <span class="setting-label">自定义颜色</span>
-            <div class="custom-color-wrap">
-              <input
-                type="color"
-                class="custom-color-input"
-                :value="currentColor"
-                @input="(e: Event) => selectColor((e.target as HTMLInputElement).value)"
-              />
-              <span class="custom-color-value">{{ currentColor }}</span>
-            </div>
-          </div>
-
-          <div class="section-label">
-            <span class="section-dot" style="background: #FF3B30"></span>
-            重置
-          </div>
-          <div class="grouped-list">
-            <div class="setting-item">
-              <div class="setting-info">
-                <span class="setting-label">恢复默认外观</span>
-                <span class="setting-desc">重置所有外观设置为默认值</span>
-              </div>
-              <button class="text-btn danger" @click="showResetDialog = true">重置</button>
             </div>
           </div>
         </div>
 
         <!-- 工具管理 -->
-        <div v-else-if="activeCategory === 'tools'" class="settings-panel" key="tools">
-          <div class="content-header">
-            <h2 class="content-title">工具管理</h2>
-            <span class="content-count">{{ configStore.tools.length }} 项</span>
+        <div v-else-if="activeCategory === 'tools'" key="tools">
+          <div class="search-bar">
+            <Search :size="14" />
+            <input
+              v-model="toolSearch"
+              type="text"
+              placeholder="搜索工具..."
+            />
           </div>
-
           <template v-for="category in toolCategories" :key="category.name">
-            <div class="section-label">
-              <span class="section-dot" :style="{ background: category.color }"></span>
-              {{ category.name }}
-              <span class="section-badge">{{ category.tools.length }}</span>
-            </div>
-            <div class="grouped-list tool-group-list">
-              <div
-                v-for="tool in category.tools"
-                :key="tool.id"
-                class="setting-item tool-item"
-                :class="{ disabled: !tool.enabled }"
-              >
-                <div class="setting-info horizontal">
-                  <div class="tool-icon" :style="{ background: `${category.color}18`, color: category.color, boxShadow: `0 2px 8px ${category.color}20` }">
-                    <component :is="getToolIcon(tool.icon)" :size="15" />
+            <div class="group-card">
+              <div class="group-title">
+                <span class="cat-dot" :style="{ background: category.color }"></span>
+                {{ category.name }}
+                <span class="group-badge">{{ category.tools.length }}</span>
+              </div>
+              <div class="group-body">
+                <div
+                  v-for="tool in category.tools"
+                  :key="tool.id"
+                  class="tool-row"
+                  :class="{ disabled: !tool.enabled }"
+                >
+                  <div class="tool-main">
+                    <div class="tool-icon" :style="{ background: `${category.color}12`, color: category.color }">
+                      <component :is="getToolIcon(tool.icon)" :size="14" />
+                    </div>
+                    <div class="tool-meta">
+                      <span class="tool-name">{{ tool.name }}</span>
+                      <span class="tool-desc">{{ tool.description || tool.desc }}</span>
+                    </div>
                   </div>
-                  <div class="tool-meta">
-                    <span class="setting-label">{{ tool.name }}</span>
-                    <span class="tool-id-tag">{{ tool.id }}</span>
+                  <div class="tool-controls">
+                    <button
+                      class="chip-btn"
+                      :class="{ active: tool.allowMultiple, disabled: !tool.enabled }"
+                      :style="tool.allowMultiple ? { background: `${category.color}14`, borderColor: `${category.color}30`, color: category.color } : {}"
+                      :disabled="!tool.enabled"
+                      @click="toggleToolAllowMultiple(tool.id, !tool.allowMultiple)"
+                    >
+                      {{ tool.allowMultiple ? '多开' : '单开' }}
+                    </button>
+                    <label class="toggle">
+                      <input
+                        type="checkbox"
+                        :checked="tool.enabled"
+                        @change="(e: Event) => toggleToolEnabled(tool.id, (e.target as HTMLInputElement).checked)"
+                      />
+                      <span class="toggle-slider"></span>
+                    </label>
                   </div>
-                </div>
-                <div class="tool-controls">
-                  <button
-                    class="chip-btn"
-                    :class="{ active: tool.allowMultiple, disabled: !tool.enabled }"
-                    :disabled="!tool.enabled"
-                    @click="toggleToolAllowMultiple(tool.id, !tool.allowMultiple)"
-                  >
-                    {{ tool.allowMultiple ? '多开' : '单开' }}
-                  </button>
-                  <label class="toggle">
-                    <input
-                      type="checkbox"
-                      :checked="tool.enabled"
-                      @change="(e: Event) => toggleToolEnabled(tool.id, (e.target as HTMLInputElement).checked)"
-                    />
-                    <span class="toggle-slider"></span>
-                  </label>
                 </div>
               </div>
             </div>
@@ -310,140 +324,126 @@ onMounted(async () => {
         </div>
 
         <!-- 系统设置 -->
-        <div v-else-if="activeCategory === 'system'" class="settings-panel" key="system">
-          <div class="content-header">
-            <h2 class="content-title">系统</h2>
-          </div>
-
-          <div class="section-label">
-            <span class="section-dot" style="background: #007AFF"></span>
-            窗口行为
-          </div>
-          <div class="grouped-list">
-            <div class="setting-item">
-              <div class="setting-info">
-                <span class="setting-label">最小化到托盘</span>
-                <span class="setting-desc">点击最小化时隐藏到系统托盘</span>
+        <div v-else-if="activeCategory === 'system'" key="system">
+          <div class="group-card">
+            <div class="group-title">窗口行为</div>
+            <div class="group-body">
+              <div class="group-row">
+                <div class="setting-info">
+                  <span class="setting-label">最小化到托盘</span>
+                  <span class="setting-desc">点击最小化时隐藏到系统托盘</span>
+                </div>
+                <label class="toggle">
+                  <input
+                    type="checkbox"
+                    :checked="systemConfig.minimizeToTray"
+                    @change="(e: Event) => toggleMinimizeToTray((e.target as HTMLInputElement).checked)"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
               </div>
-              <label class="toggle">
-                <input
-                  type="checkbox"
-                  :checked="systemConfig.minimizeToTray"
-                  @change="(e: Event) => toggleMinimizeToTray((e.target as HTMLInputElement).checked)"
-                />
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-
-            <div class="setting-item">
-              <div class="setting-info">
-                <span class="setting-label">关闭窗口时</span>
-                <span class="setting-desc">点击关闭按钮的行为</span>
-              </div>
-              <div class="segment-control">
-                <button
-                  class="segment-btn"
-                  :class="{ active: systemConfig.closeBehavior === 'close' }"
-                  @click="setCloseBehavior('close')"
-                >退出程序</button>
-                <button
-                  class="segment-btn"
-                  :class="{ active: systemConfig.closeBehavior === 'minimize' }"
-                  @click="setCloseBehavior('minimize')"
-                >最小化到托盘</button>
+              <div class="group-row">
+                <div class="setting-info">
+                  <span class="setting-label">关闭窗口时</span>
+                  <span class="setting-desc">点击关闭按钮的行为</span>
+                </div>
+                <div class="segment-control">
+                  <button
+                    class="segment-btn"
+                    :class="{ active: systemConfig.closeBehavior === 'close' }"
+                    @click="setCloseBehavior('close')"
+                  >退出程序</button>
+                  <button
+                    class="segment-btn"
+                    :class="{ active: systemConfig.closeBehavior === 'minimize' }"
+                    @click="setCloseBehavior('minimize')"
+                  >最小化到托盘</button>
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="section-label">
-            <span class="section-dot" style="background: #34C759"></span>
-            启动
-          </div>
-          <div class="grouped-list">
-            <div class="setting-item">
-              <div class="setting-info">
-                <span class="setting-label">开机启动</span>
-                <span class="setting-desc">系统启动时自动运行</span>
+          <div class="group-card">
+            <div class="group-title">启动</div>
+            <div class="group-body">
+              <div class="group-row">
+                <div class="setting-info">
+                  <span class="setting-label">开机启动</span>
+                  <span class="setting-desc">系统启动时自动运行</span>
+                </div>
+                <label class="toggle">
+                  <input
+                    type="checkbox"
+                    :checked="systemConfig.launchOnStartup"
+                    @change="(e: Event) => toggleLaunchOnStartup((e.target as HTMLInputElement).checked)"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
               </div>
-              <label class="toggle">
-                <input
-                  type="checkbox"
-                  :checked="systemConfig.launchOnStartup"
-                  @change="(e: Event) => toggleLaunchOnStartup((e.target as HTMLInputElement).checked)"
-                />
-                <span class="toggle-slider"></span>
-              </label>
             </div>
           </div>
         </div>
 
         <!-- 关于 -->
-        <div v-else-if="activeCategory === 'about'" class="settings-panel" key="about">
-          <div class="content-header">
-            <h2 class="content-title">关于</h2>
-          </div>
-
-          <div class="about-hero glass-card">
-            <div class="about-hero-bg"></div>
-            <div class="about-hero-content">
-              <div class="about-logo">
-                <span class="logo-text">{{ configStore.appName?.[0] || 'E' }}</span>
-              </div>
-              <div class="about-hero-meta">
-                <span class="about-hero-name">{{ configStore.appName }}</span>
-                <span class="about-hero-version">版本 1.0.0</span>
-                <span class="about-hero-desc">高效实用的开发者工具箱</span>
-              </div>
+        <div v-else-if="activeCategory === 'about'" key="about">
+          <!-- Logo -->
+          <div class="about-hero">
+            <div class="about-logo">
+              <span class="logo-text">{{ configStore.appName?.[0] || 'E' }}</span>
+            </div>
+            <div class="about-text">
+              <span class="about-name">{{ configStore.appName }}</span>
+              <span class="about-subtitle">v1.0.0 · 高效实用的开发者工具箱</span>
             </div>
           </div>
 
+          <!-- Stats -->
           <div class="about-stats">
-            <div class="about-stat-card glass-card">
-              <span class="about-stat-icon" style="--stat-color: #007AFF"><LayoutGrid :size="18" /></span>
+            <div class="about-stat-item">
               <span class="about-stat-value">{{ configStore.tools.length }}</span>
               <span class="about-stat-label">工具总数</span>
             </div>
-            <div class="about-stat-card glass-card">
-              <span class="about-stat-icon" style="--stat-color: #34C759"><Check :size="18" /></span>
+            <div class="about-stat-item">
               <span class="about-stat-value">{{ configStore.usageStatsSummary?.todayCount || 0 }}</span>
               <span class="about-stat-label">今日使用</span>
             </div>
-            <div class="about-stat-card glass-card">
-              <span class="about-stat-icon" style="--stat-color: #FF9F0A"><Info :size="18" /></span>
+            <div class="about-stat-item">
               <span class="about-stat-value">{{ (configStore.usageStatsSummary?.todayCount || 0) + (configStore.usageStatsSummary?.weekCount || 0) }}</span>
               <span class="about-stat-label">累计使用</span>
             </div>
           </div>
 
-          <div class="about-links">
-            <div class="grouped-list">
-              <div class="setting-item">
-                <div class="setting-info">
-                  <span class="setting-label">技术栈</span>
-                  <span class="setting-desc">Vue 3 + Wails 3 + Go</span>
-                </div>
+          <!-- Info -->
+          <div class="group-card">
+            <div class="group-title">信息</div>
+            <div class="group-body">
+              <div class="group-row">
+                <span class="setting-label">技术栈</span>
+                <span class="setting-value">Vue 3 + Wails 3 + Go</span>
               </div>
-              <div class="setting-item">
-                <div class="setting-info">
-                  <span class="setting-label">开源协议</span>
-                  <span class="setting-desc">MIT License</span>
-                </div>
+              <div class="group-row">
+                <span class="setting-label">开源协议</span>
+                <span class="setting-value">MIT License</span>
               </div>
             </div>
           </div>
 
-          <div class="section-label">数据管理</div>
-          <div class="grouped-list">
-            <div class="setting-item">
-              <div class="setting-info">
-                <span class="setting-label">清空使用数据</span>
-                <span class="setting-desc">清除所有使用统计记录，此操作不可恢复</span>
+          <!-- Data management -->
+          <div class="group-card">
+            <div class="group-title">数据管理</div>
+            <div class="group-body">
+              <div class="group-row">
+                <div class="setting-info">
+                  <span class="setting-label">清空使用数据</span>
+                  <span class="setting-desc">清除所有使用统计记录，此操作不可恢复</span>
+                </div>
+                <button class="text-btn danger" @click="showClearDialog = true">清空</button>
               </div>
-              <button class="text-btn danger" @click="showClearDialog = true">清空</button>
             </div>
           </div>
         </div>
       </Transition>
+      </div>
     </main>
 
     <!-- 重置确认对话框 -->
@@ -474,156 +474,131 @@ onMounted(async () => {
 
 <style scoped>
 .settings-page {
-  display: grid;
-  grid-template-columns: 220px 1fr;
+  display: flex;
   height: 100%;
   overflow: hidden;
   background: var(--bg-primary);
 }
 
-/* ====== 侧边栏 ====== */
-.sidebar {
+/* ====== Sidebar ====== */
+.settings-sidebar {
+  width: 170px;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  background: var(--bg-secondary);
+  padding: 20px 10px 16px;
+  background: var(--bg-sidebar);
   border-right: 1px solid var(--border-subtle);
-  overflow: hidden;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
 }
 
 .sidebar-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px 16px 12px;
+  padding: 0 12px 14px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 12px;
 }
 
 .back-btn {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
+  gap: 6px;
   padding: 0;
   background: transparent;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
+  border: none;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  color: var(--text-muted);
+  font-size: 12px;
+  transition: color var(--transition-fast);
 }
 
 .back-btn:hover {
-  background: var(--bg-hover);
-  border-color: var(--border-strong);
-  color: var(--text-primary);
-}
-
-.sidebar-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-primary);
+  color: var(--text-secondary);
 }
 
 .sidebar-nav {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.nav-item {
+.sidebar-nav-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 8px 12px;
-  margin-bottom: 2px;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border-left: 2.5px solid transparent;
+  margin-left: 4px;
   font-size: 13px;
   color: var(--text-secondary);
   cursor: pointer;
   transition: all var(--transition-fast);
   text-align: left;
+  border-right: none;
+  border-top: none;
+  border-bottom: none;
+  background: transparent;
+  width: calc(100% - 4px);
 }
 
-.nav-item:hover {
+.sidebar-nav-item:hover {
   background: var(--bg-hover);
   color: var(--text-primary);
 }
 
-.nav-item.active {
+.sidebar-nav-item.active {
   background: var(--accent-light);
-  border-color: var(--accent);
+  border-left-color: var(--accent);
   color: var(--accent);
   font-weight: 500;
 }
 
-.nav-icon {
-  font-size: 15px;
-  flex-shrink: 0;
-}
-
-.nav-label {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* ====== 主内容 ====== */
+/* ====== Main content ====== */
 .main-content {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 28px;
-}
-
-.settings-panel {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.content-header {
+  padding: 20px 24px;
   display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-bottom: 16px;
+  justify-content: center;
 }
 
-.content-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 0;
+.content-wrapper {
+  width: 100%;
+  max-width: 520px;
 }
 
-.content-count {
-  font-size: 13px;
-  color: var(--text-muted);
+/* ====== Group card ====== */
+.group-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  margin-bottom: 12px;
+  overflow: hidden;
 }
 
-/* ====== 分区标签 - macOS 风格 ====== */
-.section-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.group-title {
+  padding: 12px 18px 6px;
   font-size: 11px;
   font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.3px;
-  margin-bottom: 6px;
-  padding-left: 2px;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.section-dot {
+.cat-dot {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
+  border-radius: 3px;
   flex-shrink: 0;
 }
 
-.section-badge {
+.group-badge {
   font-size: 10px;
   font-weight: 500;
   color: var(--text-muted);
@@ -633,38 +608,26 @@ onMounted(async () => {
   margin-left: auto;
 }
 
-.section-label:not(:first-child) {
-  margin-top: 20px;
+.group-body {
+  padding: 0 18px 14px;
 }
 
-/* ====== 分组列表 - macOS Grouped List ====== */
-.grouped-list {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin-bottom: 4px;
+.group-body.color-body {
+  padding: 0 18px 18px;
 }
 
-/* ====== 设置项 ====== */
-.setting-item {
+.group-row {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 11px 16px;
-  border-bottom: 1px solid var(--border-subtle);
-  min-height: 44px;
+  align-items: center;
+  padding: 12px 0;
 }
 
-.setting-item:last-child {
-  border-bottom: none;
+.group-row + .group-row {
+  border-top: 1px solid var(--border-subtle);
 }
 
-.setting-item.disabled {
-  opacity: 0.45;
-}
-
+/* ====== Setting info ====== */
 .setting-info {
   display: flex;
   flex-direction: column;
@@ -690,7 +653,12 @@ onMounted(async () => {
   color: var(--text-muted);
 }
 
-/* ====== 输入框 ====== */
+.setting-value {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ====== Input ====== */
 .setting-input {
   width: 180px;
   height: 28px;
@@ -713,35 +681,7 @@ onMounted(async () => {
   box-shadow: var(--shadow-focus);
 }
 
-/* ====== 下拉框 ====== */
-.setting-select {
-  width: 140px;
-  height: 28px;
-  padding: 0 10px;
-  font-size: 13px;
-  color: var(--text-primary);
-  background: var(--bg-input);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  outline: none;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.setting-select:hover {
-  border-color: var(--border-strong);
-}
-
-.setting-select:focus {
-  border-color: var(--accent);
-}
-
-.setting-select option {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-}
-
-/* ====== 分段控件 - macOS Segmented Control ====== */
+/* ====== Segment control ====== */
 .segment-control {
   display: flex;
   gap: 2px;
@@ -775,12 +715,12 @@ onMounted(async () => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
-/* ====== 颜色选择 ====== */
+/* ====== Color picker ====== */
 .color-preview-row {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .color-swatch {
@@ -835,11 +775,8 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 16px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  margin-bottom: 4px;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 12px;
 }
 
 .custom-color-wrap {
@@ -879,7 +816,7 @@ onMounted(async () => {
   border-radius: 6px;
 }
 
-/* ====== 开关 - macOS Toggle ====== */
+/* ====== Toggle ====== */
 .toggle {
   position: relative;
   display: inline-block;
@@ -924,7 +861,7 @@ onMounted(async () => {
   transform: translateX(16px);
 }
 
-/* ====== 文本按钮 ====== */
+/* ====== Text button ====== */
 .text-btn {
   padding: 4px 10px;
   background: transparent;
@@ -949,29 +886,79 @@ onMounted(async () => {
   background: var(--error-light);
 }
 
-/* ====== 工具项 ====== */
-.tool-item {
-  padding: 10px 16px;
+/* ====== Tool search ====== */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  height: 32px;
+  margin-bottom: 12px;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  color: var(--text-muted);
+}
+
+.search-bar input {
+  flex: 1;
+  height: 100%;
+  padding: 0;
+  font-size: 13px;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.search-bar input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ====== Tool item ====== */
+.tool-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 6px;
+  margin: 0 -6px;
+  border-radius: 8px;
   transition: background var(--transition-fast);
 }
 
-.tool-item:not(.disabled):hover {
+.tool-row + .tool-row {
+  border-top: none;
+  margin-top: 1px;
+}
+
+.tool-row.disabled {
+  opacity: 0.4;
+}
+
+.tool-row:not(.disabled):hover {
   background: var(--bg-hover);
 }
 
+.tool-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
 .tool-icon {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  font-size: 15px;
+  border-radius: 9px;
+  font-size: 14px;
   flex-shrink: 0;
   transition: transform 0.18s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.tool-item:not(.disabled):hover .tool-icon {
+.tool-row:not(.disabled):hover .tool-icon {
   transform: scale(1.08);
 }
 
@@ -979,30 +966,34 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
 }
 
-.tool-id-tag {
+.tool-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.tool-desc {
   font-size: 10px;
-  font-family: var(--font-mono);
   color: var(--text-muted);
-  background: var(--bg-tertiary);
-  padding: 1px 6px;
-  border-radius: 4px;
-  width: fit-content;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tool-controls {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 .chip-btn {
   padding: 3px 10px;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(8px) saturate(1.2);
-  -webkit-backdrop-filter: blur(8px) saturate(1.2);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
   border-radius: 6px;
   font-size: 11px;
   font-weight: 500;
@@ -1012,16 +1003,13 @@ onMounted(async () => {
 }
 
 .chip-btn:hover:not(.disabled) {
-  background: rgba(255, 255, 255, 0.8);
   border-color: var(--border-strong);
   color: var(--text-secondary);
 }
 
 .chip-btn.active {
-  background: rgba(0, 122, 255, 0.12);
-  backdrop-filter: blur(8px) saturate(1.2);
-  -webkit-backdrop-filter: blur(8px) saturate(1.2);
-  border-color: rgba(0, 122, 255, 0.3);
+  background: var(--accent-light);
+  border-color: var(--accent);
   color: var(--accent);
 }
 
@@ -1030,76 +1018,87 @@ onMounted(async () => {
   cursor: not-allowed;
 }
 
-/* ====== 应用信息 ====== */
-.app-info-section {
+/* ====== About page ====== */
+.about-hero {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 24px 16px;
+  padding: 8px 0 20px;
+  text-align: center;
 }
 
-.app-logo {
-  width: 52px;
-  height: 52px;
-  background: var(--accent);
-  border-radius: var(--radius-lg);
+.about-logo {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25);
+  margin-bottom: 12px;
+}
+
+.logo-text {
+  font-size: 26px;
   font-weight: 700;
   color: #fff;
+  line-height: 1;
 }
 
-.app-meta {
+.about-text {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 2px;
+  gap: 4px;
 }
 
-.app-name {
-  font-size: 15px;
-  font-weight: 600;
+.about-name {
+  font-size: 20px;
+  font-weight: 700;
   color: var(--text-primary);
 }
 
-.app-version {
-  font-size: 12px;
+.about-subtitle {
+  font-size: 13px;
   color: var(--text-muted);
 }
 
-/* ====== 统计 ====== */
-.stats-row {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-  padding: 18px 16px;
+.about-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+  max-width: 520px;
 }
 
-.stat-item {
+.about-stat-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  padding: 16px 12px;
 }
 
-.stat-value {
-  font-size: 22px;
+.about-stat-value {
+  font-size: 24px;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--text-primary);
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 
-.stat-label {
+.about-stat-label {
   font-size: 11px;
   color: var(--text-muted);
   font-weight: 500;
 }
 
-/* ====== 动画 ====== */
+/* ====== Animations ====== */
 .tab-switch-enter-active {
   animation: fadeSlideIn 0.2s ease;
 }
@@ -1118,177 +1117,28 @@ onMounted(async () => {
   to { opacity: 0; transform: translateY(-4px); }
 }
 
-/* ====== 响应式 ====== */
-@media (max-width: 700px) {
-  .settings-page {
-    grid-template-columns: 1fr;
-  }
-
-  .sidebar {
-    display: none;
-  }
-
-  .main-content {
-    padding: 16px;
-  }
-
-  .setting-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .setting-input,
-  .setting-select {
-    width: 100%;
-  }
-}
-
+/* ====== Dark mode ====== */
 html.dark .chip-btn {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(148, 163, 184, 0.08);
+  border-color: rgba(148, 163, 184, 0.12);
 }
 
 html.dark .chip-btn:hover:not(.disabled) {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(148, 163, 184, 0.14);
+  border-color: rgba(148, 163, 184, 0.2);
 }
 
 html.dark .chip-btn.active {
-  background: rgba(0, 122, 255, 0.15);
-  border-color: rgba(0, 122, 255, 0.25);
+  background: rgba(96, 165, 250, 0.15);
+  border-color: rgba(96, 165, 250, 0.25);
 }
 
-html.dark .tool-group-list {
-  background: rgba(30, 30, 40, 0.5);
-  backdrop-filter: blur(12px) saturate(1.2);
-  -webkit-backdrop-filter: blur(12px) saturate(1.2);
-  border-color: rgba(255, 255, 255, 0.06);
+html.dark .about-stat-item {
+  background: var(--bg-card);
+  border-color: rgba(148, 163, 184, 0.12);
 }
 
-/* ====== About 页面 ====== */
-.glass-card {
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(16px) saturate(1.4);
-  -webkit-backdrop-filter: blur(16px) saturate(1.4);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: var(--radius-lg);
-}
-
-html.dark .glass-card {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-.about-hero {
-  position: relative;
-  overflow: hidden;
-  padding: 28px 24px;
-  margin-bottom: 16px;
-}
-
-.about-hero-bg {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, var(--accent-light) 0%, transparent 60%);
-  opacity: 0.6;
-}
-
-html.dark .about-hero-bg {
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.18) 0%, transparent 60%);
-  opacity: 1;
-}
-
-.about-hero-content {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-
-.about-logo {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
-  background: var(--accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.25);
-}
-
-.logo-text {
-  font-size: 24px;
-  font-weight: 700;
-  color: #fff;
-  line-height: 1;
-}
-
-.about-hero-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.about-hero-name {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.about-hero-version {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-muted);
-}
-
-.about-hero-desc {
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.about-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.about-stat-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 16px 12px;
-}
-
-.about-stat-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: color-mix(in srgb, var(--stat-color) 12%, transparent);
-  color: var(--stat-color);
-}
-
-.about-stat-value {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--text-primary);
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
-.about-stat-label {
-  font-size: 11px;
-  color: var(--text-muted);
-  font-weight: 500;
-}
-
-.about-links {
-  margin-bottom: 4px;
+html.dark .about-logo {
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
 }
 </style>

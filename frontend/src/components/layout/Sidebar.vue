@@ -44,17 +44,17 @@ const categoryIconMap: Record<string, any> = {
 
 // 分类颜色映射
 const categoryColorMap: Record<string, string> = {
-  '开发工具': '#007AFF',
-  '编码转换': '#34C759',
-  '时间处理': '#FF9F0A',
-  '文本处理': '#5AC8FA',
-  '安全工具': '#FF3B30',
-  '系统工具': '#5856D6',
-  '其他': '#AF52DE',
+  '开发工具': '#3b82f6',
+  '编码转换': '#10b981',
+  '时间处理': '#f59e0b',
+  '文本处理': '#06b6d4',
+  '安全工具': '#ef4444',
+  '系统工具': '#6366f1',
+  '其他': '#8b5cf6',
 }
 
 const getCategoryIcon = (name: string) => categoryIconMap[name] || LayoutGrid
-const getCategoryColor = (name: string) => categoryColorMap[name] || '#007AFF'
+const getCategoryColor = (name: string) => categoryColorMap[name] || '#3b82f6'
 
 // 当前选中的分类
 const activeCategory = computed(() => {
@@ -144,6 +144,8 @@ const toggleSidebar = () => {
   background: var(--bg-sidebar);
   border-right: 1px solid var(--border-subtle);
   transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
 }
 
 /* ====== 导航 ====== */

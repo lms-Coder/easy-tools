@@ -47,6 +47,7 @@ tasks:
         platforms: [windows]
       - cmd: rm -f *.syso
         platforms: [linux, darwin]
+      - upx --best --lzma "{{.BIN_DIR}}/{{.APP_NAME}}.exe"
     vars:
       BUILD_FLAGS: '{{if eq .DEV "true"}}{{if .EXTRA_TAGS}}-tags {{.EXTRA_TAGS}} {{end}}-buildvcs=false -gcflags=all="-l"{{else}}-tags production{{if .EXTRA_TAGS}},{{.EXTRA_TAGS}}{{end}} -trimpath -buildvcs=false -ldflags="-w -s -H windowsgui"{{end}}'
     env:
