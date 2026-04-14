@@ -97,9 +97,10 @@ export const useConfigStore = defineStore('config', () => {
 
       // 系统配置
       if (sysConfig) {
+        const closeBehavior = (sysConfig.CloseBehavior || 'minimize') as 'close' | 'minimize' | 'ask'
         config.value.system = {
-          minimizeToTray: sysConfig.MinimizeToTray,
-          closeBehavior: (sysConfig.CloseBehavior || 'minimize') as 'close' | 'minimize' | 'ask',
+          minimizeToTray: closeBehavior === 'minimize' ? true : sysConfig.MinimizeToTray,
+          closeBehavior,
           launchOnStartup: sysConfig.LaunchOnStartup,
         }
       }

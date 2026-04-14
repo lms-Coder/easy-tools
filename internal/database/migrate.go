@@ -80,8 +80,8 @@ func Migrate(db *DB) error {
 			"theme":             "light",
 			"primary_color":     "#007AFF",
 			"sidebar_collapsed": "false",
-			"minimize_to_tray":  "false",
-			"close_behavior":    "",
+			"minimize_to_tray":  "true",
+			"close_behavior":    "minimize",
 			"launch_on_startup": "false",
 			"language":          "zh-CN",
 		}

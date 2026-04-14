@@ -85,9 +85,15 @@ type SystemConfig struct {
 }
 
 func (s *ConfigService) GetSystemConfig() *SystemConfig {
+	closeBehavior := s.GetCloseBehavior()
+	minimizeToTray := s.getSetting("minimize_to_tray") == "true"
+	// 关闭行为为 minimize 时，minimizeToTray 也应为 true（保持一致）
+	if closeBehavior == "minimize" && !minimizeToTray {
+		minimizeToTray = true
+	}
 	return &SystemConfig{
-		MinimizeToTray:  s.getSetting("minimize_to_tray") == "true",
-		CloseBehavior:   s.getSetting("close_behavior"),
+		MinimizeToTray:  minimizeToTray,
+		CloseBehavior:   closeBehavior,
 		LaunchOnStartup: s.getSetting("launch_on_startup") == "true",
 	}
 }
@@ -101,7 +107,11 @@ func (s *ConfigService) SetCloseBehavior(behavior string) error {
 }
 
 func (s *ConfigService) GetCloseBehavior() string {
-	return s.getSetting("close_behavior")
+	v := s.getSetting("close_behavior")
+	if v == "" {
+		return "minimize"
+	}
+	return v
 }
 
 func (s *ConfigService) GetLaunchOnStartup() bool {
