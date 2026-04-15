@@ -36,6 +36,7 @@ import HugeiconsXml01 from '@/components/icons/HugeiconsXml01.vue'
 import UilLinux from '@/components/icons/UilLinux.vue'
 import EosIconsEnv from '@/components/icons/EosIconsEnv.vue'
 import AsciiIcon from '@/components/icons/AsciiIcon.vue'
+import WatermarkIcon from '@/components/icons/WatermarkIcon.vue'
 
 const iconMap: Record<string, any> = {
   'icon-json': LetsIconsJson,
@@ -69,6 +70,7 @@ const iconMap: Record<string, any> = {
   'icon-crypto': Lock,
   'icon-env': EosIconsEnv,
   'icon-ascii': AsciiIcon,
+  'icon-watermark': WatermarkIcon,
   'icon-jdk': DeviconPlainJava,
   'icon-idcard': FileIcon,
   'icon-drive-file': FileIcon,

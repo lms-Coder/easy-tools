@@ -235,6 +235,7 @@ onMounted(async () => {
                   <span class="setting-desc">选择界面主题</span>
                 </div>
                 <div class="segment-control">
+                  <div class="segment-slider" :class="{ 'slider-right': themeStore.currentTheme === 'dark' }"></div>
                   <button
                     v-for="opt in themeOptions"
                     :key="opt.value"
@@ -401,6 +402,7 @@ onMounted(async () => {
                   <span class="setting-desc">点击关闭按钮的行为</span>
                 </div>
                 <div class="segment-control">
+                  <div class="segment-slider" :class="{ 'slider-right': systemConfig.closeBehavior === 'minimize' }"></div>
                   <button
                     class="segment-btn"
                     :class="{ active: systemConfig.closeBehavior === 'close' }"
@@ -713,16 +715,38 @@ onMounted(async () => {
 
 /* ====== Segment control ====== */
 .segment-control {
-  display: flex;
-  gap: 2px;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   background: var(--bg-tertiary);
   padding: 2px;
   border-radius: var(--radius-sm);
 }
 
+.segment-slider {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: calc(50% - 2px);
+  height: calc(100% - 4px);
+  background: var(--bg-card);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.05);
+  transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.segment-slider.slider-right {
+  left: 50%;
+}
+
 .segment-btn {
+  position: relative;
+  z-index: 1;
+  flex: 1;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
   padding: 5px 14px;
   background: transparent;
@@ -731,8 +755,9 @@ onMounted(async () => {
   font-size: 12px;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: color var(--transition-fast);
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .segment-btn:hover {
@@ -740,9 +765,7 @@ onMounted(async () => {
 }
 
 .segment-btn.active {
-  background: var(--bg-card);
   color: var(--text-primary);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
 /* ====== Font preview ====== */

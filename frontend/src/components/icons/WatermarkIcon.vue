@@ -1,0 +1,9 @@
+<template>
+  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 48 48"><circle cx="24" cy="24" r="21.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="m11 35.99l12-23.98v23.98l12-24M32 32h2.6m-2.604 4v-8h4"/></svg>
+</template>
+
+<script lang="ts">
+export default {
+  name: 'WatermarkIcon'
+}
+</script>

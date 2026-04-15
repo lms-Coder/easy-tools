@@ -255,6 +255,16 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     implemented: true,
     window: { width: 960, height: 680, minWidth: 700, minHeight: 500 },
   },
+  {
+    id: 'watermark',
+    name: '水印工具',
+    description: '为图片添加文字、图片或满屏水印',
+    category: 'other',
+    icon: 'icon-watermark',
+    route: '/tool/watermark',
+    implemented: true,
+    window: { width: 1000, height: 700, minWidth: 800, minHeight: 500 },
+  },
 ]
 
 export function getToolDefinition(id: string): ToolDefinition | undefined {

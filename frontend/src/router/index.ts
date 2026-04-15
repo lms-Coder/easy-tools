@@ -26,6 +26,7 @@ const toolComponentMap: Record<string, () => Promise<any>> = {
   'color-picker': () => import('@/views/tools/other/color-picker/index.vue'),
   'uuid': () => import('@/views/tools/other/uuid/index.vue'),
   'env-vars': () => import('@/views/tools/system/env-vars/index.vue'),
+  'watermark': () => import('@/views/tools/other/watermark/index.vue'),
 }
 
 const fallbackComponent = () => import('@/views/tools/ToolWrapper.vue')
