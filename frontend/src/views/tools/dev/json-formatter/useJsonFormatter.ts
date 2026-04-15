@@ -3,8 +3,15 @@ import { toast } from '@/composables/useToast'
 import { useToolHistory } from '@/composables/useToolHistory'
 import hljs from 'highlight.js/lib/core'
 import json from 'highlight.js/lib/languages/json'
+import { useJsonPath } from './jsonpath/useJsonPath'
+import { useConvert } from './convert/useConvert'
+import { useJsonDiff } from './diff/useJsonDiff'
+import { useSchemaValidate } from './schema/useSchemaValidate'
 
 hljs.registerLanguage('json', json)
+
+// ====== Mode ======
+export type ToolMode = 'formatter' | 'convert' | 'diff' | 'schema'
 
 // ====== State ======
 const inputText = ref('')
@@ -268,35 +275,7 @@ function escapeHtml(str: string): string {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
-function buildTreeHtml(data: any, path: string = '$'): string {
-  if (data === null) return `<span class="tv-null" data-path="${escapeHtml(path)}" data-type="null">null</span>`
-  if (typeof data === 'boolean') return `<span class="tv-bool" data-path="${escapeHtml(path)}" data-type="boolean" data-value="${data}">${data}</span>`
-  if (typeof data === 'number') return `<span class="tv-num" data-path="${escapeHtml(path)}" data-type="number" data-value="${data}">${data}</span>`
-  if (typeof data === 'string') return `<span class="tv-string" data-path="${escapeHtml(path)}" data-type="string" data-value="${escapeHtml(data)}">"${escapeHtml(data)}"</span>`
-
-  if (Array.isArray(data)) {
-    if (data.length === 0) return `<span class="tv-bracket" data-path="${escapeHtml(path)}" data-type="array">[]</span>`
-    const items = data.map((item, i) =>
-      `<div class="tv-item">${buildTreeHtml(item, `${path}[${i}]`)}</div>`
-    ).join('')
-    const filterBtn = data.length > 0 && data[0] && typeof data[0] === 'object'
-      ? `<span class="tv-filter" data-filter-path="${escapeHtml(path)}" title="筛选">⊞</span>` : ''
-    return `<details open data-path="${escapeHtml(path)}" data-type="array"><summary><span class="tv-toggle"></span><span class="tv-bracket">[</span><span class="tv-collapsed"> ... ]</span><span class="tv-count">${data.length} 项</span>${filterBtn}</summary><div class="tv-children">${items}</div><span class="tv-bracket tv-close">]</span></details>`
-  }
-
-  if (typeof data === 'object') {
-    const keys = Object.keys(data)
-    if (keys.length === 0) return `<span class="tv-bracket" data-path="${escapeHtml(path)}" data-type="object">{}</span>`
-    const items = keys.map(key =>
-      `<div class="tv-item"><span class="tv-key" data-path="${escapeHtml(`${path}.${key}`)}" data-type="key" data-value="${escapeHtml(key)}">"${escapeHtml(key)}"</span><span class="tv-colon">: </span>${buildTreeHtml(data[key], `${path}.${key}`)}</div>`
-    ).join('')
-    return `<details open data-path="${escapeHtml(path)}" data-type="object"><summary><span class="tv-toggle"></span><span class="tv-bracket">{</span><span class="tv-collapsed"> ... }</span><span class="tv-count">${keys.length} 个键</span></summary><div class="tv-children">${items}</div><span class="tv-bracket tv-close">}</span></details>`
-  }
-
-  return String(data)
-}
-
-const treeViewHtml = computed(() => treeData.value ? buildTreeHtml(treeData.value) : '')
+// buildTreeHtml replaced by buildTreeHtmlEnhanced below
 
 // ====== Tree Interaction ======
 const nodeInfo = ref<{ path: string; type: string; value: string } | null>(null)
@@ -387,6 +366,232 @@ function handleTreeClick(e: MouseEvent) {
   }
 }
 
+// ====== Tree Enhancements ======
+const treeExpandLevel = ref(0) // 0 = all, 1/2/3 = levels
+const treeSearchText = ref('')
+const treeSearchRegex = ref(false)
+
+function expandAllTree() {
+  document.querySelectorAll('.tree-viewer details').forEach(el => { (el as HTMLDetailsElement).open = true })
+  treeExpandLevel.value = 0
+}
+
+function collapseAllTree() {
+  document.querySelectorAll('.tree-viewer details').forEach(el => { (el as HTMLDetailsElement).open = false })
+  treeExpandLevel.value = -1
+}
+
+function expandToLevel(level: number) {
+  treeExpandLevel.value = level
+  const detailsList = document.querySelectorAll('.tree-viewer details')
+  detailsList.forEach(el => {
+    // 计算深度：数父级中有多少个 details
+    let depth = 0
+    let parent = el.parentElement
+    while (parent) {
+      if (parent.tagName === 'DETAILS') depth++
+      parent = parent.parentElement
+    }
+    ;(el as HTMLDetailsElement).open = depth < level
+  })
+}
+
+const treeSearchMatches = computed(() => {
+  if (!treeSearchText.value || !treeData.value) return new Set<string>()
+  const keyword = treeSearchText.value
+  const matches = new Set<string>()
+  function search(data: any, path: string) {
+    if (data === null) {
+      if ('null'.includes(keyword)) matches.add(path)
+      return
+    }
+    if (typeof data === 'string') {
+      if (data.includes(keyword)) matches.add(path)
+      return
+    }
+    if (typeof data === 'number' || typeof data === 'boolean') {
+      if (String(data).includes(keyword)) matches.add(path)
+      return
+    }
+    if (Array.isArray(data)) {
+      data.forEach((item, i) => search(item, `${path}[${i}]`))
+      return
+    }
+    if (typeof data === 'object') {
+      for (const [key, value] of Object.entries(data)) {
+        if (key.includes(keyword)) matches.add(`${path}.${key}`)
+        search(value, `${path}.${key}`)
+      }
+    }
+  }
+  if (treeSearchRegex.value) {
+    try {
+      const regex = new RegExp(keyword, 'i')
+      function searchRegex(data: any, path: string) {
+        if (data === null) { if (regex.test('null')) matches.add(path); return }
+        if (typeof data === 'string') { if (regex.test(data)) matches.add(path); return }
+        if (typeof data === 'number' || typeof data === 'boolean') { if (regex.test(String(data))) matches.add(path); return }
+        if (Array.isArray(data)) { data.forEach((item, i) => searchRegex(item, `${path}[${i}]`)); return }
+        if (typeof data === 'object') {
+          for (const [key, value] of Object.entries(data)) {
+            if (regex.test(key)) matches.add(`${path}.${key}`)
+            searchRegex(value, `${path}.${key}`)
+          }
+        }
+      }
+      searchRegex(treeData.value, '$')
+    } catch { /* invalid regex */ }
+  } else {
+    search(treeData.value, '$')
+  }
+  return matches
+})
+
+const treeSearchMatchCount = computed(() => treeSearchMatches.value.size)
+
+// 增强版 buildTreeHtml：支持搜索高亮
+function buildTreeHtmlEnhanced(data: any, path: string = '$'): string {
+  const searchHits = treeSearchMatches.value
+  const isMatch = (p: string) => searchHits.size > 0 && searchHits.has(p)
+  const matchClass = (p: string) => isMatch(p) ? ' tv-search-match' : ''
+
+  if (data === null) return `<span class="tv-null${matchClass(path)}" data-path="${escapeHtml(path)}" data-type="null">null</span>`
+  if (typeof data === 'boolean') return `<span class="tv-bool${matchClass(path)}" data-path="${escapeHtml(path)}" data-type="boolean" data-value="${data}">${data}</span>`
+  if (typeof data === 'number') return `<span class="tv-num${matchClass(path)}" data-path="${escapeHtml(path)}" data-type="number" data-value="${data}">${data}</span>`
+  if (typeof data === 'string') return `<span class="tv-string${matchClass(path)}" data-path="${escapeHtml(path)}" data-type="string" data-value="${escapeHtml(data)}">"${highlightSearch(escapeHtml(data), path)}"</span>`
+
+  if (Array.isArray(data)) {
+    if (data.length === 0) return `<span class="tv-bracket${matchClass(path)}" data-path="${escapeHtml(path)}" data-type="array">[]</span>`
+    const items = data.map((item, i) =>
+      `<div class="tv-item">${buildTreeHtmlEnhanced(item, `${path}[${i}]`)}</div>`
+    ).join('')
+    const filterBtn = data.length > 0 && data[0] && typeof data[0] === 'object'
+      ? `<span class="tv-filter" data-filter-path="${escapeHtml(path)}" title="筛选">⊞</span>` : ''
+    return `<details open data-path="${escapeHtml(path)}" data-type="array"><summary><span class="tv-toggle"></span><span class="tv-bracket">[</span><span class="tv-collapsed"> ... ]</span><span class="tv-count">${data.length} 项</span>${filterBtn}</summary><div class="tv-children">${items}</div><span class="tv-bracket tv-close">]</span></details>`
+  }
+
+  if (typeof data === 'object') {
+    const keys = Object.keys(data)
+    if (keys.length === 0) return `<span class="tv-bracket${matchClass(path)}" data-path="${escapeHtml(path)}" data-type="object">{}</span>`
+    const items = keys.map(key =>
+      `<div class="tv-item"><span class="tv-key${matchClass(`${path}.${key}`)}" data-path="${escapeHtml(`${path}.${key}`)}" data-type="key" data-value="${escapeHtml(key)}">"${highlightSearch(escapeHtml(key), `${path}.${key}`)}"</span><span class="tv-colon">: </span>${buildTreeHtmlEnhanced(data[key], `${path}.${key}`)}</div>`
+    ).join('')
+    return `<details open data-path="${escapeHtml(path)}" data-type="object"><summary><span class="tv-toggle"></span><span class="tv-bracket">{</span><span class="tv-collapsed"> ... }</span><span class="tv-count">${keys.length} 个键</span></summary><div class="tv-children">${items}</div><span class="tv-bracket tv-close">}</span></details>`
+  }
+
+  return String(data)
+}
+
+function highlightSearch(htmlText: string, _path: string): string {
+  if (!treeSearchText.value || treeSearchMatches.value.size === 0) return htmlText
+  if (treeSearchRegex.value) {
+    try {
+      const regex = new RegExp(`(${treeSearchText.value})`, 'gi')
+      return htmlText.replace(regex, '<mark class="tv-highlight">$1</mark>')
+    } catch { return htmlText }
+  }
+  // Simple string highlight (case insensitive)
+  const keyword = treeSearchText.value
+  const regex = new RegExp(`(${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi')
+  return htmlText.replace(regex, '<mark class="tv-highlight">$1</mark>')
+}
+
+const treeViewHtml = computed(() => {
+  if (!treeData.value) return ''
+  return buildTreeHtmlEnhanced(treeData.value)
+})
+
+// 节点编辑
+function setTreeNodeValue(path: string, newValue: any) {
+  if (!treeData.value) return
+  const parts = path.replace(/^\$/, '').split(/\.|\[|\]/).filter(Boolean)
+  let current: any = treeData.value
+  for (let i = 0; i < parts.length - 1; i++) {
+    if (current == null) return
+    current = current[parts[i]]
+  }
+  const lastKey = parts[parts.length - 1]
+  if (current != null && lastKey !== undefined) {
+    current[lastKey] = newValue
+    // 同步回 inputText 并重新格式化
+    inputText.value = JSON.stringify(treeData.value)
+    parseJson()
+  }
+}
+
+function deleteTreeNode(path: string) {
+  if (!treeData.value) return
+  const parts = path.replace(/^\$/, '').split(/\.|\[|\]/).filter(Boolean)
+  if (parts.length === 0) return
+  let current: any = treeData.value
+  for (let i = 0; i < parts.length - 1; i++) {
+    if (current == null) return
+    current = current[parts[i]]
+  }
+  const lastKey = parts[parts.length - 1]
+  if (Array.isArray(current)) {
+    const idx = parseInt(lastKey)
+    if (!isNaN(idx) && idx >= 0 && idx < current.length) {
+      current.splice(idx, 1)
+    }
+  } else if (typeof current === 'object' && current !== null) {
+    delete current[lastKey]
+  }
+  inputText.value = JSON.stringify(treeData.value)
+  parseJson()
+}
+
+function copyTreeNode(path: string) {
+  const value = getValueByPath(path)
+  const text = JSON.stringify(value, null, 2)
+  navigator.clipboard.writeText(text).catch(() => {})
+}
+
+function copyTreePath(path: string) {
+  navigator.clipboard.writeText(path.replace(/^\$./, '')).catch(() => {})
+}
+
+// 节点编辑状态
+const treeEditNode = ref<{ visible: boolean; x: number; y: number; path: string; type: string; rawValue: string }>({
+  visible: false, x: 0, y: 0, path: '', type: '', rawValue: '',
+})
+
+function handleTreeDblclick(e: MouseEvent) {
+  const info = findNodeInfo(e.target as HTMLElement)
+  if (!info) return
+  // 不允许编辑根节点和数组/对象的 summary
+  if (info.path === '$' || info.type === 'array' || info.type === 'object' || info.type === 'key') return
+  const value = getValueByPath(info.path)
+  treeEditNode.value = {
+    visible: true,
+    x: e.clientX,
+    y: e.clientY,
+    path: info.path,
+    type: info.type,
+    rawValue: value === null || value === undefined ? '' : String(value),
+  }
+}
+
+function confirmTreeEdit() {
+  const { path, type, rawValue } = treeEditNode.value
+  let newValue: any = rawValue
+  if (type === 'number') {
+    newValue = Number(rawValue)
+    if (isNaN(newValue)) { toast.error('请输入有效数字'); return }
+  } else if (type === 'boolean') {
+    newValue = rawValue === 'true'
+  } else if (type === 'null') {
+    newValue = null
+  }
+  // string 类型直接使用原始值
+  setTreeNodeValue(path, newValue)
+  treeEditNode.value.visible = false
+}
+
+function cancelTreeEdit() {
+  treeEditNode.value.visible = false
+}
+
 // ====== Array Filter ======
 const filterPanel = ref({
   show: false, path: '', field: '', mode: 'contains' as 'contains' | 'equals' | 'regex',
@@ -427,7 +632,7 @@ function applyArrayFilter() {
     const childrenEl = detailsEl.querySelector('.tv-children')
     if (childrenEl) {
       childrenEl.innerHTML = filtered.map((item, i) =>
-        `<div class="tv-item">${buildTreeHtml(item, `${path}[${i}]`)}</div>`
+        `<div class="tv-item">${buildTreeHtmlEnhanced(item, `${path}[${i}]`)}</div>`
       ).join('')
     }
   }
@@ -442,7 +647,7 @@ function resetFilter() {
     const childrenEl = detailsEl.querySelector('.tv-children')
     if (childrenEl) {
       childrenEl.innerHTML = arr.map((item, i) =>
-        `<div class="tv-item">${buildTreeHtml(item, `${path}[${i}]`)}</div>`
+        `<div class="tv-item">${buildTreeHtmlEnhanced(item, `${path}[${i}]`)}</div>`
       ).join('')
     }
   }
@@ -471,6 +676,15 @@ watch([indentSize, sortKeys], () => {
 
 // ====== Export ======
 export function useJsonFormatter() {
+  // ====== Mode ======
+  const activeMode = ref<ToolMode>('formatter')
+
+  // ====== Sub-modules ======
+  const jsonPathModule = useJsonPath()
+  const convertModule = useConvert()
+  const diffModule = useJsonDiff()
+  const schemaModule = useSchemaValidate()
+
   const { history, showHistory, saveToHistory, deleteItem, clearHistory } =
     useToolHistory<JsonHistoryData>({ toolId: 'json-formatter', maxItems: 50 })
 
@@ -504,13 +718,16 @@ export function useJsonFormatter() {
   })
 
   return {
+    // Mode
+    activeMode,
+
     // State
     inputText, outputText, indentSize, sortKeys, viewMode, wordWrap,
     error, copied, isValid, isDragging, searchText, matchIndex,
     jsonStats, fileInputRef,
 
     // Tree
-    treeViewHtml, nodeInfo, contextMenu,
+    treeViewHtml, treeData, nodeInfo, contextMenu,
 
     // Filter
     filterPanel,
@@ -537,6 +754,24 @@ export function useJsonFormatter() {
 
     // Filter
     openFilterPanel, applyArrayFilter, resetFilter,
+
+    // Tree enhancements
+    treeExpandLevel, treeSearchText, treeSearchRegex, treeSearchMatchCount,
+    expandAllTree, collapseAllTree, expandToLevel,
+    setTreeNodeValue, deleteTreeNode, copyTreeNode, copyTreePath,
+    treeEditNode, handleTreeDblclick, confirmTreeEdit, cancelTreeEdit,
+
+    // JSONPath
+    jsonPathModule,
+
+    // Convert
+    convertModule,
+
+    // Diff
+    diffModule,
+
+    // Schema
+    schemaModule,
 
     // History
     history, showHistory, deleteItem, handleHistoryUse, handleClearHistory,

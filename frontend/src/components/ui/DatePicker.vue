@@ -33,7 +33,7 @@ const calendarDays = computed(() => {
   const firstDay = dayjs(new Date(viewYear.value, viewMonth.value, 1))
   const startDow = firstDay.day()
   const startDate = firstDay.subtract(startDow, 'day')
-  const days = []
+  const days: { date: Dayjs; day: number; isCurrentMonth: boolean; isToday: boolean; isSelected: boolean }[] = []
   for (let i = 0; i < 42; i++) {
     const d = startDate.add(i, 'day')
     days.push({
@@ -52,7 +52,7 @@ const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8�
 const yearRangeStart = computed(() => Math.floor(viewYear.value / 10) * 10 - 1)
 const yearRange = computed(() => {
   const start = yearRangeStart.value
-  const years = []
+  const years: number[] = []
   for (let i = 0; i < 12; i++) {
     years.push(start + i)
   }

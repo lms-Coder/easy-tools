@@ -21,13 +21,13 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
   // 开发工具
   {
     id: 'json-formatter',
-    name: 'JSON 格式化',
-    description: '格式化、压缩、校验 JSON 数据',
+    name: 'JSON 工具箱',
+    description: '格式化、互转、对比、Schema 验证',
     category: 'dev',
     icon: 'icon-json',
     route: '/tool/json-formatter',
     implemented: true,
-    window: { width: 1024, height: 768, minWidth: 700, minHeight: 500 },
+    window: { width: 1100, height: 800, minWidth: 800, minHeight: 560 },
   },
   {
     id: 'json-schema',
