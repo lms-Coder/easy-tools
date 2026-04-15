@@ -91,6 +91,25 @@
   /* Transitions */
   --transition-fast: 120ms ease;
   --transition-normal: 200ms ease;
+  --transition-slow: 350ms ease;
+
+  /* Z-index scale */
+  --z-tooltip: 9000;
+  --z-popover: 9999;
+  --z-overlay: 10000;
+
+  /* Layout */
+  --header-height: 40px;
+  --titlebar-height: 38px;
+  --sidebar-width: 220px;
+  --sidebar-width-expanded: 220px;
+  --sidebar-width-collapsed: 56px;
+
+  /* Line height */
+  --line-height-normal: 1.5;
+
+  /* Alias for font-mono */
+  --font-family-mono: var(--font-mono);
 
   /* Shadows - blue-tinted */
   --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
@@ -113,11 +132,6 @@
   --glass-blur-sm: blur(8px) saturate(1.2);
   --glass-blur-lg: blur(20px) saturate(1.6);
 
-  /* Layout */
-  --titlebar-height: 38px;
-  --sidebar-width: 220px;
-  --sidebar-width-expanded: 220px;
-  --sidebar-width-collapsed: 56px;
 }
 
 /* ========================================

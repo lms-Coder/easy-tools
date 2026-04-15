@@ -631,22 +631,6 @@ const {
   transform: translateY(0) scale(0.98);
 }
 
-/* ====== Tooltip ====== */
-.toolbar-tooltip {
-  position: fixed;
-  z-index: 9999;
-  padding: 5px 12px;
-  font-size: 12px;
-  color: var(--text-inverse, #fff);
-  background: var(--bg-tooltip, rgba(0, 0, 0, 0.85));
-  border-radius: var(--radius-sm, 4px);
-  white-space: nowrap;
-  pointer-events: none;
-  transform: translateX(-50%);
-  min-width: 60px;
-  text-align: center;
-}
-
 /* ====== 响应式 ====== */
 @media (max-width: 760px) {
   .input-wrap { max-width: none; }

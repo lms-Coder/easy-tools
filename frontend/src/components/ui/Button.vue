@@ -81,7 +81,7 @@ withDefaults(defineProps<{
 
 .btn-primary {
   background: var(--accent);
-  color: var(--accent-text);
+  color: #fff;
   border-color: var(--accent);
 }
 
@@ -102,13 +102,12 @@ withDefaults(defineProps<{
 }
 
 .btn-danger {
-  background: var(--color-error);
-  color: var(--text-inverse);
-  border-color: var(--color-error);
-}
+  background: var(--error);
+  color: #fff;
+  border-color: var(--error);}
 
 .btn-danger:hover:not(:disabled) {
-  background: var(--color-error);
+  background: var(--error);
   opacity: 0.85;
 }
 

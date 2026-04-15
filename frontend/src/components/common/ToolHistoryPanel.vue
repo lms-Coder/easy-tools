@@ -405,6 +405,6 @@ const getFieldValue = (item: HistoryItem, field: DisplayField) => {
 .slide-enter-from,
 .slide-leave-to {
   opacity: 0;
-  transform: translateY(-8px);
+  transform: translateX(16px);
 }
 </style>

@@ -154,31 +154,46 @@ defineExpose({ toggle, open, close })
   white-space: normal;
 }
 
-/* 箭头 */
-.popover-content::before {
+/* 箭头 - 使用双层伪元素避免边框残留 */
+.popover-content::before,
+.popover-content::after {
   content: '';
   position: absolute;
   width: 10px;
   height: 10px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
   transform: rotate(45deg);
+}
+
+.popover-content::before {
+  background: var(--border-subtle);
+}
+
+.popover-content::after {
+  background: var(--bg-card);
 }
 
 .popover-bottom::before {
   top: -6px;
   left: var(--arrow-x, 50%);
   margin-left: -5px;
-  border-bottom: none;
-  border-right: none;
+}
+
+.popover-bottom::after {
+  top: -5px;
+  left: var(--arrow-x, 50%);
+  margin-left: -5px;
 }
 
 .popover-top::before {
   bottom: -6px;
   left: var(--arrow-x, 50%);
   margin-left: -5px;
-  border-top: none;
-  border-left: none;
+}
+
+.popover-top::after {
+  bottom: -5px;
+  left: var(--arrow-x, 50%);
+  margin-left: -5px;
 }
 
 /* 过渡动画 */

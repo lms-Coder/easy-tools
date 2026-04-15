@@ -61,17 +61,21 @@ function onInput(event: Event) {
   box-shadow: var(--shadow-focus);
 }
 
+.input:focus:not(:focus-visible):not(:disabled) {
+  box-shadow: none;
+}
+
 .input:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
 .input-error {
-  border-color: var(--color-error);
+  border-color: var(--error);
 }
 
 .input-error:focus:not(:disabled) {
-  border-color: var(--color-error);
-  box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.2);
+  border-color: var(--error);
+  box-shadow: 0 0 0 3px var(--error-light);
 }
 </style>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useConfigStore } from '@/stores/config'
 import { useThemeStore } from '@/stores/theme'
 import {
@@ -12,6 +12,7 @@ import {
 import Tooltip from '@/components/ui/Tooltip.vue'
 
 const route = useRoute()
+const router = useRouter()
 const configStore = useConfigStore()
 const themeStore = useThemeStore()
 
@@ -28,6 +29,16 @@ const pageTitle = computed(() => {
 const handleThemeToggle = () => {
   themeStore.toggle()
 }
+
+// 跳转设置
+const goToSettings = () => {
+  router.push('/settings')
+}
+
+// 搜索 - 跳转工具箱并聚焦搜索框
+const goToSearch = () => {
+  router.push('/tools')
+}
 </script>
 
 <template>
@@ -40,8 +51,8 @@ const handleThemeToggle = () => {
     <!-- 右侧：操作区 -->
     <div class="header-right">
       <!-- 搜索按钮 -->
-      <Tooltip content="搜索 (Ctrl+K)" position="bottom">
-        <button class="glass-icon-btn header-btn">
+      <Tooltip content="搜索工具" position="bottom">
+        <button class="glass-icon-btn header-btn" @click="goToSearch">
           <Search :size="16" />
         </button>
       </Tooltip>
@@ -56,7 +67,7 @@ const handleThemeToggle = () => {
 
       <!-- 设置按钮 -->
       <Tooltip content="设置" position="bottom">
-        <button class="glass-icon-btn header-btn">
+        <button class="glass-icon-btn header-btn" @click="goToSettings">
           <Settings :size="16" />
         </button>
       </Tooltip>
@@ -74,8 +85,6 @@ const handleThemeToggle = () => {
   background-color: var(--bg-primary);
   border-bottom: 1px solid var(--border-subtle);
   user-select: none;
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
 }
 
 .header-left {

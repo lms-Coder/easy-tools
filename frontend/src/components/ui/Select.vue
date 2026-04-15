@@ -92,27 +92,46 @@ onUnmounted(() => {
     </button>
   </div>
   <Teleport to="body">
-    <div v-if="open" ref="dropdownRef" class="ui-select-dropdown" :style="dropdownStyle">
-      <div
-        v-for="opt in options"
-        :key="opt.value"
-        :class="['ui-select-option', { 'ui-select-option-active': opt.value === modelValue }]"
-        @click="select(opt)"
-      >
-        <span class="ui-select-option-label">{{ opt.label }}</span>
-        <span v-if="opt.value === modelValue" class="ui-select-option-check">✓</span>
+    <Transition name="select-dropdown">
+      <div v-if="open" ref="dropdownRef" class="ui-select-dropdown" :style="dropdownStyle">
+        <div
+          v-for="opt in options"
+          :key="opt.value"
+          :class="['ui-select-option', { 'ui-select-option-active': opt.value === modelValue }]"
+          @click="select(opt)"
+        >
+          <span class="ui-select-option-label">{{ opt.label }}</span>
+          <span v-if="opt.value === modelValue" class="ui-select-option-check">&#10003;</span>
+        </div>
       </div>
-    </div>
+    </Transition>
   </Teleport>
 </template>
 
 <style>
 /* Dropdown — Teleport 到 body，不能用 scoped */
+.select-dropdown-enter-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.select-dropdown-leave-active {
+  transition: opacity 0.1s ease, transform 0.1s ease;
+}
+
+.select-dropdown-enter-from,
+.select-dropdown-leave-to {
+  opacity: 0;
+  transform: scaleY(0.92);
+}
+
 .ui-select-dropdown {
+  transform-origin: top center;
   background: var(--bg-card);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.02);
+  backdrop-filter: blur(12px) saturate(1.3);
+  -webkit-backdrop-filter: blur(12px) saturate(1.3);
   padding: 4px;
   max-height: 240px;
   overflow-y: auto;

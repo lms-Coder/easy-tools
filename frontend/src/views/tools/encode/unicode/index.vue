@@ -413,21 +413,6 @@ const {
   margin: 0;
 }
 
-/* ====== Tooltip ====== */
-.toolbar-tooltip {
-  position: fixed;
-  z-index: 9999;
-  padding: 5px 10px;
-  font-size: 12px;
-  color: var(--text-inverse, #fff);
-  background: var(--bg-tooltip, rgba(0, 0, 0, 0.85));
-  border-radius: 4px;
-  white-space: nowrap;
-  pointer-events: none;
-  transform: translateX(-50%);
-  line-height: 1.4;
-}
-
 /* ====== Scrollbar ====== */
 .tool-panel-body::-webkit-scrollbar { width: 5px; }
 .tool-panel-body::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }

@@ -16,6 +16,7 @@ import {
   Calendar,
   ChevronRight,
   Code,
+  Inbox,
 } from 'lucide-vue-next'
 import { getIcon } from '@/utils/icons'
 
@@ -465,7 +466,9 @@ const goToTool = async (tool: any) => {
         <div class="hero-deco"></div>
 
         <div class="time-block">
-          <div class="time-display">{{ currentTime }}</div>
+          <div class="time-display">
+            {{ now.format('HH') }}<span class="colon">:</span>{{ now.format('mm') }}<span class="colon">:</span>{{ now.format('ss') }}
+          </div>
           <div class="date-display">
             <span class="date">{{ currentDate }}</span>
             <span class="weekday">{{ currentWeekday }}</span>
@@ -531,8 +534,10 @@ const goToTool = async (tool: any) => {
                 </div>
                 <span class="recent-time">{{ item.time }}</span>
               </div>
-              <div v-if="recentTools.length === 0" class="empty-hint">
-                暂无使用记录
+              <div v-if="recentTools.length === 0" class="empty-state-sm">
+                <Inbox :size="20" class="empty-state-icon" />
+                <span class="empty-state-title">暂无使用记录</span>
+                <span class="empty-state-desc">使用工具后会在这里显示</span>
               </div>
             </div>
           </div>
@@ -570,7 +575,11 @@ const goToTool = async (tool: any) => {
               </div>
             </div>
             <div class="group-content" v-show="activeTab === 'rank'" v-else>
-              <div class="empty-hint">暂无排行数据</div>
+              <div class="empty-state-sm">
+                <Inbox :size="20" class="empty-state-icon" />
+                <span class="empty-state-title">暂无排行数据</span>
+                <span class="empty-state-desc">使用工具后会生成排行</span>
+              </div>
             </div>
           </div>
         </div>
@@ -707,6 +716,15 @@ const goToTool = async (tool: any) => {
   letter-spacing: -1.5px;
 }
 
+.time-display .colon {
+  animation: colon-blink 1s step-end infinite;
+}
+
+@keyframes colon-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
 .date-display {
   display: flex;
   gap: 8px;
@@ -754,7 +772,7 @@ const goToTool = async (tool: any) => {
   padding: 12px 14px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border-weak);
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   backdrop-filter: var(--glass-blur-sm);
   transition: all 150ms ease;
 }
@@ -804,7 +822,7 @@ const goToTool = async (tool: any) => {
   padding: 12px 16px;
   background: color-mix(in srgb, var(--accent) 10%, var(--glass-bg));
   border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   backdrop-filter: var(--glass-blur-sm);
   cursor: pointer;
   transition: all 150ms ease;
@@ -946,7 +964,7 @@ const goToTool = async (tool: any) => {
 .tab-switch {
   display: inline-flex;
   background: var(--bg-secondary);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   padding: 2px;
   gap: 1px;
 }
@@ -999,7 +1017,7 @@ const goToTool = async (tool: any) => {
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 150ms ease;
 }
@@ -1019,7 +1037,7 @@ const goToTool = async (tool: any) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-size: 14px;
   flex-shrink: 0;
 }
@@ -1058,10 +1076,30 @@ const goToTool = async (tool: any) => {
   flex-shrink: 0;
 }
 
-.empty-hint {
-  padding: 16px;
+.empty-state-sm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
   text-align: center;
+  gap: 4px;
+}
+
+.empty-state-icon {
+  color: var(--text-muted);
+  opacity: 0.3;
+  margin-bottom: 4px;
+}
+
+.empty-state-title {
   font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.empty-state-desc {
+  font-size: 11px;
   color: var(--text-muted);
 }
 
@@ -1080,7 +1118,7 @@ const goToTool = async (tool: any) => {
   align-items: center;
   gap: 8px;
   padding: 4px 8px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: background 150ms ease;
 }
@@ -1150,7 +1188,7 @@ const goToTool = async (tool: any) => {
 
 .category-item {
   padding: 7px 10px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   transition: background 150ms ease;
 }
 

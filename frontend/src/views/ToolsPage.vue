@@ -635,16 +635,16 @@ function goBack() {
   min-width: 160px;
   max-width: 220px;
   padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--bg-popover);
   backdrop-filter: blur(16px) saturate(1.4);
   -webkit-backdrop-filter: blur(16px) saturate(1.4);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--border-default);
   border-radius: 10px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: all 150ms ease;
+  transition: all 150ms ease 300ms;
   z-index: 20;
 }
 
@@ -655,7 +655,7 @@ function goBack() {
   left: 50%;
   transform: translateX(-50%);
   border: 5px solid transparent;
-  border-bottom-color: rgba(255, 255, 255, 0.4);
+  border-bottom-color: var(--border-default);
 }
 
 .tool-card .tool-tip::before {
@@ -665,7 +665,7 @@ function goBack() {
   left: 50%;
   transform: translateX(-50%);
   border: 4px solid transparent;
-  border-bottom-color: rgba(255, 255, 255, 0.85);
+  border-bottom-color: var(--bg-popover);
   z-index: 1;
 }
 
@@ -763,15 +763,15 @@ function goBack() {
 
 /* ====== 动画 ====== */
 .list-fade-enter-active {
-  animation: fadeIn 0.15s ease;
+  animation: fadeIn 0.2s ease;
 }
 
 .list-fade-leave-active {
-  animation: fadeOut 0.1s ease;
+  animation: fadeOut 0.12s ease;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -779,6 +779,34 @@ function goBack() {
   from { opacity: 1; }
   to { opacity: 0; }
 }
+
+/* 交错入场动画 */
+.list-fade-enter-active .tool-card {
+  animation: cardStagger 0.3s ease both;
+}
+
+@keyframes cardStagger {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.list-fade-enter-active .tool-card:nth-child(1) { animation-delay: 0s; }
+.list-fade-enter-active .tool-card:nth-child(2) { animation-delay: 0.03s; }
+.list-fade-enter-active .tool-card:nth-child(3) { animation-delay: 0.06s; }
+.list-fade-enter-active .tool-card:nth-child(4) { animation-delay: 0.09s; }
+.list-fade-enter-active .tool-card:nth-child(5) { animation-delay: 0.12s; }
+.list-fade-enter-active .tool-card:nth-child(6) { animation-delay: 0.15s; }
+.list-fade-enter-active .tool-card:nth-child(7) { animation-delay: 0.18s; }
+.list-fade-enter-active .tool-card:nth-child(8) { animation-delay: 0.21s; }
+.list-fade-enter-active .tool-card:nth-child(9) { animation-delay: 0.24s; }
+.list-fade-enter-active .tool-card:nth-child(10) { animation-delay: 0.27s; }
+.list-fade-enter-active .tool-card:nth-child(n+11) { animation-delay: 0.3s; }
 
 /* ====== 响应式 ====== */
 @media (max-width: 800px) {
@@ -824,19 +852,6 @@ function goBack() {
   .tool-card .tool-name {
     font-size: 11px;
   }
-}
-
-html.dark .tool-card .tool-tip {
-  background: rgba(30, 41, 59, 0.85);
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-html.dark .tool-card .tool-tip::after {
-  border-bottom-color: rgba(255, 255, 255, 0.08);
-}
-
-html.dark .tool-card .tool-tip::before {
-  border-bottom-color: rgba(30, 41, 59, 0.85);
 }
 
 html.dark .tool-card .tool-desc {

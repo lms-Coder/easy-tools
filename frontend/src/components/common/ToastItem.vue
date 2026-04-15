@@ -118,7 +118,7 @@ html.dark .toast-item {
 }
 
 .toast-item.closing {
-  animation: toast-out 0.2s ease-in forwards;
+  animation: toast-out 0.25s ease forwards;
 }
 
 .toast-icon {
@@ -187,7 +187,7 @@ html.dark .toast-close:hover {
   }
   100% {
     opacity: 0;
-    transform: translateY(-10px) scale(0.95);
+    transform: translateY(-16px) scale(0.92);
   }
 }
 </style>

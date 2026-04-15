@@ -110,6 +110,10 @@ html.dark body::before {
   outline: none;
 }
 
+.glass-input:focus:not(:focus-visible) {
+  box-shadow: none;
+}
+
 /* 原生按钮 */
 .glass-btn {
   display: inline-flex;
@@ -618,6 +622,47 @@ html.dark body::before {
   margin: 0;
 }
 
+/* 工具栏提示 - 全局提取 */
+.toolbar-tooltip {
+  position: fixed;
+  z-index: 9999;
+  padding: 5px 10px;
+  font-size: 12px;
+  color: var(--text-inverse, #fff);
+  background: var(--bg-tooltip, rgba(0, 0, 0, 0.85));
+  border-radius: var(--radius-xs);
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translateX(-50%);
+  line-height: 1.4;
+}
+
+/* 工具页 textarea 通用样式 */
+.config-textarea {
+  width: 100%;
+  padding: var(--spacing-sm);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal, 1.5);
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  resize: none;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  box-sizing: border-box;
+}
+
+.config-textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.config-textarea:focus {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-focus);
+}
+
 /* 工具页错误提示 */
 .tool-error {
   overflow: hidden;
@@ -877,7 +922,7 @@ html.dark body::before {
 ::-webkit-scrollbar-thumb {
   background: rgba(100, 116, 139, 0.15);
   border-radius: 999px;
-  transition: background 0.3s ease;
+  transition: background 150ms ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -931,6 +976,20 @@ a:hover {
   text-decoration: underline;
 }
 
+/* Focus-visible 可访问性 */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+button:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+select:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
 /* 代码 */
 code,
 pre {
@@ -978,6 +1037,20 @@ select {
   }
   to {
     clip-path: circle(150% at var(--x, 50%) var(--y, 50%));
+  }
+}
+
+/* ========================================
+   Reduced Motion - 无障碍
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

@@ -914,7 +914,7 @@ onMounted(async () => {
   left: 2px;
   width: 16px;
   height: 16px;
-  background: #fff;
+  background: var(--text-inverse, #fff);
   border-radius: 50%;
   transition: all var(--transition-fast);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);

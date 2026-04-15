@@ -89,7 +89,7 @@ const toggleSidebar = () => {
         title="首页"
       >
         <Home class="nav-icon" :size="16" />
-        <span class="nav-text" v-if="!collapsed">首页</span>
+        <span class="nav-text" v-show="!collapsed">首页</span>
       </div>
 
       <!-- 全部工具 -->
@@ -100,13 +100,13 @@ const toggleSidebar = () => {
         title="全部工具"
       >
         <LayoutGrid class="nav-icon" :size="16" />
-        <span class="nav-text" v-if="!collapsed">全部工具</span>
+        <span class="nav-text" v-show="!collapsed">全部工具</span>
       </div>
 
       <!-- 分类区域 -->
       <template v-if="categories.length > 0">
         <div class="nav-divider"></div>
-        <div class="nav-label" v-if="!collapsed">分类</div>
+        <div class="nav-label" v-show="!collapsed">分类</div>
         <div
           v-for="cat in categories"
           :key="cat.name"
@@ -116,7 +116,7 @@ const toggleSidebar = () => {
           :title="cat.name"
         >
           <span class="cat-dot" :style="{ background: getCategoryColor(cat.name) }"></span>
-          <span class="nav-text" v-if="!collapsed">{{ cat.name }}</span>
+          <span class="nav-text" v-show="!collapsed">{{ cat.name }}</span>
         </div>
       </template>
     </nav>
@@ -126,7 +126,7 @@ const toggleSidebar = () => {
       <div class="nav-item" @click="toggleSidebar" :title="collapsed ? '展开' : '收起'">
         <PanelLeftOpen v-if="collapsed" class="nav-icon" :size="16" />
         <PanelLeftClose v-else class="nav-icon" :size="16" />
-        <span class="nav-text" v-if="!collapsed">收起</span>
+        <span class="nav-text" v-show="!collapsed">收起</span>
       </div>
     </div>
   </aside>
@@ -157,6 +157,7 @@ const toggleSidebar = () => {
 }
 
 .nav-item {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -166,9 +167,22 @@ const toggleSidebar = () => {
   border-radius: var(--radius-sm);
   cursor: pointer;
   white-space: nowrap;
-  transition: all var(--transition-fast);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 13px;
   color: var(--text-secondary);
+}
+
+.nav-item::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 50%;
+  width: 3px;
+  height: 0;
+  border-radius: 2px;
+  background: var(--accent);
+  transform: translateY(-50%);
+  transition: height 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .nav-item:hover {
@@ -179,6 +193,10 @@ const toggleSidebar = () => {
 .nav-item.active {
   background: var(--accent-light);
   color: var(--accent);
+}
+
+.nav-item.active::before {
+  height: 16px;
 }
 
 .nav-item.active .nav-icon {
@@ -200,6 +218,27 @@ const toggleSidebar = () => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar.collapsed .nav-text {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.nav-label {
+  padding: 4px 14px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar.collapsed .nav-label {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* ====== 分类圆点 - macOS 风格 ====== */
@@ -226,16 +265,6 @@ const toggleSidebar = () => {
   background: var(--border-subtle);
 }
 
-/* ====== 标签 ====== */
-.nav-label {
-  padding: 4px 14px 6px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
 /* ====== 底部 ====== */
 .foot {
   padding: 4px 8px 8px;
@@ -252,11 +281,11 @@ const toggleSidebar = () => {
   padding: 0;
 }
 
-.sidebar.collapsed .nav-divider {
-  margin: 8px 8px;
+.sidebar.collapsed .nav-item::before {
+  left: 0;
 }
 
-.sidebar.collapsed .nav-label {
-  display: none;
+.sidebar.collapsed .nav-divider {
+  margin: 8px 8px;
 }
 </style>

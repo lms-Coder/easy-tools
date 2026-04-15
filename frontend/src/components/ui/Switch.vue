@@ -69,7 +69,7 @@ function toggle() {
 /* Thumb */
 .switch-thumb {
   display: block;
-  background: #ffffff;
+  background: var(--text-inverse, #fff);
   border-radius: var(--radius-full);
   transition: transform var(--transition-fast);
   box-shadow: var(--shadow-xs);

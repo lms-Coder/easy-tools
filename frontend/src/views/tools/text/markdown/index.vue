@@ -414,21 +414,6 @@ const {
   margin: 0;
 }
 
-/* ====== Tooltip ====== */
-.toolbar-tooltip {
-  position: fixed;
-  z-index: 9999;
-  padding: 5px 10px;
-  font-size: 12px;
-  color: var(--text-inverse);
-  background: var(--bg-tooltip, rgba(0, 0, 0, 0.85));
-  border-radius: 4px;
-  white-space: nowrap;
-  transform: translateX(-50%);
-  backdrop-filter: blur(4px);
-  line-height: 1.4;
-}
-
 /* ====== Responsive ====== */
 @media (max-width: 760px) {
   .tool-main.split { grid-template-columns: 1fr !important; }
