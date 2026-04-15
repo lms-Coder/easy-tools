@@ -95,20 +95,45 @@ const emit = defineEmits<{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 32px;
-  padding: 0 20px;
-  font-size: 12px;
-  font-weight: 500;
+  height: 38px;
+  padding: 0 28px;
+  font-size: 13px;
+  font-weight: 550;
   color: #fff;
   background: var(--accent);
-  border: 1px solid var(--accent);
-  border-radius: var(--radius-sm);
+  border: none;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 1px 3px color-mix(in srgb, var(--accent) 25%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--accent) 20%, transparent) inset;
+}
+
+.ref-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+html.dark .ref-btn::after {
+  background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 100%);
 }
 
 .ref-btn:hover {
-  background: var(--accent-hover);
-  border-color: var(--accent-hover);
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 14px color-mix(in srgb, var(--accent) 30%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--accent) 20%, transparent) inset;
+}
+
+.ref-btn:active {
+  filter: brightness(0.96);
+  transform: translateY(0) scale(0.98);
 }
 </style>

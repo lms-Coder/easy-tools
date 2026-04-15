@@ -6,6 +6,9 @@ import {
   Info,
   TriangleAlert,
   HelpCircle,
+  CircleCheck,
+  CircleX,
+  CircleAlert,
 } from 'lucide-vue-next'
 
 export interface DialogProps {
@@ -33,14 +36,14 @@ const emit = defineEmits<{
   (e: 'cancel'): void
 }>()
 
-const dialogRef = ref<HTMLElement | null>(null)
-const isAnimating = ref(false)
+const isClosing = ref(false)
+const hasContent = computed(() => !!props.content)
 
 const close = () => {
-  isAnimating.value = true
+  isClosing.value = true
   setTimeout(() => {
     emit('update:visible', false)
-    isAnimating.value = false
+    isClosing.value = false
   }, 200)
 }
 
@@ -55,44 +58,35 @@ const handleCancel = () => {
 }
 
 const handleMaskClick = (e: MouseEvent) => {
-  if (e.target === e.currentTarget) {
-    handleCancel()
-  }
+  if (e.target === e.currentTarget) handleCancel()
 }
 
 const handleKeydown = (e: KeyboardEvent) => {
-  if (e.key === 'Escape') {
-    handleCancel()
-  } else if (e.key === 'Enter' && !props.showCancel) {
-    handleConfirm()
-  }
+  if (e.key === 'Escape') handleCancel()
+  else if (e.key === 'Enter' && !props.showCancel) handleConfirm()
 }
 
-watch(
-  () => props.visible,
-  (val) => {
-    if (val) {
-      document.addEventListener('keydown', handleKeydown)
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.removeEventListener('keydown', handleKeydown)
-      document.body.style.overflow = ''
-    }
+watch(() => props.visible, (val) => {
+  if (val) {
+    document.addEventListener('keydown', handleKeydown)
+    document.body.style.overflow = 'hidden'
+  } else {
+    document.removeEventListener('keydown', handleKeydown)
+    document.body.style.overflow = ''
   }
-)
+})
 
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown)
   document.body.style.overflow = ''
 })
 
-// 是否显示关闭按钮（纯提示型不需要）
-const showClose = computed(() => props.showCancel)
+const showCloseBtn = computed(() => props.showCancel)
 
-const iconMap = {
-  success: Check,
-  warning: TriangleAlert,
-  error: TriangleAlert,
+const iconMap: Record<string, any> = {
+  success: CircleCheck,
+  warning: CircleAlert,
+  error: CircleX,
   info: Info,
   confirm: HelpCircle,
 }
@@ -104,45 +98,69 @@ const currentIcon = computed(() => iconMap[props.type] || iconMap.confirm)
   <Teleport to="body">
     <Transition name="dialog">
       <div
-        v-if="visible"
+        v-if="visible && !isClosing"
         class="dialog-overlay"
-        :class="{ closing: isAnimating }"
         @click="handleMaskClick"
       >
-        <div ref="dialogRef" class="dialog-container" :class="[`type-${type}`, { closing: isAnimating }]">
-          <!-- 关闭按钮（仅确认型显示） -->
-          <button v-if="showClose" class="dialog-close" @click="handleCancel">
+        <div class="dialog-container" :class="`type-${type}`">
+          <!-- Close button -->
+          <button v-if="showCloseBtn" class="dialog-close" @click="handleCancel">
             <X :size="14" />
           </button>
 
-          <!-- 内容区 -->
+          <!-- Body -->
           <div class="dialog-body">
-            <!-- 图标 -->
             <div class="dialog-icon-wrap">
-              <div class="dialog-icon">
-                <component :is="currentIcon" :size="22" :stroke-width="2" />
-              </div>
+              <div class="dialog-icon-ring"></div>
+              <component :is="currentIcon" :size="22" :stroke-width="1.8" class="dialog-icon" />
             </div>
-
-            <!-- 标题 -->
             <h3 class="dialog-title">{{ title }}</h3>
-
-            <!-- 描述 -->
-            <p v-if="content" class="dialog-desc">{{ content }}</p>
+            <p v-if="hasContent" class="dialog-desc">{{ content }}</p>
           </div>
 
-          <!-- 按钮区 -->
+          <!-- Actions -->
           <div class="dialog-actions">
-            <button
-              v-if="showCancel"
-              class="dialog-btn btn-cancel"
-              @click="handleCancel"
-            >
+            <button v-if="showCancel" class="dialog-btn cancel" @click="handleCancel">
               {{ cancelText }}
             </button>
             <button
-              class="dialog-btn btn-confirm"
-              :class="{ 'btn-danger': danger || type === 'error' }"
+              class="dialog-btn confirm"
+              :class="{ danger: danger || type === 'error' }"
+              @click="handleConfirm"
+            >
+              {{ confirmText }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+
+    <!-- Closing state overlay -->
+    <Transition name="dialog">
+      <div
+        v-if="visible && isClosing"
+        class="dialog-overlay closing"
+        @click="handleMaskClick"
+      >
+        <div class="dialog-container closing" :class="`type-${type}`">
+          <button v-if="showCloseBtn" class="dialog-close" @click="handleCancel">
+            <X :size="14" />
+          </button>
+          <div class="dialog-body">
+            <div class="dialog-icon-wrap">
+              <div class="dialog-icon-ring"></div>
+              <component :is="currentIcon" :size="22" :stroke-width="1.8" class="dialog-icon" />
+            </div>
+            <h3 class="dialog-title">{{ title }}</h3>
+            <p v-if="hasContent" class="dialog-desc">{{ content }}</p>
+          </div>
+          <div class="dialog-actions">
+            <button v-if="showCancel" class="dialog-btn cancel" @click="handleCancel">
+              {{ cancelText }}
+            </button>
+            <button
+              class="dialog-btn confirm"
+              :class="{ danger: danger || type === 'error' }"
               @click="handleConfirm"
             >
               {{ confirmText }}
@@ -155,64 +173,66 @@ const currentIcon = computed(() => iconMap[props.type] || iconMap.confirm)
 </template>
 
 <style scoped>
-/* ====== 遮罩层 ====== */
+/* ====== Overlay ====== */
 .dialog-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(15, 23, 42, 0.15);
+  backdrop-filter: blur(16px) saturate(1.6);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 10000;
   padding: 24px;
 }
 
 html.dark .dialog-overlay {
   background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
 }
 
-/* ====== 容器 ====== */
+/* ====== Container ====== */
 .dialog-container {
   position: relative;
   width: 100%;
-  max-width: 340px;
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(40px) saturate(200%);
-  -webkit-backdrop-filter: blur(40px) saturate(200%);
-  border-radius: 14px;
+  max-width: 380px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
   box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.08),
-    0 4px 16px rgba(0, 0, 0, 0.04);
-  border: 0.5px solid rgba(0, 0, 0, 0.06);
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+    0 24px 80px -12px rgba(15, 23, 42, 0.18),
+    0 8px 24px -4px rgba(15, 23, 42, 0.08);
   overflow: hidden;
+  transform-origin: center;
 }
 
 html.dark .dialog-container {
-  background: rgba(44, 44, 46, 0.78);
-  border-color: rgba(255, 255, 255, 0.08);
   box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.4),
-    0 4px 16px rgba(0, 0, 0, 0.2);
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 24px 80px -12px rgba(0, 0, 0, 0.55),
+    0 8px 24px -4px rgba(0, 0, 0, 0.3);
 }
 
-/* ====== 关闭按钮 ====== */
+/* ====== Close Button ====== */
 .dialog-close {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 24px;
-  height: 24px;
+  top: 14px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
   background: transparent;
-  color: var(--text-tertiary, #aeaeb2);
-  border-radius: 6px;
+  color: var(--text-muted);
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.15s ease;
+  z-index: 1;
 }
 
 .dialog-close:hover {
@@ -220,62 +240,82 @@ html.dark .dialog-container {
   color: var(--text-secondary);
 }
 
-/* ====== 内容区 ====== */
+/* ====== Body ====== */
 .dialog-body {
-  padding: 28px 24px 20px;
+  padding: 32px 28px 24px;
   text-align: center;
 }
 
+/* ====== Icon with ambient ring ====== */
 .dialog-icon-wrap {
-  margin-bottom: 14px;
-}
-
-.dialog-icon {
-  width: 40px;
-  height: 40px;
-  margin: 0 auto;
+  position: relative;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  transition: all 0.2s ease;
 }
 
-/* 各类型图标颜色 */
-.type-info .dialog-icon {
-  background: var(--info-light);
+.dialog-icon-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 18px;
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.type-info .dialog-icon-ring {
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+}
+.type-warning .dialog-icon-ring {
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, transparent 70%);
+}
+.type-error .dialog-icon-ring {
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, transparent 70%);
+}
+.type-success .dialog-icon-ring {
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, transparent 70%);
+}
+.type-confirm .dialog-icon-ring {
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+}
+
+.dialog-icon {
+  position: relative;
+  z-index: 1;
+}
+
+/* Type-specific icon backgrounds */
+.type-info .dialog-icon-wrap,
+.type-confirm .dialog-icon-wrap {
+  background: color-mix(in srgb, var(--info) 12%, transparent);
   color: var(--info);
-  box-shadow: 0 2px 8px var(--info-light);
+  border-radius: 14px;
 }
 
-.type-warning .dialog-icon {
-  background: var(--warning-light);
+.type-warning .dialog-icon-wrap {
+  background: color-mix(in srgb, var(--warning) 14%, transparent);
   color: var(--warning);
-  box-shadow: 0 2px 8px var(--warning-light);
+  border-radius: 14px;
 }
 
-.type-error .dialog-icon {
-  background: var(--error-light);
+.type-error .dialog-icon-wrap {
+  background: color-mix(in srgb, var(--error) 10%, transparent);
   color: var(--error);
-  box-shadow: 0 2px 8px var(--error-light);
+  border-radius: 14px;
 }
 
-.type-success .dialog-icon {
-  background: var(--success-light);
+.type-success .dialog-icon-wrap {
+  background: color-mix(in srgb, var(--success) 14%, transparent);
   color: var(--success);
-  box-shadow: 0 2px 8px var(--success-light);
-}
-
-.type-confirm .dialog-icon {
-  background: var(--accent-light);
-  color: var(--accent);
-  box-shadow: 0 2px 8px var(--accent-light);
+  border-radius: 14px;
 }
 
 .dialog-title {
   margin: 0 0 6px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 650;
   color: var(--text-primary);
   line-height: 1.4;
   letter-spacing: -0.2px;
@@ -285,98 +325,122 @@ html.dark .dialog-container {
   margin: 0;
   font-size: 13px;
   color: var(--text-secondary);
-  line-height: 1.6;
+  line-height: 1.65;
   white-space: pre-line;
 }
 
-/* ====== 按钮区 ====== */
+/* ====== Actions ====== */
 .dialog-actions {
   display: flex;
-  gap: 8px;
-  padding: 4px 16px 16px;
+  gap: 10px;
+  padding: 6px 24px 24px;
 }
 
 .dialog-btn {
   flex: 1;
-  height: 32px;
+  height: 38px;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 550;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
   letter-spacing: -0.1px;
+  position: relative;
+  overflow: hidden;
 }
 
-.btn-cancel {
-  background: var(--bg-tertiary, #ececee);
+.dialog-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+html.dark .dialog-btn::after {
+  background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 100%);
+}
+
+.dialog-btn.cancel {
+  background: var(--bg-tertiary);
   color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
 }
 
-.btn-cancel:hover {
+.dialog-btn.cancel:hover {
   background: var(--bg-hover);
+  border-color: var(--border-default);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
 }
 
-html.dark .btn-cancel {
-  background: rgba(255, 255, 255, 0.1);
+.dialog-btn.cancel:active {
+  transform: translateY(0) scale(0.98);
 }
 
-html.dark .btn-cancel:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.btn-confirm {
+.dialog-btn.confirm {
   background: var(--accent);
   color: #fff;
+  box-shadow:
+    0 1px 3px color-mix(in srgb, var(--accent) 25%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--accent) 20%, transparent) inset;
 }
 
-.btn-confirm:hover {
-  filter: brightness(1.1);
+.dialog-btn.confirm:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 14px color-mix(in srgb, var(--accent) 30%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--accent) 20%, transparent) inset;
 }
 
-.btn-confirm:active {
-  filter: brightness(0.95);
+.dialog-btn.confirm:active {
+  filter: brightness(0.96);
+  transform: translateY(0) scale(0.98);
 }
 
-.btn-confirm.btn-danger {
+.dialog-btn.confirm.danger {
   background: var(--error);
+  box-shadow:
+    0 1px 3px color-mix(in srgb, var(--error) 25%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--error) 15%, transparent) inset;
 }
 
-.btn-confirm.btn-danger:hover {
-  filter: brightness(1.1);
+.dialog-btn.confirm.danger:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 14px color-mix(in srgb, var(--error) 30%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--error) 15%, transparent) inset;
 }
 
-/* ====== 动画 ====== */
+/* ====== Animations ====== */
 .dialog-enter-active {
-  animation: dialog-fade-in 0.2s ease-out;
-}
-
-.dialog-leave-active {
-  animation: dialog-fade-out 0.15s ease-in;
+  transition: opacity 0.2s ease;
 }
 
 .dialog-enter-active .dialog-container {
-  animation: dialog-scale-in 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
+  animation: dialog-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dialog-leave-active {
+  transition: opacity 0.18s ease;
 }
 
 .dialog-leave-active .dialog-container {
-  animation: dialog-scale-out 0.15s ease-in;
+  animation: dialog-out 0.18s ease-in forwards;
 }
 
-@keyframes dialog-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.dialog-enter-from,
+.dialog-leave-to {
+  opacity: 0;
 }
 
-@keyframes dialog-fade-out {
-  from { opacity: 1; }
-  to { opacity: 0; }
-}
-
-@keyframes dialog-scale-in {
+@keyframes dialog-in {
   from {
     opacity: 0;
-    transform: scale(0.92) translateY(8px);
+    transform: scale(0.88) translateY(12px);
   }
   to {
     opacity: 1;
@@ -384,14 +448,14 @@ html.dark .btn-cancel:hover {
   }
 }
 
-@keyframes dialog-scale-out {
+@keyframes dialog-out {
   from {
     opacity: 1;
     transform: scale(1);
   }
   to {
     opacity: 0;
-    transform: scale(0.96);
+    transform: scale(0.94);
   }
 }
 </style>

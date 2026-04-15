@@ -72,7 +72,7 @@ onUnmounted(() => {
                 <slot name="title">{{ title }}</slot>
               </div>
               <button v-if="showClose && closable" class="modal-close" @click="close">
-                <X :size="16" />
+                <X :size="15" />
               </button>
             </div>
 
@@ -99,7 +99,7 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 1000;
+  z-index: 10000;
 }
 
 /* 遮罩层 */
@@ -109,8 +109,15 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
+  background: rgba(15, 23, 42, 0.15);
+  backdrop-filter: blur(16px) saturate(1.6);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+}
+
+html.dark .modal-mask {
   background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
 }
 
 /* 内容包装器 */
@@ -124,19 +131,31 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 24px;
 }
 
 /* 模态框内容 */
 .modal-content {
   position: relative;
-  background: var(--bg-secondary);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  max-width: calc(100vw - 40px);
-  max-height: calc(100vh - 40px);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+    0 24px 80px -12px rgba(15, 23, 42, 0.18),
+    0 8px 24px -4px rgba(15, 23, 42, 0.08);
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 48px);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+html.dark .modal-content {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 24px 80px -12px rgba(0, 0, 0, 0.55),
+    0 8px 24px -4px rgba(0, 0, 0, 0.3);
 }
 
 /* 头部 */
@@ -144,15 +163,16 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  padding: 20px 24px;
   border-bottom: 1px solid var(--border-subtle);
   flex-shrink: 0;
 }
 
 .modal-title {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 650;
   color: var(--text-primary);
+  letter-spacing: -0.2px;
 }
 
 .modal-close {
@@ -162,12 +182,11 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;
-  font-size: 16px;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
 .modal-close:hover {
@@ -179,7 +198,7 @@ onUnmounted(() => {
 .modal-body {
   flex: 1;
   overflow: auto;
-  padding: 20px;
+  padding: 24px;
 }
 
 /* 底部 */
@@ -188,15 +207,26 @@ onUnmounted(() => {
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
-  padding: 14px 20px;
+  padding: 16px 24px;
   border-top: 1px solid var(--border-subtle);
   flex-shrink: 0;
 }
 
 /* 过渡动画 */
-.modal-enter-active,
+.modal-enter-active {
+  transition: opacity 0.2s ease;
+}
+
+.modal-enter-active .modal-content {
+  animation: modal-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 .modal-leave-active {
-  transition: all 0.2s ease;
+  transition: opacity 0.18s ease;
+}
+
+.modal-leave-active .modal-content {
+  animation: modal-out 0.18s ease-in forwards;
 }
 
 .modal-enter-from,
@@ -204,14 +234,25 @@ onUnmounted(() => {
   opacity: 0;
 }
 
-.modal-enter-from .modal-content,
-.modal-leave-to .modal-content {
-  transform: scale(0.96);
-  opacity: 0;
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
-.modal-enter-active .modal-content,
-.modal-leave-active .modal-content {
-  transition: all 0.2s ease;
+@keyframes modal-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
 }
 </style>

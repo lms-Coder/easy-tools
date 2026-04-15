@@ -161,14 +161,14 @@ const {
     </div>
 
     <!-- 终止确认弹窗 -->
-    <Modal v-model:visible="showConfirmModal" title="确认终止" width="420px">
+    <Modal v-model:visible="showConfirmModal" title="确认终止" width="400px">
       <div class="confirm-body">
-        <div class="confirm-icon"><AlertTriangle :size="24" /></div>
+        <div class="confirm-icon"><AlertTriangle :size="22" /></div>
         <p class="confirm-msg">{{ confirmMessage }}</p>
       </div>
       <template #footer>
-        <button class="action-btn" @click="showConfirmModal = false">取消</button>
-        <button class="action-btn danger" @click="executeKill">确认终止</button>
+        <button class="modal-cancel-btn" @click="showConfirmModal = false">取消</button>
+        <button class="modal-danger-btn" @click="executeKill">确认终止</button>
       </template>
     </Modal>
 
@@ -536,26 +536,99 @@ const {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 8px 0;
+  padding: 4px 0 8px;
 }
 
 .confirm-icon {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--warning-light);
+  background: color-mix(in srgb, var(--warning) 14%, transparent);
   color: var(--warning);
-  border-radius: var(--radius-lg);
-  margin-bottom: 14px;
+  border-radius: 14px;
+  margin-bottom: 18px;
+  position: relative;
+}
+
+.confirm-icon::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 18px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, transparent 70%);
+  opacity: 0.5;
 }
 
 .confirm-msg {
-  font-size: 14px;
-  line-height: 1.7;
+  font-size: 13px;
+  line-height: 1.65;
   color: var(--text-primary);
   margin: 0;
+}
+
+.modal-cancel-btn {
+  height: 38px;
+  padding: 0 24px;
+  font-size: 13px;
+  font-weight: 550;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-cancel-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-default);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.modal-cancel-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.modal-danger-btn {
+  height: 38px;
+  padding: 0 24px;
+  font-size: 13px;
+  font-weight: 550;
+  color: #fff;
+  background: var(--error);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 1px 3px color-mix(in srgb, var(--error) 25%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--error) 15%, transparent) inset;
+}
+
+.modal-danger-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.modal-danger-btn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 14px color-mix(in srgb, var(--error) 30%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--error) 15%, transparent) inset;
+}
+
+.modal-danger-btn:active {
+  filter: brightness(0.96);
+  transform: translateY(0) scale(0.98);
 }
 
 /* ====== Tooltip ====== */
