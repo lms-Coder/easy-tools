@@ -90,7 +90,7 @@ const onDrop = (e: DragEvent) => {
             <span>水印设置</span>
           </div>
           <div class="panel-actions">
-            <button class="action-btn" @click="clear" :disabled="!hasSourceImage"
+            <button class="tool-icon-btn" @click="clear" :disabled="!hasSourceImage"
               @mouseenter="showTooltip('重置', $event)" @mouseleave="hideTooltip">
               <Trash2 :size="13" />
             </button>
@@ -369,13 +369,6 @@ const onDrop = (e: DragEvent) => {
 
 <style scoped>
 /* ====== Header ====== */
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 4px;
-}
-
 .stat-tag {
   padding: 2px 8px;
   border-radius: 10px;
@@ -386,28 +379,6 @@ const onDrop = (e: DragEvent) => {
 }
 
 /* ====== Panel Actions ====== */
-.panel-actions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.action-btn {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all var(--transition-fast);
-  padding: 0;
-}
-
-.action-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
 .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ====== Config Sections ====== */
@@ -417,30 +388,6 @@ const onDrop = (e: DragEvent) => {
   gap: 0;
   overflow-y: auto;
 }
-
-.config-section {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.config-section.grow {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  border-bottom: none;
-  min-height: 0;
-}
-
-.config-label {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
 .val-code {
   font-family: var(--font-mono);
   font-size: 11px;

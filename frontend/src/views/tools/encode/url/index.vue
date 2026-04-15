@@ -44,11 +44,11 @@ const {
           </div>
           <div class="panel-actions">
             <span v-if="inputStats.chars" class="byte-info">{{ inputStats.chars }} 字符</span>
-            <button class="action-btn" @click="paste"
+            <button class="tool-icon-btn" @click="paste"
               @mouseenter="showTooltip('粘贴', $event)" @mouseleave="hideTooltip">
               <ClipboardPaste :size="13" />
             </button>
-            <button class="action-btn" @click="clear" :disabled="!inputText"
+            <button class="tool-icon-btn" @click="clear" :disabled="!inputText"
               @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
               <Trash2 :size="13" />
             </button>
@@ -109,12 +109,12 @@ const {
             <span>输出</span>
           </div>
           <div class="panel-actions">
-            <button class="action-btn" @click="toggleMode"
+            <button class="tool-icon-btn" @click="toggleMode"
               @mouseenter="showTooltip('交换输入输出', $event)" @mouseleave="hideTooltip">
               <ArrowLeftRight :size="13" />
             </button>
             <div class="panel-divider"></div>
-            <button class="action-btn" @click="copyOutput" :disabled="!outputText"
+            <button class="tool-icon-btn" @click="copyOutput" :disabled="!outputText"
               @mouseenter="showTooltip('复制', $event)" @mouseleave="hideTooltip">
               <Check v-if="copied" :size="13" /><Copy v-else :size="13" />
             </button>
@@ -146,15 +146,15 @@ const {
             <span>URL 输入</span>
           </div>
           <div class="panel-actions">
-            <button class="action-btn" @click="paste"
+            <button class="tool-icon-btn" @click="paste"
               @mouseenter="showTooltip('粘贴', $event)" @mouseleave="hideTooltip">
               <ClipboardPaste :size="13" />
             </button>
-            <button class="action-btn" @click="loadExample"
+            <button class="tool-icon-btn" @click="loadExample"
               @mouseenter="showTooltip('示例', $event)" @mouseleave="hideTooltip">
               <Code :size="13" />
             </button>
-            <button class="action-btn" @click="clear" :disabled="!inputText"
+            <button class="tool-icon-btn" @click="clear" :disabled="!inputText"
               @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
               <Trash2 :size="13" />
             </button>
@@ -272,13 +272,6 @@ const {
 
 <style scoped>
 /* ====== Header ====== */
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 4px;
-}
-
 .mode-tag {
   padding: 2px 8px;
   border-radius: 10px;
@@ -301,12 +294,6 @@ const {
 }
 
 /* ====== Panel Actions ====== */
-.panel-actions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
 .panel-divider {
   width: 1px;
   height: 16px;
@@ -314,22 +301,6 @@ const {
   margin: 0 4px;
 }
 
-.action-btn {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all var(--transition-fast);
-  padding: 0;
-}
-
-.action-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
 .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .byte-info {
@@ -343,33 +314,6 @@ const {
 }
 
 /* ====== Segment Buttons ====== */
-.seg-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 5px 12px;
-  border: 1px solid var(--border-subtle);
-  background: var(--bg-secondary);
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  white-space: nowrap;
-}
-
-.seg-btn:hover { border-color: var(--border-default); background: var(--bg-hover); color: var(--text-primary); }
-
-.seg-btn.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-}
-
-.seg-btn.xs { padding: 3px 8px; font-size: 11px; height: 24px; }
-
 .tab-toggle, .mode-toggle {
   display: flex;
   gap: 2px;
@@ -381,29 +325,6 @@ const {
   flex-direction: column;
   gap: 0;
   overflow-y: auto;
-}
-
-.config-section {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.config-section.grow {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  border-bottom: none;
-  min-height: 0;
-}
-
-.config-label {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
 }
 
 /* ====== 编码规则 ====== */
@@ -523,7 +444,7 @@ const {
 
 .dot.blue { background: var(--accent); }
 .dot.green { background: var(--success); }
-.dot.orange { background: #f59e0b; }
+.dot.orange { background: var(--warning); }
 
 .parse-count {
   padding: 0 6px;

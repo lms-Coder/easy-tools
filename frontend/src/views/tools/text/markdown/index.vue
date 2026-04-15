@@ -37,26 +37,26 @@ const {
       <div class="control-row">
         <!-- 格式化按钮组 -->
         <div class="control-group">
-          <button class="action-btn" @click="insertBold" @mouseenter="showTooltip('粗体', $event)" @mouseleave="hideTooltip"><Bold :size="13" /></button>
-          <button class="action-btn" @click="insertItalic" @mouseenter="showTooltip('斜体', $event)" @mouseleave="hideTooltip"><Italic :size="13" /></button>
-          <button class="action-btn" @click="insertStrikethrough" @mouseenter="showTooltip('删除线', $event)" @mouseleave="hideTooltip"><Strikethrough :size="13" /></button>
+          <button class="tool-icon-btn" @click="insertBold" @mouseenter="showTooltip('粗体', $event)" @mouseleave="hideTooltip"><Bold :size="13" /></button>
+          <button class="tool-icon-btn" @click="insertItalic" @mouseenter="showTooltip('斜体', $event)" @mouseleave="hideTooltip"><Italic :size="13" /></button>
+          <button class="tool-icon-btn" @click="insertStrikethrough" @mouseenter="showTooltip('删除线', $event)" @mouseleave="hideTooltip"><Strikethrough :size="13" /></button>
           <div class="control-divider"></div>
-          <button class="action-btn" @click="insertH2" @mouseenter="showTooltip('H2', $event)" @mouseleave="hideTooltip"><span class="btn-text">H2</span></button>
-          <button class="action-btn" @click="insertH3" @mouseenter="showTooltip('H3', $event)" @mouseleave="hideTooltip"><span class="btn-text">H3</span></button>
+          <button class="tool-icon-btn" @click="insertH2" @mouseenter="showTooltip('H2', $event)" @mouseleave="hideTooltip"><span class="btn-text">H2</span></button>
+          <button class="tool-icon-btn" @click="insertH3" @mouseenter="showTooltip('H3', $event)" @mouseleave="hideTooltip"><span class="btn-text">H3</span></button>
           <div class="control-divider"></div>
-          <button class="action-btn" @click="insertUl" @mouseenter="showTooltip('无序列表', $event)" @mouseleave="hideTooltip"><List :size="13" /></button>
-          <button class="action-btn" @click="insertOl" @mouseenter="showTooltip('有序列表', $event)" @mouseleave="hideTooltip"><ListOrdered :size="13" /></button>
-          <button class="action-btn" @click="insertQuote" @mouseenter="showTooltip('引用', $event)" @mouseleave="hideTooltip"><Quote :size="13" /></button>
+          <button class="tool-icon-btn" @click="insertUl" @mouseenter="showTooltip('无序列表', $event)" @mouseleave="hideTooltip"><List :size="13" /></button>
+          <button class="tool-icon-btn" @click="insertOl" @mouseenter="showTooltip('有序列表', $event)" @mouseleave="hideTooltip"><ListOrdered :size="13" /></button>
+          <button class="tool-icon-btn" @click="insertQuote" @mouseenter="showTooltip('引用', $event)" @mouseleave="hideTooltip"><Quote :size="13" /></button>
           <div class="control-divider"></div>
-          <button class="action-btn" @click="insertInlineCode" @mouseenter="showTooltip('行内代码', $event)" @mouseleave="hideTooltip"><Code :size="13" /></button>
-          <button class="action-btn" @click="insertCodeBlock" @mouseenter="showTooltip('代码块', $event)" @mouseleave="hideTooltip"><Code :size="13" /><span class="btn-sup">□</span></button>
-          <button class="action-btn" @click="insertLink" @mouseenter="showTooltip('链接', $event)" @mouseleave="hideTooltip"><Link :size="13" /></button>
-          <button class="action-btn" @click="insertImage" @mouseenter="showTooltip('图片', $event)" @mouseleave="hideTooltip"><Image :size="13" /></button>
-          <button class="action-btn" @click="insertTable" @mouseenter="showTooltip('表格', $event)" @mouseleave="hideTooltip"><span class="btn-text">⊞</span></button>
+          <button class="tool-icon-btn" @click="insertInlineCode" @mouseenter="showTooltip('行内代码', $event)" @mouseleave="hideTooltip"><Code :size="13" /></button>
+          <button class="tool-icon-btn" @click="insertCodeBlock" @mouseenter="showTooltip('代码块', $event)" @mouseleave="hideTooltip"><Code :size="13" /><span class="btn-sup">□</span></button>
+          <button class="tool-icon-btn" @click="insertLink" @mouseenter="showTooltip('链接', $event)" @mouseleave="hideTooltip"><Link :size="13" /></button>
+          <button class="tool-icon-btn" @click="insertImage" @mouseenter="showTooltip('图片', $event)" @mouseleave="hideTooltip"><Image :size="13" /></button>
+          <button class="tool-icon-btn" @click="insertTable" @mouseenter="showTooltip('表格', $event)" @mouseleave="hideTooltip"><span class="btn-text">⊞</span></button>
           <div class="control-divider"></div>
-          <button class="action-btn" @click="insertMathInline" @mouseenter="showTooltip('行内公式', $event)" @mouseleave="hideTooltip"><span class="btn-text">$x</span></button>
-          <button class="action-btn" @click="insertMathBlock" @mouseenter="showTooltip('块级公式', $event)" @mouseleave="hideTooltip"><span class="btn-text">∑</span></button>
-          <button class="action-btn" @click="insertMermaid" @mouseenter="showTooltip('Mermaid', $event)" @mouseleave="hideTooltip"><span class="btn-text">◆</span></button>
+          <button class="tool-icon-btn" @click="insertMathInline" @mouseenter="showTooltip('行内公式', $event)" @mouseleave="hideTooltip"><span class="btn-text">$x</span></button>
+          <button class="tool-icon-btn" @click="insertMathBlock" @mouseenter="showTooltip('块级公式', $event)" @mouseleave="hideTooltip"><span class="btn-text">∑</span></button>
+          <button class="tool-icon-btn" @click="insertMermaid" @mouseenter="showTooltip('Mermaid', $event)" @mouseleave="hideTooltip"><span class="btn-text">◆</span></button>
         </div>
 
         <!-- 视图 + 操作 -->
@@ -67,12 +67,12 @@ const {
             <button :class="['seg-btn xs', { active: viewMode === 'preview' }]" @click="viewMode = 'preview'" @mouseenter="showTooltip('预览', $event)" @mouseleave="hideTooltip"><Eye :size="11" /></button>
           </div>
           <div class="control-divider"></div>
-          <button class="action-btn" @click="loadExample" @mouseenter="showTooltip('示例', $event)" @mouseleave="hideTooltip"><ClipboardPaste :size="13" /></button>
-          <button class="action-btn" @click="copyHtml" :disabled="!previewHtml" @mouseenter="showTooltip('复制 HTML', $event)" @mouseleave="hideTooltip">
+          <button class="tool-icon-btn" @click="loadExample" @mouseenter="showTooltip('示例', $event)" @mouseleave="hideTooltip"><ClipboardPaste :size="13" /></button>
+          <button class="tool-icon-btn" @click="copyHtml" :disabled="!previewHtml" @mouseenter="showTooltip('复制 HTML', $event)" @mouseleave="hideTooltip">
             <Check v-if="copied" :size="13" style="color: var(--success)" /><Copy v-else :size="13" />
           </button>
           <div class="export-dropdown">
-            <button class="action-btn"><Download :size="13" /></button>
+            <button class="tool-icon-btn"><Download :size="13" /></button>
             <div class="dropdown-menu">
               <button class="dropdown-item" @click="saveToLocal()" :disabled="!markdownText">
                 <span><Save :size="13" style="margin-right:6px" />保存到本地</span><span class="shortcut">local</span>
@@ -86,7 +86,7 @@ const {
             </div>
           </div>
           <div class="control-divider"></div>
-          <button class="action-btn" @click="clearAll" :disabled="!markdownText" @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip"><Trash2 :size="13" /></button>
+          <button class="tool-icon-btn" @click="clearAll" :disabled="!markdownText" @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip"><Trash2 :size="13" /></button>
         </div>
       </div>
     </div>
@@ -137,13 +137,6 @@ const {
 
 <style scoped>
 /* ====== Header ====== */
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 4px;
-}
-
 .mode-tag {
   padding: 2px 8px;
   border-radius: 10px;
@@ -185,64 +178,13 @@ const {
   gap: 2px;
 }
 
-.control-divider {
-  width: 1px;
-  height: 16px;
-  background: var(--border-subtle);
-  margin: 0 4px;
-}
-
 /* ====== Segment Buttons ====== */
-.seg-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 5px 12px;
-  border: 1px solid var(--border-subtle);
-  background: var(--bg-secondary);
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  white-space: nowrap;
-}
-
-.seg-btn:hover { border-color: var(--border-default); background: var(--bg-hover); color: var(--text-primary); }
-
-.seg-btn.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-}
-
-.seg-btn.xs { padding: 3px 8px; font-size: 11px; height: 24px; }
-
 .control-toggle {
   display: flex;
   gap: 2px;
 }
 
 /* ====== Action Buttons ====== */
-.action-btn {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all var(--transition-fast);
-  padding: 0;
-  position: relative;
-}
-
-.action-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
 .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .btn-text {
@@ -258,12 +200,6 @@ const {
   right: 2px;
   font-size: 8px;
   color: var(--text-muted);
-}
-
-.panel-actions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
 }
 
 /* ====== Filename Input ====== */
@@ -290,10 +226,13 @@ const {
   align-items: center;
 }
 
-.export-dropdown:hover .dropdown-menu { display: block; }
+.export-dropdown:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
 
 .dropdown-menu {
-  display: none;
   position: absolute;
   top: 100%;
   right: 0;
@@ -304,6 +243,10 @@ const {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   z-index: 50;
   padding: 4px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.15s cubic-bezier(0.4, 0, 0.2, 1), transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dropdown-item {

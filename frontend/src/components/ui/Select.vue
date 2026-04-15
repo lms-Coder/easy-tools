@@ -133,17 +133,13 @@ onUnmounted(() => {
   backdrop-filter: blur(12px) saturate(1.3);
   -webkit-backdrop-filter: blur(12px) saturate(1.3);
   padding: 4px;
-  max-height: 240px;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .ui-select-dropdown::-webkit-scrollbar {
-  width: 4px;
-}
-
-.ui-select-dropdown::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border-radius: 2px;
+  display: none;
 }
 
 .ui-select-option {

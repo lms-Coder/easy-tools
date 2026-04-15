@@ -190,13 +190,6 @@ const onHslInput = () => setHSL(Number(hInput.value), Number(sInput.value), Numb
 
 <style scoped>
 /* ====== Header ====== */
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 4px;
-}
-
 .preview-dot {
   width: 18px;
   height: 18px;
@@ -213,12 +206,6 @@ const onHslInput = () => setHSL(Number(hInput.value), Number(sInput.value), Numb
 }
 
 /* ====== Panel Actions ====== */
-.panel-actions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
 .fav-btn {
   display: inline-flex;
   align-items: center;
@@ -254,37 +241,13 @@ const onHslInput = () => setHSL(Number(hInput.value), Number(sInput.value), Numb
   flex: 1;
 }
 
-.config-section {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.config-section.grow {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  border-bottom: none;
-  min-height: 0;
-}
-
-.config-label {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
 .config-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.config-row .config-label { margin-bottom: 0; }
-
+.config-row 
 /* ====== Color Preview ====== */
 .color-preview-box {
   position: relative;
@@ -299,10 +262,10 @@ const onHslInput = () => setHSL(Number(hInput.value), Number(sInput.value), Numb
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(45deg, #ccc 25%, transparent 25%),
-    linear-gradient(-45deg, #ccc 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #ccc 75%),
-    linear-gradient(-45deg, transparent 75%, #ccc 75%);
+    linear-gradient(45deg, var(--border-strong) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--border-strong) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--border-strong) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--border-strong) 75%);
   background-size: 16px 16px;
   background-position: 0 0, 0 8px, 8px -8px, -8px 0;
 }
@@ -338,7 +301,7 @@ const onHslInput = () => setHSL(Number(hInput.value), Number(sInput.value), Numb
   border-radius: 50%;
   background: var(--accent);
   cursor: pointer;
-  border: 2px solid #fff;
+  border: 2px solid var(--text-inverse, #fff);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 

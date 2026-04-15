@@ -45,15 +45,15 @@ const {
             <span>表达式设置</span>
           </div>
           <div class="panel-actions">
-            <button class="action-btn" @click="fillDemo"
+            <button class="tool-icon-btn" @click="fillDemo"
               @mouseenter="showTooltip('填入示例', $event)" @mouseleave="hideTooltip">
               <RotateCw :size="13" />
             </button>
-            <button class="action-btn" @click="clearInput" :disabled="!cronInput"
+            <button class="tool-icon-btn" @click="clearInput" :disabled="!cronInput"
               @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
               <Trash2 :size="13" />
             </button>
-            <button class="action-btn" :disabled="!parseResult.valid"
+            <button class="tool-icon-btn" :disabled="!parseResult.valid"
               @click="copyValue('cron', parseResult.normalized)"
               @mouseenter="showTooltip('复制表达式', $event)" @mouseleave="hideTooltip">
               <Copy :size="13" />
@@ -217,13 +217,6 @@ const {
 
 <style scoped>
 /* ====== Header ====== */
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 4px;
-}
-
 .tool-status {
   display: inline-flex;
   align-items: center;
@@ -240,28 +233,6 @@ const {
 .tool-status.error { color: var(--error); background: var(--error-light); }
 
 /* ====== Panel Actions ====== */
-.panel-actions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.action-btn {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all var(--transition-fast);
-  padding: 0;
-}
-
-.action-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
 .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ====== Config Sections ====== */
@@ -270,29 +241,6 @@ const {
   flex-direction: column;
   gap: 0;
   overflow-y: auto;
-}
-
-.config-section {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.config-section.grow {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  border-bottom: none;
-  min-height: 0;
-}
-
-.config-label {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
 }
 
 /* ====== Cron Input ====== */

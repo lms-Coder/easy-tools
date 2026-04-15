@@ -69,7 +69,7 @@ const importExample = JSON.stringify([
           </div>
           <div class="panel-actions">
             <button
-              class="action-btn"
+              class="tool-icon-btn"
               :class="{ active: showFavoritesOnly }"
               @click="showFavoritesOnly = !showFavoritesOnly"
               @mouseenter="showTooltip('只显示收藏', $event)"
@@ -78,7 +78,7 @@ const importExample = JSON.stringify([
               <Heart :size="13" :fill="showFavoritesOnly ? 'currentColor' : 'none'" />
             </button>
             <button
-              class="action-btn"
+              class="tool-icon-btn"
               @click="toggleImportPanel"
               @mouseenter="showTooltip('导入自定义命令', $event)"
               @mouseleave="hideTooltip"
@@ -166,7 +166,7 @@ const importExample = JSON.stringify([
               <span>{{ selectedCommand.name }}</span>
               <span v-if="isCustomCommand(selectedCommand.name)" class="custom-badge">自定义</span>
             </div>
-            <button v-if="isCustomCommand(selectedCommand.name)" class="action-btn danger" @click="deleteCustomCommand(selectedCommand.name)" @mouseenter="showTooltip('删除命令', $event)" @mouseleave="hideTooltip">
+            <button v-if="isCustomCommand(selectedCommand.name)" class="tool-icon-btn danger" @click="deleteCustomCommand(selectedCommand.name)" @mouseenter="showTooltip('删除命令', $event)" @mouseleave="hideTooltip">
               <Trash2 :size="13" />
             </button>
           </div>
@@ -302,13 +302,6 @@ const importExample = JSON.stringify([
 </template>
 
 <style scoped>
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 4px;
-}
-
 .stat-tag {
   display: inline-flex;
   align-items: center;
@@ -344,37 +337,6 @@ const importExample = JSON.stringify([
 }
 
 /* ===== Panel Actions ===== */
-.panel-actions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.action-btn {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all var(--transition-fast);
-  padding: 0;
-}
-
-.action-btn:hover {
-  color: var(--text-primary);
-  background: var(--bg-hover);
-}
-
-.action-btn.active {
-  color: #f43f5e;
-  background: rgba(244, 63, 94, 0.1);
-}
-
 .action-btn.danger:hover {
   color: #ef4444;
   background: rgba(239, 68, 68, 0.1);
@@ -588,19 +550,19 @@ const importExample = JSON.stringify([
   font-weight: 500;
 }
 
-.cat-file { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
-.cat-text { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
-.cat-network { background: rgba(6, 182, 212, 0.1); color: #06b6d4; }
-.cat-process { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+.cat-file { background: var(--accent-light); color: var(--accent); }
+.cat-text { background: var(--success-light); color: var(--success); }
+.cat-network { background: rgba(6, 182, 212, 0.1); color: var(--info); }
+.cat-process { background: var(--warning-light); color: var(--warning); }
 .cat-user { background: rgba(236, 72, 153, 0.1); color: #ec4899; }
-.cat-disk { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
-.cat-compress { background: rgba(99, 102, 241, 0.1); color: #6366f1; }
+.cat-disk { background: var(--error-light); color: var(--error); }
+.cat-compress { background: var(--accent-light); color: var(--accent); }
 .cat-system { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
-.cat-package { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+.cat-package { background: var(--success-light); color: var(--success); }
 .cat-debug { background: rgba(249, 115, 22, 0.1); color: #f97316; }
-.cat-shell { background: rgba(234, 179, 8, 0.1); color: #eab308; }
+.cat-shell { background: var(--warning-light); color: var(--warning); }
 .cat-perf { background: rgba(14, 165, 233, 0.1); color: #0ea5e9; }
-.cat-custom { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+.cat-custom { background: var(--warning-light); color: var(--warning); }
 
 /* ===== Empty State ===== */
 .empty-results,
@@ -678,17 +640,17 @@ const importExample = JSON.stringify([
   display: flex;
   align-items: center;
   padding: 10px 14px;
-  background: #1e1e2e;
-  border-radius: 8px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
   font-family: var(--font-mono);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .code-block .syntax-code,
 .code-block .example-cmd {
   flex: 1;
   font-size: 13px;
-  color: #cdd6f4;
+  color: var(--text-primary);
   word-break: break-all;
   line-height: 1.5;
 }
@@ -700,9 +662,9 @@ const importExample = JSON.stringify([
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #a6adc8;
+  border-radius: var(--radius-sm);
+  background: var(--bg-hover);
+  color: var(--text-muted);
   cursor: pointer;
   transition: all var(--transition-fast);
   flex-shrink: 0;
@@ -711,8 +673,8 @@ const importExample = JSON.stringify([
 }
 
 .copy-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #cdd6f4;
+  background: var(--bg-active);
+  color: var(--text-primary);
 }
 
 .copy-hint {
@@ -722,7 +684,7 @@ const importExample = JSON.stringify([
   flex-shrink: 0;
   margin-left: 8px;
   padding: 4px;
-  color: #a6adc8;
+  color: var(--text-muted);
   opacity: 0.4;
   transition: all var(--transition-fast);
 }

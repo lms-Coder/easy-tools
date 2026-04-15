@@ -75,7 +75,7 @@ const tokens = computed(() => tokenizePattern(pattern.value))
             <span>正则配置</span>
           </div>
           <div class="panel-actions">
-            <button class="action-btn" @click="clearAll" :disabled="!pattern && !testText"
+            <button class="tool-icon-btn" @click="clearAll" :disabled="!pattern && !testText"
               @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
               <Trash2 :size="13" />
             </button>
@@ -162,15 +162,15 @@ const tokens = computed(() => tokenizePattern(pattern.value))
               </button>
             </div>
             <div class="panel-divider"></div>
-            <button v-if="activeTab === 'match' && matchCount > 0" class="action-btn" @click="copyAllMatches"
+            <button v-if="activeTab === 'match' && matchCount > 0" class="tool-icon-btn" @click="copyAllMatches"
               @mouseenter="showTooltip('复制所有匹配', $event)" @mouseleave="hideTooltip">
               <Copy :size="13" />
             </button>
-            <button v-if="activeTab === 'replace' && replacedText" class="action-btn" @click="copyResult(replacedText)"
+            <button v-if="activeTab === 'replace' && replacedText" class="tool-icon-btn" @click="copyResult(replacedText)"
               @mouseenter="showTooltip('复制', $event)" @mouseleave="hideTooltip">
               <Copy :size="13" />
             </button>
-            <button v-if="activeTab === 'code' && generatedCode" class="action-btn" @click="copyResult(generatedCode)"
+            <button v-if="activeTab === 'code' && generatedCode" class="tool-icon-btn" @click="copyResult(generatedCode)"
               @mouseenter="showTooltip('复制代码', $event)" @mouseleave="hideTooltip">
               <Copy :size="13" />
             </button>
@@ -324,13 +324,6 @@ const tokens = computed(() => tokenizePattern(pattern.value))
 
 <style scoped>
 /* ====== Header ====== */
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 4px;
-}
-
 .tool-status {
   display: inline-flex;
   align-items: center;
@@ -347,12 +340,6 @@ const tokens = computed(() => tokenizePattern(pattern.value))
 .tool-status.error { color: var(--error); background: var(--error-light); }
 
 /* ====== Panel Actions ====== */
-.panel-actions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
 .panel-divider {
   width: 1px;
   height: 16px;
@@ -360,52 +347,9 @@ const tokens = computed(() => tokenizePattern(pattern.value))
   margin: 0 4px;
 }
 
-.action-btn {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all var(--transition-fast);
-  padding: 0;
-}
-
-.action-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
 .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ====== Segment Buttons ====== */
-.seg-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 5px 12px;
-  border: 1px solid var(--border-subtle);
-  background: var(--bg-secondary);
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  white-space: nowrap;
-}
-
-.seg-btn:hover { border-color: var(--border-default); background: var(--bg-hover); color: var(--text-primary); }
-
-.seg-btn.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-}
-
-.seg-btn.xs { padding: 3px 8px; font-size: 11px; height: 24px; }
-
 .preview-tabs {
   display: flex;
   gap: 2px;
@@ -417,29 +361,6 @@ const tokens = computed(() => tokenizePattern(pattern.value))
   flex-direction: column;
   gap: 0;
   overflow-y: auto;
-}
-
-.config-section {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.config-section.grow {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  border-bottom: none;
-  min-height: 0;
-}
-
-.config-label {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
 }
 
 .panel-stat {
@@ -547,16 +468,16 @@ const tokens = computed(() => tokenizePattern(pattern.value))
 
 .token-tag:hover { filter: brightness(1.15); }
 
-.tt-charClass     { color: #3b82f6; background: rgba(59,130,246,0.1); }
-.tt-quantifier    { color: #f59e0b; background: rgba(245,158,11,0.1); }
-.tt-anchor        { color: #10b981; background: rgba(16,185,129,0.1); }
-.tt-group         { color: #8b5cf6; background: rgba(139,92,246,0.1); }
+.tt-charClass     { color: var(--accent); background: var(--accent-light); }
+.tt-quantifier    { color: var(--warning); background: var(--warning-light); }
+.tt-anchor        { color: var(--success); background: var(--success-light); }
+.tt-group         { color: var(--accent); background: var(--accent-light); }
 .tt-lookaround    { color: #a855f7; background: rgba(168,85,247,0.1); }
-.tt-escape        { color: #ef4444; background: rgba(239,68,68,0.08); }
-.tt-backreference { color: #6366f1; background: rgba(99,102,241,0.1); }
-.tt-alternation   { color: #f43f5e; background: rgba(244,63,94,0.1); }
+.tt-escape        { color: var(--error); background: var(--error-light); }
+.tt-backreference { color: var(--accent); background: var(--accent-light); }
+.tt-alternation   { color: var(--error); background: var(--error-light); }
 .tt-literal       { color: var(--text-primary); background: transparent; }
-.tt-modifier      { color: #22d3ee; background: rgba(34,211,238,0.1); }
+.tt-modifier      { color: var(--info); background: rgba(34,211,238,0.1); }
 
 /* ====== 常用预设 ====== */
 .preset-bar {
@@ -886,19 +807,19 @@ const tokens = computed(() => tokenizePattern(pattern.value))
 }
 
 /* highlight.js */
-.code-output :deep(.hljs-keyword) { color: #f43f5e; font-weight: 600; }
-.code-output :deep(.hljs-built_in) { color: #22d3ee; }
-.code-output :deep(.hljs-type) { color: #8b5cf6; }
-.code-output :deep(.hljs-literal) { color: #f59e0b; }
-.code-output :deep(.hljs-number) { color: #f59e0b; }
-.code-output :deep(.hljs-string) { color: #10b981; }
+.code-output :deep(.hljs-keyword) { color: var(--error); font-weight: 600; }
+.code-output :deep(.hljs-built_in) { color: var(--info); }
+.code-output :deep(.hljs-type) { color: var(--accent); }
+.code-output :deep(.hljs-literal) { color: var(--warning); }
+.code-output :deep(.hljs-number) { color: var(--warning); }
+.code-output :deep(.hljs-string) { color: var(--success); }
 .code-output :deep(.hljs-comment) { color: var(--text-muted); font-style: italic; }
-.code-output :deep(.hljs-function) { color: #3b82f6; }
-.code-output :deep(.hljs-title) { color: #3b82f6; }
+.code-output :deep(.hljs-function) { color: var(--accent); }
+.code-output :deep(.hljs-title) { color: var(--accent); }
 .code-output :deep(.hljs-params) { color: var(--text-primary); }
-.code-output :deep(.hljs-meta) { color: #22d3ee; }
-.code-output :deep(.hljs-symbol) { color: #ef4444; }
-.code-output :deep(.hljs-variable) { color: #6366f1; }
+.code-output :deep(.hljs-meta) { color: var(--info); }
+.code-output :deep(.hljs-symbol) { color: var(--error); }
+.code-output :deep(.hljs-variable) { color: var(--accent); }
 .code-output :deep(.hljs-attr) { color: #8b5cf6; }
 
 /* ====== Test Suite ====== */

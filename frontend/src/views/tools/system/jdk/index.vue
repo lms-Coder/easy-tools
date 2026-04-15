@@ -226,13 +226,6 @@ const {
 
 <style scoped>
 /* ====== 标题栏 ====== */
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 4px;
-}
-
 .current-tag {
   display: flex;
   align-items: center;
@@ -384,17 +377,6 @@ const {
   display: flex;
   align-items: center;
   gap: 12px;
-}
-
-.config-label {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  width: 80px;
-  flex-shrink: 0;
 }
 
 .config-value {
@@ -605,7 +587,7 @@ const {
   position: absolute;
   width: 8px;
   height: 8px;
-  background: #fff;
+  background: var(--text-inverse, #fff);
   border-radius: 50%;
   top: 50%;
   left: 50%;

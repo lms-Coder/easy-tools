@@ -663,6 +663,176 @@ html.dark body::before {
   box-shadow: var(--shadow-focus);
 }
 
+/* 工具页通用布局 */
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 4px;
+}
+
+.panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.config-section {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.config-section.grow {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-bottom: none;
+  position: relative;
+}
+
+.config-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.control-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border-subtle);
+  flex-shrink: 0;
+}
+
+/* 工具页分段按钮 */
+.seg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 12px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.seg-btn:hover {
+  border-color: var(--border-default);
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.seg-btn.active {
+  background: var(--accent);
+  color: var(--text-inverse, #fff);
+  border-color: var(--accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.seg-btn.small { padding: 4px 10px; font-size: 12px; }
+.seg-btn.xs { padding: 3px 8px; font-size: 11px; height: 24px; }
+.seg-btn.xxs { padding: 2px 7px; font-size: 10px; height: 20px; font-family: var(--font-mono); }
+
+/* 工具页图标按钮 */
+.tool-icon-btn {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: 14px;
+}
+
+.tool-icon-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.tool-icon-btn:active {
+  transform: scale(0.95);
+}
+
+.tool-icon-btn.active {
+  color: var(--accent);
+  background: var(--accent-light);
+}
+
+.tool-icon-btn.mini {
+  width: 22px;
+  height: 22px;
+  font-size: 12px;
+  border-radius: var(--radius-xs);
+}
+
+.tool-icon-btn.small {
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+}
+
+.tool-icon-btn.danger:hover:not(:disabled) {
+  color: var(--error);
+  background: var(--error-light);
+}
+
+.tool-icon-btn.primary {
+  background: var(--accent);
+  color: var(--text-inverse, #fff);
+  border-color: var(--accent);
+}
+
+.tool-icon-btn.primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: var(--text-inverse, #fff);
+}
+
+/* 工具页 Range Slider */
+.range-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: var(--bg-tertiary);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid var(--bg-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: transform var(--transition-fast);
+}
+
+.range-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.range-slider::-webkit-slider-thumb:active {
+  transform: scale(1.05);
+}
+
 /* 工具页错误提示 */
 .tool-error {
   overflow: hidden;

@@ -160,7 +160,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     icon: 'icon-clock-circle',
     route: '/tool/timestamp',
     implemented: true,
-    window: { width: 900, height: 640, minWidth: 640, minHeight: 460 },
+    window: { width: 1024, height: 720, minWidth: 700, minHeight: 520 },
   },
   {
     id: 'calendar',

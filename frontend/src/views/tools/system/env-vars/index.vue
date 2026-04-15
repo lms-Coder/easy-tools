@@ -67,7 +67,7 @@ const {
             </button>
           </div>
 
-          <button class="action-btn" @click="refresh" :disabled="loading"
+          <button class="tool-icon-btn" @click="refresh" :disabled="loading"
             @mouseenter="showTooltip('刷新', $event)" @mouseleave="hideTooltip">
             <RefreshCw :size="14" :class="{ spinning: loading }" />
           </button>
@@ -145,13 +145,6 @@ const {
 
 <style scoped>
 /* ====== Header ====== */
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-right: 4px;
-}
-
 .stat-tag {
   display: inline-flex;
   align-items: center;
@@ -287,23 +280,6 @@ const {
 }
 
 /* ====== Action Button ====== */
-.action-btn {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--border-subtle);
-  background: var(--bg-secondary);
-  border-radius: var(--radius-sm);
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  padding: 0;
-  flex-shrink: 0;
-}
-
-.action-btn:hover { color: var(--text-primary); background: var(--bg-hover); border-color: var(--border-default); }
 .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ====== List Card ====== */
@@ -563,6 +539,6 @@ const {
   .toolbar-row { flex-wrap: wrap; }
   .search-wrap { width: 100%; order: 1; }
   .scope-group { order: 2; }
-  .action-btn { order: 3; }
+  
 }
 </style>

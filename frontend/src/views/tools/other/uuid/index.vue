@@ -38,7 +38,7 @@ const onGenerate = () => {
             <span>设置</span>
           </div>
           <div class="panel-actions">
-            <button class="action-btn" @click="clear" :disabled="!results.length"
+            <button class="tool-icon-btn" @click="clear" :disabled="!results.length"
               @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
               <Trash2 :size="13" />
             </button>
@@ -99,7 +99,7 @@ const onGenerate = () => {
             <span v-if="results.length" class="panel-stat accent">{{ results.length }} 项</span>
           </div>
           <div class="panel-actions">
-            <button class="action-btn" @click="copyAll" :disabled="!results.length"
+            <button class="tool-icon-btn" @click="copyAll" :disabled="!results.length"
               @mouseenter="showTooltip('复制全部', $event)" @mouseleave="hideTooltip">
               <Check v-if="copied" :size="13" style="color: var(--success)" />
               <Copy v-else :size="13" />
@@ -110,7 +110,7 @@ const onGenerate = () => {
           <div v-if="results.length" class="result-list">
             <div
               v-for="(uuid, i) in results" :key="i"
-              class="result-row" @click="copySingle(uuid)"
+              class="result-row" :style="{ animationDelay: (i * 30) + 'ms' }" @click="copySingle(uuid)"
             >
               <span class="result-idx">{{ String(i + 1).padStart(2, '0') }}</span>
               <code class="result-value">{{ uuid }}</code>
@@ -135,13 +135,6 @@ const onGenerate = () => {
 
 <style scoped>
 /* ====== Header ====== */
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 4px;
-}
-
 .version-tag {
   padding: 2px 8px;
   border-radius: 10px;
@@ -161,28 +154,6 @@ const onGenerate = () => {
 }
 
 /* ====== Panel Actions ====== */
-.panel-actions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.action-btn {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all var(--transition-fast);
-  padding: 0;
-}
-
-.action-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
 .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ====== Config Sections ====== */
@@ -193,37 +164,13 @@ const onGenerate = () => {
   overflow-y: auto;
 }
 
-.config-section {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.config-section.grow {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  border-bottom: none;
-  min-height: 0;
-}
-
-.config-label {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
 .config-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.config-row .config-label { margin-bottom: 0; }
-
+.config-row 
 .val-code {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -353,6 +300,12 @@ const onGenerate = () => {
   border-bottom: 1px solid var(--border-subtle);
   cursor: pointer;
   transition: background 0.1s;
+  animation: uuid-row-in 0.25s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes uuid-row-in {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 .result-row:last-child { border-bottom: none; }

@@ -42,7 +42,7 @@ const {
             <span>内容设置</span>
           </div>
           <div class="panel-actions">
-            <button class="action-btn" @click="clear" :disabled="!inputText"
+            <button class="tool-icon-btn" @click="clear" :disabled="!inputText"
               @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
               <Trash2 :size="13" />
             </button>
@@ -127,11 +127,11 @@ const {
             <span>生成结果</span>
           </div>
           <div class="panel-actions">
-            <button class="action-btn" @click="copyQR" :disabled="!qrCodeDataUrl"
+            <button class="tool-icon-btn" @click="copyQR" :disabled="!qrCodeDataUrl"
               @mouseenter="showTooltip('复制图片', $event)" @mouseleave="hideTooltip">
               <Copy :size="13" />
             </button>
-            <button class="action-btn" @click="downloadQR" :disabled="!qrCodeDataUrl"
+            <button class="tool-icon-btn" @click="downloadQR" :disabled="!qrCodeDataUrl"
               @mouseenter="showTooltip('下载 PNG', $event)" @mouseleave="hideTooltip">
               <Download :size="13" />
             </button>
@@ -177,13 +177,6 @@ const {
 
 <style scoped>
 /* ====== Header ====== */
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 4px;
-}
-
 .stat-tag {
   padding: 2px 8px;
   border-radius: 10px;
@@ -206,28 +199,6 @@ const {
 }
 
 /* ====== Panel Actions ====== */
-.panel-actions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.action-btn {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all var(--transition-fast);
-  padding: 0;
-}
-
-.action-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
 .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ====== Config Sections ====== */
@@ -236,29 +207,6 @@ const {
   flex-direction: column;
   gap: 0;
   overflow-y: auto;
-}
-
-.config-section {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.config-section.grow {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  border-bottom: none;
-  min-height: 0;
-}
-
-.config-label {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
 }
 
 .config-hint {
@@ -338,7 +286,7 @@ const {
 }
 
 .level-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
-.level-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.level-chip.active { background: var(--accent); border-color: var(--accent); color: var(--text-inverse, #fff); }
 
 /* ====== Range Slider ====== */
 .qr-range {
@@ -427,9 +375,15 @@ const {
 
 .qr-display {
   padding: 20px;
-  background: #fff;
+  background: var(--text-inverse, #fff);
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  animation: qr-fade-in 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes qr-fade-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .qr-image {

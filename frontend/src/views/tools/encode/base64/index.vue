@@ -103,15 +103,15 @@ import { computed } from 'vue'
           </div>
           <div class="panel-actions">
             <span class="byte-info">{{ hasFile ? formatBytes(fileInfo!.size) : formatBytes(inputByteSize) }}</span>
-            <button class="action-btn" @click="importFile"
+            <button class="tool-icon-btn" @click="importFile"
               @mouseenter="showTooltip('导入文件', $event)" @mouseleave="hideTooltip">
               <FileUp :size="13" />
             </button>
-            <button class="action-btn" @click="pasteFromClipboard"
+            <button class="tool-icon-btn" @click="pasteFromClipboard"
               @mouseenter="showTooltip('粘贴', $event)" @mouseleave="hideTooltip">
               <ClipboardPaste :size="13" />
             </button>
-            <button class="action-btn" @click="clearAll" :disabled="!inputText && !outputText"
+            <button class="tool-icon-btn" @click="clearAll" :disabled="!inputText && !outputText"
               @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
               <Trash2 :size="13" />
             </button>
@@ -143,7 +143,7 @@ import { computed } from 'vue'
                   </span>
                   <span>URL Safe</span>
                 </label>
-                <button class="action-btn small" @click="swap" :disabled="!outputText"
+                <button class="tool-icon-btn small" @click="swap" :disabled="!outputText"
                   @mouseenter="showTooltip('交换', $event)" @mouseleave="hideTooltip">
                   <ArrowRightLeft :size="12" />
                 </button>
@@ -183,11 +183,11 @@ import { computed } from 'vue'
                     <span>预览</span>
                   </span>
                   <div class="preview-actions">
-                    <button class="action-btn mini" @click="openFullscreen"
+                    <button class="tool-icon-btn mini" @click="openFullscreen"
                       @mouseenter="showTooltip('全屏', $event)" @mouseleave="hideTooltip">
                       <Maximize2 :size="11" />
                     </button>
-                    <button class="action-btn mini" @click="showPreview = !showPreview">
+                    <button class="tool-icon-btn mini" @click="showPreview = !showPreview">
                       <EyeOff v-if="showPreview" :size="11" />
                       <Eye v-else :size="11" />
                     </button>
@@ -230,11 +230,11 @@ import { computed } from 'vue'
           <div class="panel-actions">
             <span v-if="outputText" class="byte-info">{{ formatBytes(outputByteSize) }}</span>
             <div class="panel-divider"></div>
-            <button v-if="hasFile && mode === 'decode'" class="action-btn" @click="downloadFromBase64"
+            <button v-if="hasFile && mode === 'decode'" class="tool-icon-btn" @click="downloadFromBase64"
               @mouseenter="showTooltip('下载文件', $event)" @mouseleave="hideTooltip">
               <Download :size="13" />
             </button>
-            <button v-else-if="outputText" class="action-btn" @click="copyOutput"
+            <button v-else-if="outputText" class="tool-icon-btn" @click="copyOutput"
               @mouseenter="showTooltip('复制', $event)" @mouseleave="hideTooltip">
               <Check v-if="copied" :size="13" /><Copy v-else :size="13" />
             </button>
@@ -249,7 +249,7 @@ import { computed } from 'vue'
                   <Eye :size="12" />
                   <span>文件预览</span>
                 </span>
-                <button class="action-btn mini" @click="openFullscreen"
+                <button class="tool-icon-btn mini" @click="openFullscreen"
                   @mouseenter="showTooltip('全屏预览', $event)" @mouseleave="hideTooltip">
                   <Maximize2 :size="11" />
                 </button>
@@ -316,12 +316,6 @@ import { computed } from 'vue'
 
 <style scoped>
 /* ====== Panel Actions ====== */
-.panel-actions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
 .panel-divider {
   width: 1px;
   height: 16px;
@@ -329,54 +323,11 @@ import { computed } from 'vue'
   margin: 0 4px;
 }
 
-.action-btn {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all var(--transition-fast);
-  padding: 0;
-}
-
-.action-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
 .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .action-btn.mini { width: 22px; height: 22px; }
 .action-btn.small { width: 24px; height: 24px; }
 
 /* ====== Segment Buttons ====== */
-.seg-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 5px 12px;
-  border: 1px solid var(--border-subtle);
-  background: var(--bg-secondary);
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  white-space: nowrap;
-}
-
-.seg-btn:hover { border-color: var(--border-default); background: var(--bg-hover); color: var(--text-primary); }
-
-.seg-btn.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-}
-
-.seg-btn.xs { padding: 3px 8px; font-size: 11px; height: 24px; }
-
 .mode-toggle {
   display: flex;
   gap: 2px;
@@ -390,38 +341,13 @@ import { computed } from 'vue'
   overflow-y: auto;
 }
 
-.config-section {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.config-section.grow {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  border-bottom: none;
-  position: relative;
-  min-height: 0;
-}
-
-.config-label {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
 .config-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.config-row .config-label { margin-bottom: 0; }
-
+.config-row 
 .options-group {
   display: flex;
   align-items: center;
@@ -651,7 +577,7 @@ import { computed } from 'vue'
   gap: 6px;
   font-size: 12px;
   font-weight: 600;
-  color: #ef4444;
+  color: var(--error);
   margin-bottom: 4px;
 }
 

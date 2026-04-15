@@ -12,7 +12,12 @@ import {
 } from 'lucide-vue-next'
 import ToolTitleBar from '@/components/common/ToolTitleBar.vue'
 import ToolHistoryPanel from '@/components/common/ToolHistoryPanel.vue'
+import Select from '@/components/ui/Select.vue'
+import DatePicker from '@/components/ui/DatePicker.vue'
+import TimePicker from '@/components/ui/TimePicker.vue'
 import { useTimestamp, timezones } from './useTimestamp'
+
+const timezoneOptions = timezones.map(tz => ({ label: tz.label, value: tz.value }))
 
 const {
   selectedTimezone,
@@ -20,7 +25,7 @@ const {
   inputTimestamp, tsError, detectedUnit,
   tsInputDayjs, tsLocal, tsISO, tsUTC, tsRelative, tsDayOfWeek,
   tsTimestampSeconds, tsTimestampMs,
-  inputDate, inputTime, dateInputDayjs,
+  dateDayjs, dateInputDayjs,
   dateTsSeconds, dateTsMs, dateISO,
   copiedField, copyText,
   setCurrentAsInput, setNowAsDate, clearTimestamp, clearDate,
@@ -32,9 +37,7 @@ const {
   <div class="tool-page">
     <!-- 标题栏 -->
     <ToolTitleBar title="时间戳转换" icon="icon-clock-circle">
-      <select v-model="selectedTimezone" class="tz-select">
-        <option v-for="tz in timezones" :key="tz.value" :value="tz.value">{{ tz.label }}</option>
-      </select>
+      <Select v-model="selectedTimezone" :options="timezoneOptions" size="sm" style="min-width: 130px" />
       <button class="glass-icon-btn" :class="{ active: showHistory }" @click="showHistory = !showHistory" title="历史记录">
         <History :size="14" />
       </button>
@@ -128,8 +131,8 @@ const {
               <span class="ts-section-title">日期转时间戳</span>
             </div>
             <div class="ts-input-row">
-              <input v-model="inputDate" class="ts-input" type="date" />
-              <input v-model="inputTime" class="ts-input ts-input-time" type="time" step="1" />
+              <DatePicker v-model="dateDayjs" placeholder="选择日期" />
+              <TimePicker v-model="dateDayjs" placeholder="选择时间" />
             </div>
             <div class="ts-input-hint">
               <button class="ts-link-btn" @click="setNowAsDate">
@@ -236,28 +239,6 @@ const {
 </template>
 
 <style scoped>
-/* ====== Title Bar Slot ====== */
-.tz-select {
-  height: 28px;
-  padding: 0 8px;
-  font-size: 12px;
-  color: var(--text-secondary);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  outline: none;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.tz-select:hover {
-  border-color: var(--border-default);
-}
-
-.tz-select:focus {
-  border-color: var(--accent);
-}
-
 /* ====== Left Panel ====== */
 .ts-left {
   display: flex;
@@ -401,8 +382,12 @@ const {
   border-color: var(--accent);
 }
 
-.ts-input-time {
-  flex: 0 0 120px;
+.ts-input-row :deep(.ui-datepicker) {
+  flex: 1;
+}
+
+.ts-input-row :deep(.ui-timepicker) {
+  flex: 0 0 110px;
 }
 
 .ts-unit-badge {

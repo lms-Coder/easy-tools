@@ -76,17 +76,9 @@ export function useTimestamp() {
   const tsTimestampMs = computed(() => tsInputDayjs.value ? String(tsInputDayjs.value.valueOf()) : '')
 
   // ====== Date → Timestamp ======
-  const inputDate = ref('')
-  const inputTime = ref('')
+  const dateDayjs = ref<dayjs.Dayjs | null>(null)
 
-  const dateInputDayjs = computed(() => {
-    const d = inputDate.value
-    const t = inputTime.value || '00:00:00'
-    if (!d) return null
-    const parsed = dayjs.tz(`${d} ${t}`, 'YYYY-MM-DD HH:mm:ss', selectedTimezone.value)
-    if (!parsed.isValid()) return null
-    return parsed
-  })
+  const dateInputDayjs = computed(() => dateDayjs.value)
 
   const dateTsSeconds = computed(() => dateInputDayjs.value ? String(Math.floor(dateInputDayjs.value.valueOf() / 1000)) : '')
   const dateTsMs = computed(() => dateInputDayjs.value ? String(dateInputDayjs.value.valueOf()) : '')
@@ -111,9 +103,7 @@ export function useTimestamp() {
   }
 
   function setNowAsDate() {
-    const d = now.value.tz(selectedTimezone.value)
-    inputDate.value = d.format('YYYY-MM-DD')
-    inputTime.value = d.format('HH:mm:ss')
+    dateDayjs.value = now.value.tz(selectedTimezone.value)
   }
 
   function clearTimestamp() {
@@ -122,8 +112,7 @@ export function useTimestamp() {
   }
 
   function clearDate() {
-    inputDate.value = ''
-    inputTime.value = ''
+    dateDayjs.value = null
   }
 
   // ====== History ======
@@ -146,9 +135,8 @@ export function useTimestamp() {
     if (item.mode === 'timestamp') {
       inputTimestamp.value = item.input
     } else {
-      const parts = item.input.split(' ')
-      inputDate.value = parts[0] || ''
-      inputTime.value = parts[1] || '00:00:00'
+      const parsed = dayjs.tz(item.input, 'YYYY-MM-DD HH:mm:ss', item.timezone)
+      if (parsed.isValid()) dateDayjs.value = parsed
     }
     if (item.timezone) selectedTimezone.value = item.timezone
     showHistory.value = false
@@ -171,8 +159,8 @@ export function useTimestamp() {
 
   // Auto-save on successful date→timestamp conversion
   watch(dateInputDayjs, (d) => {
-    if (!d || !inputDate.value) return
-    const input = `${inputDate.value} ${inputTime.value || '00:00:00'}`
+    if (!d) return
+    const input = d.tz(selectedTimezone.value).format('YYYY-MM-DD HH:mm:ss')
     const isDuplicate = history.value.some(item => item.input === input && item.mode === 'date')
     if (!isDuplicate) {
       saveToHistory({
@@ -202,7 +190,7 @@ export function useTimestamp() {
     tsInputDayjs, tsLocal, tsISO, tsUTC, tsRelative, tsDayOfWeek,
     tsTimestampSeconds, tsTimestampMs,
     // Date → Timestamp
-    inputDate, inputTime, dateInputDayjs,
+    dateDayjs, dateInputDayjs,
     dateTsSeconds, dateTsMs, dateISO,
     // Copy
     copiedField, copyText,

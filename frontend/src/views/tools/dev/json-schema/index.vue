@@ -74,7 +74,7 @@ const {
             <span>Schema 编辑器</span>
           </div>
           <div class="panel-actions">
-            <button class="action-btn" @click="showImportModal = true"
+            <button class="tool-icon-btn" @click="showImportModal = true"
               @mouseenter="showTooltip('导入 Schema', $event)" @mouseleave="hideTooltip">
               <Upload :size="13" />
             </button>
@@ -134,13 +134,13 @@ const {
                 <span v-if="item.field.required" class="required-indicator" title="必填">*</span>
 
                 <div class="field-actions">
-                  <button class="action-btn mini" @click.stop="moveField(item.field.id, 'up')"
+                  <button class="tool-icon-btn mini" @click.stop="moveField(item.field.id, 'up')"
                     @mouseenter="showTooltip('上移', $event)" @mouseleave="hideTooltip"><ArrowUp :size="11" /></button>
-                  <button class="action-btn mini" @click.stop="moveField(item.field.id, 'down')"
+                  <button class="tool-icon-btn mini" @click.stop="moveField(item.field.id, 'down')"
                     @mouseenter="showTooltip('下移', $event)" @mouseleave="hideTooltip"><ArrowDown :size="11" /></button>
-                  <button class="action-btn mini" @click.stop="duplicateField(item.field.id)"
+                  <button class="tool-icon-btn mini" @click.stop="duplicateField(item.field.id)"
                     @mouseenter="showTooltip('复制', $event)" @mouseleave="hideTooltip"><Copy :size="11" /></button>
-                  <button class="action-btn mini danger" @click.stop="deleteField(item.field.id)"
+                  <button class="tool-icon-btn mini danger" @click.stop="deleteField(item.field.id)"
                     @mouseenter="showTooltip('删除', $event)" @mouseleave="hideTooltip"><Trash2 :size="11" /></button>
                 </div>
               </div>
@@ -171,19 +171,19 @@ const {
               </button>
             </div>
             <div class="panel-divider"></div>
-            <button v-if="activeTab === 'schema'" class="action-btn" @click="copyToClipboard(schemaJson, 'Schema JSON')"
+            <button v-if="activeTab === 'schema'" class="tool-icon-btn" @click="copyToClipboard(schemaJson, 'Schema JSON')"
               @mouseenter="showTooltip('复制', $event)" @mouseleave="hideTooltip">
               <Copy :size="13" />
             </button>
-            <button v-if="activeTab === 'sample'" class="action-btn" @click="copyToClipboard(sampleJson, '示例数据')"
+            <button v-if="activeTab === 'sample'" class="tool-icon-btn" @click="copyToClipboard(sampleJson, '示例数据')"
               @mouseenter="showTooltip('复制', $event)" @mouseleave="hideTooltip">
               <Copy :size="13" />
             </button>
-            <button v-if="activeTab === 'codegen'" class="action-btn" @click="copyToClipboard(codeGenResult.code, '生成的代码')"
+            <button v-if="activeTab === 'codegen'" class="tool-icon-btn" @click="copyToClipboard(codeGenResult.code, '生成的代码')"
               @mouseenter="showTooltip('复制', $event)" @mouseleave="hideTooltip">
               <Copy :size="13" />
             </button>
-            <button v-if="activeTab === 'openapi'" class="action-btn" @click="copyToClipboard(openApiJson, 'OpenAPI 规范')"
+            <button v-if="activeTab === 'openapi'" class="tool-icon-btn" @click="copyToClipboard(openApiJson, 'OpenAPI 规范')"
               @mouseenter="showTooltip('复制', $event)" @mouseleave="hideTooltip">
               <Copy :size="13" />
             </button>
@@ -267,11 +267,12 @@ const {
 
     <!-- Field editor popup -->
     <Teleport to="body">
+      <Transition name="editor-popup">
       <div v-if="selectedField" ref="fieldEditorEl" class="field-editor-popup"
         :style="{ top: editorPos.top + 'px', left: editorPos.left + 'px' }">
         <div class="editor-header" @mousedown.prevent="startDrag">
           <span class="editor-title">编辑字段</span>
-          <button class="action-btn mini" @click="selectedFieldId = null"
+          <button class="tool-icon-btn mini" @click="selectedFieldId = null"
             @mouseenter="showTooltip('关闭', $event)" @mouseleave="hideTooltip"><X :size="11" /></button>
         </div>
         <div class="editor-body">
@@ -400,6 +401,7 @@ const {
           </div>
         </div>
       </div>
+      </Transition>
     </Teleport>
 
     <!-- Import modal -->
@@ -407,7 +409,7 @@ const {
       <div class="modal-content">
         <div class="modal-header">
           <span class="modal-title">导入 JSON Schema</span>
-          <button class="action-btn mini" @click="showImportModal = false"
+          <button class="tool-icon-btn mini" @click="showImportModal = false"
             @mouseenter="showTooltip('关闭', $event)" @mouseleave="hideTooltip"><X :size="11" /></button>
         </div>
         <div class="modal-body">
@@ -431,13 +433,6 @@ const {
 
 <style scoped>
 /* ====== Header ====== */
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 4px;
-}
-
 .stat-tag {
   padding: 2px 8px;
   border-radius: 10px;
@@ -449,12 +444,6 @@ const {
 }
 
 /* ====== Panel Actions ====== */
-.panel-actions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
 .panel-divider {
   width: 1px;
   height: 16px;
@@ -462,26 +451,10 @@ const {
   margin: 0 4px;
 }
 
-.action-btn {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all var(--transition-fast);
-  padding: 0;
-}
-
-.action-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
 .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .action-btn.mini { width: 22px; height: 22px; }
-.action-btn.mini.danger:hover { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+.action-btn.mini.danger:hover { color: var(--error); background: var(--error-light); }
 
 .add-field-btn {
   width: 28px;
@@ -508,58 +481,7 @@ const {
   overflow-y: auto;
 }
 
-.config-section {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.config-section.grow {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  border-bottom: none;
-  min-height: 0;
-}
-
-.config-label {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
 /* ====== Segment Buttons ====== */
-.seg-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 5px 12px;
-  border: 1px solid var(--border-subtle);
-  background: var(--bg-secondary);
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  white-space: nowrap;
-}
-
-.seg-btn:hover { border-color: var(--border-default); background: var(--bg-hover); color: var(--text-primary); }
-
-.seg-btn.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-}
-
-.seg-btn.xs { padding: 3px 8px; font-size: 11px; height: 24px; }
-.seg-btn.xxs { padding: 2px 7px; font-size: 10px; height: 20px; }
-
 /* ====== Preview Tabs ====== */
 .preview-tabs {
   display: flex;
@@ -660,12 +582,12 @@ const {
   letter-spacing: 0.3px;
 }
 
-.type-string { color: #22c55e; background: rgba(34, 197, 94, 0.1); }
-.type-number { color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
-.type-integer { color: #06b6d4; background: rgba(6, 182, 212, 0.1); }
-.type-boolean { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+.type-string { color: var(--success); background: var(--success-light); }
+.type-number { color: var(--accent); background: var(--accent-light); }
+.type-integer { color: var(--info); background: var(--info-light); }
+.type-boolean { color: var(--warning); background: var(--warning-light); }
 .type-null { color: #94a3b8; background: rgba(148, 163, 184, 0.1); }
-.type-object { color: #a855f7; background: rgba(168, 85, 247, 0.1); }
+.type-object { color: var(--accent); background: var(--accent-light); }
 .type-array { color: #ec4899; background: rgba(236, 72, 153, 0.1); }
 
 .required-indicator {
@@ -743,6 +665,19 @@ const {
 }
 
 /* ====== Field Editor Popup ====== */
+.editor-popup-enter-active {
+  animation: editorPopupIn 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.editor-popup-leave-active {
+  animation: editorPopupOut 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes editorPopupOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(-4px) scale(0.98); }
+}
+
 .field-editor-popup {
   position: fixed;
   z-index: 1000;
@@ -968,10 +903,10 @@ const {
 .import-error {
   margin-top: 10px;
   padding: 8px 12px;
-  background: rgba(239, 68, 68, 0.1);
+  background: var(--error-light);
   border: 1px solid rgba(239, 68, 68, 0.2);
   border-radius: 6px;
-  color: #ef4444;
+  color: var(--error);
   font-size: 12px;
 }
 

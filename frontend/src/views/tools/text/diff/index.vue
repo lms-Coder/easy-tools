@@ -77,26 +77,26 @@ const {
           <div class="control-divider"></div>
 
           <!-- 文件操作 -->
-          <button class="action-btn" @click="compareFiles"
+          <button class="tool-icon-btn" @click="compareFiles"
             @mouseenter="showTooltip('对比文件', $event)" @mouseleave="hideTooltip"><FileInput :size="13" /></button>
-          <button class="action-btn" @click="importLeftFile"
+          <button class="tool-icon-btn" @click="importLeftFile"
             @mouseenter="showTooltip('导入左侧', $event)" @mouseleave="hideTooltip"><Upload :size="13" /></button>
-          <button class="action-btn" @click="importRightFile"
+          <button class="tool-icon-btn" @click="importRightFile"
             @mouseenter="showTooltip('导入右侧', $event)" @mouseleave="hideTooltip"><Upload :size="13" /></button>
 
           <div class="control-divider"></div>
 
           <!-- 导出 -->
-          <button class="action-btn" @click="exportAsHTML" :disabled="!hasDiff"
+          <button class="tool-icon-btn" @click="exportAsHTML" :disabled="!hasDiff"
             @mouseenter="showTooltip('导出 HTML', $event)" @mouseleave="hideTooltip"><Download :size="13" /></button>
-          <button class="action-btn" @click="exportAsPatch" :disabled="!hasDiff"
+          <button class="tool-icon-btn" @click="exportAsPatch" :disabled="!hasDiff"
             @mouseenter="showTooltip('导出 Patch', $event)" @mouseleave="hideTooltip"><FileCode :size="13" /></button>
 
           <template v-if="changeBlocks.length > 0">
             <div class="control-divider"></div>
-            <button class="action-btn" @click="navigateToChange('prev')"
+            <button class="tool-icon-btn" @click="navigateToChange('prev')"
               @mouseenter="showTooltip('上一个差异', $event)" @mouseleave="hideTooltip"><ChevronUp :size="13" /></button>
-            <button class="action-btn" @click="navigateToChange('next')"
+            <button class="tool-icon-btn" @click="navigateToChange('next')"
               @mouseenter="showTooltip('下一个差异', $event)" @mouseleave="hideTooltip"><ChevronDown :size="13" /></button>
             <span class="nav-indicator">{{ activeChangeIndex + 1 }}/{{ changeBlocks.length }}</span>
           </template>
@@ -104,9 +104,9 @@ const {
 
         <div class="control-group">
           <!-- 工具 -->
-          <button class="action-btn" @click="useExample"
+          <button class="tool-icon-btn" @click="useExample"
             @mouseenter="showTooltip('示例', $event)" @mouseleave="hideTooltip"><FileText :size="13" /></button>
-          <button class="action-btn" @click="swapTexts"
+          <button class="tool-icon-btn" @click="swapTexts"
             @mouseenter="showTooltip('左右互换', $event)" @mouseleave="hideTooltip"><ArrowLeftRight :size="13" /></button>
 
           <div class="control-divider"></div>
@@ -127,7 +127,7 @@ const {
 
           <div class="control-divider"></div>
 
-          <button class="action-btn" @click="clearAll" :disabled="!leftText && !rightText"
+          <button class="tool-icon-btn" @click="clearAll" :disabled="!leftText && !rightText"
             @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip"><Trash2 :size="13" /></button>
         </div>
       </div>
@@ -145,9 +145,9 @@ const {
           </div>
           <div class="panel-actions">
             <span v-if="leftText" class="diff-meta">{{ leftText.length }} 字符</span>
-            <button class="action-btn" @click="importLeftFile"
+            <button class="tool-icon-btn" @click="importLeftFile"
               @mouseenter="showTooltip('导入文件', $event)" @mouseleave="hideTooltip"><Upload :size="13" /></button>
-            <button class="action-btn" @click="copyText(leftText, '左侧文本')" :disabled="!leftText"
+            <button class="tool-icon-btn" @click="copyText(leftText, '左侧文本')" :disabled="!leftText"
               @mouseenter="showTooltip('复制', $event)" @mouseleave="hideTooltip"><Copy :size="13" /></button>
           </div>
         </div>
@@ -179,9 +179,9 @@ const {
           </div>
           <div class="panel-actions">
             <span v-if="rightText" class="diff-meta">{{ rightText.length }} 字符</span>
-            <button class="action-btn" @click="importRightFile"
+            <button class="tool-icon-btn" @click="importRightFile"
               @mouseenter="showTooltip('导入文件', $event)" @mouseleave="hideTooltip"><Upload :size="13" /></button>
-            <button class="action-btn" @click="copyText(rightText, '右侧文本')" :disabled="!rightText"
+            <button class="tool-icon-btn" @click="copyText(rightText, '右侧文本')" :disabled="!rightText"
               @mouseenter="showTooltip('复制', $event)" @mouseleave="hideTooltip"><Copy :size="13" /></button>
           </div>
         </div>
@@ -215,7 +215,7 @@ const {
             <span>{{ leftFileName }} ↔ {{ rightFileName }}</span>
           </div>
           <div class="panel-actions">
-            <button class="action-btn" @click="copyText(leftText + '\n---\n' + rightText, '全部文本')" :disabled="!leftText && !rightText"
+            <button class="tool-icon-btn" @click="copyText(leftText + '\n---\n' + rightText, '全部文本')" :disabled="!leftText && !rightText"
               @mouseenter="showTooltip('复制全部', $event)" @mouseleave="hideTooltip"><Copy :size="13" /></button>
           </div>
         </div>
@@ -250,13 +250,6 @@ const {
 
 <style scoped>
 /* ====== 标题栏 ====== */
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 4px;
-}
-
 .diff-summary {
   display: inline-flex;
   align-items: center;
@@ -344,70 +337,14 @@ const {
   gap: 2px;
 }
 
-.control-divider {
-  width: 1px;
-  height: 16px;
-  background: var(--border-subtle);
-  margin: 0 4px;
-}
-
 /* ====== Segment Buttons ====== */
-.seg-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 5px 12px;
-  border: 1px solid var(--border-subtle);
-  background: var(--bg-secondary);
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  white-space: nowrap;
-}
-
-.seg-btn:hover { border-color: var(--border-default); background: var(--bg-hover); color: var(--text-primary); }
-
-.seg-btn.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-}
-
-.seg-btn.xs { padding: 3px 8px; font-size: 11px; height: 24px; }
-
 .control-toggle {
   display: flex;
   gap: 2px;
 }
 
 /* ====== Action Buttons ====== */
-.action-btn {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all var(--transition-fast);
-  padding: 0;
-}
-
-.action-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
 .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-.panel-actions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
 
 /* ====== Options ====== */
 .diff-option {

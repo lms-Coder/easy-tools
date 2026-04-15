@@ -75,15 +75,15 @@ const {
               <Check :size="10" v-if="isValid" /><CircleX :size="10" v-else />
               {{ isValid ? '有效' : '无效' }}
             </span>
-            <button class="action-btn" @click="importFile"
+            <button class="tool-icon-btn" @click="importFile"
               @mouseenter="showTooltip('导入文件', $event)" @mouseleave="hideTooltip">
               <Upload :size="13" />
             </button>
-            <button class="action-btn" @click="pasteFromClipboard"
+            <button class="tool-icon-btn" @click="pasteFromClipboard"
               @mouseenter="showTooltip('粘贴', $event)" @mouseleave="hideTooltip">
               <ClipboardPaste :size="13" />
             </button>
-            <button class="action-btn" @click="clearAll" :disabled="!inputText"
+            <button class="tool-icon-btn" @click="clearAll" :disabled="!inputText"
               @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
               <Trash2 :size="13" />
             </button>
@@ -223,11 +223,11 @@ const {
               </template>
             </div>
             <div class="panel-divider"></div>
-            <button class="action-btn" @click="copyOutput" :disabled="!outputText"
+            <button class="tool-icon-btn" @click="copyOutput" :disabled="!outputText"
               @mouseenter="showTooltip('复制', $event)" @mouseleave="hideTooltip">
               <Check v-if="copied" :size="13" /><Copy v-else :size="13" />
             </button>
-            <button class="action-btn" @click="downloadXml" :disabled="!outputText"
+            <button class="tool-icon-btn" @click="downloadXml" :disabled="!outputText"
               @mouseenter="showTooltip('下载', $event)" @mouseleave="hideTooltip">
               <Download :size="13" />
             </button>
@@ -315,13 +315,6 @@ html.dark .tool-page {
 }
 
 /* ====== Header ====== */
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 4px;
-}
-
 .header-stats {
   display: flex;
   align-items: center;
@@ -341,12 +334,6 @@ html.dark .tool-page {
 }
 
 /* ====== Panel Actions ====== */
-.panel-actions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
 .panel-divider {
   width: 1px;
   height: 16px;
@@ -354,22 +341,6 @@ html.dark .tool-page {
   margin: 0 4px;
 }
 
-.action-btn {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all var(--transition-fast);
-  padding: 0;
-}
-
-.action-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
 .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .status-badge {
@@ -384,7 +355,7 @@ html.dark .tool-page {
 }
 
 .status-badge.success { color: var(--accent); background: var(--accent-light); }
-.status-badge.error { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+.status-badge.error { color: #ef4444; background: var(--error-light); }
 
 /* ====== Config Sections ====== */
 .tool-panel-body {
@@ -394,37 +365,13 @@ html.dark .tool-page {
   overflow-y: auto;
 }
 
-.config-section {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.config-section.grow {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  border-bottom: none;
-  position: relative;
-}
-
-.config-label {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
 .config-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.config-row .config-label { margin-bottom: 0; }
-
+.config-row 
 /* ====== Action Group ====== */
 .action-group {
   display: flex;
@@ -451,34 +398,6 @@ html.dark .tool-page {
 .execute-btn-sm:hover { filter: brightness(1.1); }
 
 /* ====== Segment Buttons ====== */
-.seg-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 5px 12px;
-  border: 1px solid var(--border-subtle);
-  background: var(--bg-secondary);
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  white-space: nowrap;
-}
-
-.seg-btn:hover { border-color: var(--border-default); background: var(--bg-hover); color: var(--text-primary); }
-
-.seg-btn.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-}
-
-.seg-btn.small { padding: 4px 10px; font-size: 12px; }
-.seg-btn.xs { padding: 3px 8px; font-size: 11px; height: 24px; }
-
 /* ====== Options Row ====== */
 .options-row {
   display: flex;

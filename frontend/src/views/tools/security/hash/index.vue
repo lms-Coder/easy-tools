@@ -45,15 +45,15 @@ const {
             <span>输入</span>
           </div>
           <div class="panel-actions">
-            <button class="action-btn" @click="calculateAllHashes"
+            <button class="tool-icon-btn" @click="calculateAllHashes"
               @mouseenter="showTooltip('重新计算', $event)" @mouseleave="hideTooltip">
               <RotateCw :size="13" />
             </button>
-            <button class="action-btn" @click="paste"
+            <button class="tool-icon-btn" @click="paste"
               @mouseenter="showTooltip('粘贴', $event)" @mouseleave="hideTooltip">
               <ClipboardPaste :size="13" />
             </button>
-            <button class="action-btn" @click="clear" :disabled="!inputText"
+            <button class="tool-icon-btn" @click="clear" :disabled="!inputText"
               @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
               <Trash2 :size="13" />
             </button>
@@ -150,13 +150,6 @@ const {
 
 <style scoped>
 /* ====== Header ====== */
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 4px;
-}
-
 .algo-tag {
   padding: 2px 8px;
   border-radius: 10px;
@@ -176,28 +169,6 @@ const {
 }
 
 /* ====== Panel Actions ====== */
-.panel-actions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.action-btn {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all var(--transition-fast);
-  padding: 0;
-}
-
-.action-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
 .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ====== Config Sections ====== */
@@ -208,37 +179,13 @@ const {
   overflow-y: auto;
 }
 
-.config-section {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.config-section.grow {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  border-bottom: none;
-  min-height: 0;
-}
-
-.config-label {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
 .config-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.config-row .config-label { margin-bottom: 0; }
-
+.config-row 
 /* ====== Algo Chips ====== */
 .algo-chips {
   display: flex;
@@ -334,6 +281,12 @@ const {
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
   transition: border-color 0.15s;
+  animation: hash-card-in 0.25s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes hash-card-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .hash-card:hover { border-color: var(--border-default); }

@@ -51,7 +51,7 @@ const {
             />
           </div>
           <button
-            class="action-btn primary"
+            class="tool-icon-btn primary"
             :disabled="isSearching || !canSearch"
             @click="lookupPort"
             @mouseenter="showTooltip('查询端口', $event)"
@@ -63,7 +63,7 @@ const {
           </button>
           <button
             v-if="hasSearched"
-            class="action-btn"
+            class="tool-icon-btn"
             @click="clearResults"
             @mouseenter="showTooltip('清空', $event)"
             @mouseleave="hideTooltip"
@@ -108,7 +108,7 @@ const {
               <span>端口 {{ searchedPort }} 占用情况</span>
               <span class="count">{{ portInfos.length }} 个进程</span>
             </div>
-            <button class="action-btn danger" @click="confirmKillByPort">
+            <button class="tool-icon-btn danger" @click="confirmKillByPort">
               <X :size="14" />
               <span>终止全部</span>
             </button>
@@ -181,13 +181,6 @@ const {
 
 <style scoped>
 /* ====== 标题栏 ====== */
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 4px;
-}
-
 .port-stat {
   padding: 2px 8px;
   border-radius: var(--radius-xs);
@@ -256,24 +249,6 @@ const {
 .port-input::placeholder { color: var(--text-muted); }
 
 /* ====== 操作按钮 ====== */
-.action-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  height: 32px;
-  padding: 0 16px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all 0.15s;
-  white-space: nowrap;
-}
-
 .action-btn:hover:not(:disabled) {
   color: var(--text-primary);
   border-color: var(--border-default);
@@ -286,7 +261,7 @@ const {
 }
 
 .action-btn.primary {
-  color: #fff;
+  color: var(--text-inverse, #fff);
   background: var(--accent);
   border-color: var(--accent);
 }
@@ -294,11 +269,11 @@ const {
 .action-btn.primary:hover:not(:disabled) {
   background: var(--accent-hover);
   border-color: var(--accent-hover);
-  color: #fff;
+  color: var(--text-inverse, #fff);
 }
 
 .action-btn.danger {
-  color: #fff;
+  color: var(--text-inverse, #fff);
   background: var(--error);
   border-color: var(--error);
 }
@@ -462,6 +437,10 @@ const {
   color: var(--text-primary);
 }
 
+.data-table tbody tr {
+  transition: background 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .data-table tbody tr:hover {
   background: var(--bg-hover);
 }
@@ -520,8 +499,8 @@ const {
 .spinner {
   width: 14px;
   height: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #fff;
+  border: 2px solid var(--text-inverse, #fff);
+  border-top-color: var(--text-inverse, #fff);
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
@@ -557,7 +536,7 @@ const {
   position: absolute;
   inset: -4px;
   border-radius: 18px;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--warning-light) 0%, transparent 70%);
   opacity: 0.5;
 }
 
@@ -597,7 +576,7 @@ const {
   padding: 0 24px;
   font-size: 13px;
   font-weight: 550;
-  color: #fff;
+  color: var(--text-inverse, #fff);
   background: var(--error);
   border: none;
   border-radius: 12px;

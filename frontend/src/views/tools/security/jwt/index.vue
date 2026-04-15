@@ -84,15 +84,15 @@ const {
 
             <div class="panel-divider"></div>
 
-            <button class="action-btn" @click="loadExample"
+            <button class="tool-icon-btn" @click="loadExample"
               @mouseenter="showTooltip('示例', $event)" @mouseleave="hideTooltip">
               <RotateCw :size="13" />
             </button>
-            <button class="action-btn" @click="currentMode === 'decode' ? paste() : (() => {})()"
+            <button class="tool-icon-btn" @click="currentMode === 'decode' ? paste() : (() => {})()"
               @mouseenter="showTooltip('粘贴', $event)" @mouseleave="hideTooltip">
               <ClipboardPaste :size="13" />
             </button>
-            <button class="action-btn" @click="currentMode === 'decode' ? clearDecode() : clearGenerate()"
+            <button class="tool-icon-btn" @click="currentMode === 'decode' ? clearDecode() : clearGenerate()"
               @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
               <Trash2 :size="13" />
             </button>
@@ -180,7 +180,7 @@ const {
             <div v-if="isHmacFamily" class="config-section">
               <div class="config-row">
                 <label class="config-label">密钥</label>
-                <button class="action-btn mini" @click="generateHmacSecret"
+                <button class="tool-icon-btn mini" @click="generateHmacSecret"
                   @mouseenter="showTooltip('随机生成', $event)" @mouseleave="hideTooltip">
                   <RefreshCw :size="11" />
                 </button>
@@ -205,7 +205,7 @@ const {
                       <button :class="['seg-btn xxs', { active: keyFormat === 'jwk' }]" @click="keyFormat = 'jwk'">JWK</button>
                       <button :class="['seg-btn xxs', { active: keyFormat === 'pem' }]" @click="keyFormat = 'pem'">PEM</button>
                     </div>
-                    <button class="action-btn mini" @click="generateKeyPair" :disabled="keyGenerating"
+                    <button class="tool-icon-btn mini" @click="generateKeyPair" :disabled="keyGenerating"
                       @mouseenter="showTooltip('生成密钥对', $event)" @mouseleave="hideTooltip">
                       <RefreshCw :size="11" />
                     </button>
@@ -226,7 +226,7 @@ const {
                       <div class="keypair-block">
                         <div class="keypair-head">
                           <span class="keypair-tag">公钥</span>
-                          <button class="action-btn mini" @click="copyText(rsaPublicKey, 'pub')">
+                          <button class="tool-icon-btn mini" @click="copyText(rsaPublicKey, 'pub')">
                             <Check v-if="copiedField === 'pub'" :size="10" />
                             <Copy v-else :size="10" />
                           </button>
@@ -237,7 +237,7 @@ const {
                       <div class="keypair-block">
                         <div class="keypair-head">
                           <span class="keypair-tag">私钥</span>
-                          <button class="action-btn mini" @click="copyText(rsaPrivateKey, 'priv')">
+                          <button class="tool-icon-btn mini" @click="copyText(rsaPrivateKey, 'priv')">
                             <Check v-if="copiedField === 'priv'" :size="10" />
                             <Copy v-else :size="10" />
                           </button>
@@ -251,7 +251,7 @@ const {
                       <div class="keypair-block">
                         <div class="keypair-head">
                           <span class="keypair-tag">公钥</span>
-                          <button class="action-btn mini" @click="copyText(ecPublicKey, 'ecpub')">
+                          <button class="tool-icon-btn mini" @click="copyText(ecPublicKey, 'ecpub')">
                             <Check v-if="copiedField === 'ecpub'" :size="10" />
                             <Copy v-else :size="10" />
                           </button>
@@ -262,7 +262,7 @@ const {
                       <div class="keypair-block">
                         <div class="keypair-head">
                           <span class="keypair-tag">私钥</span>
-                          <button class="action-btn mini" @click="copyText(ecPrivateKey, 'ecpriv')">
+                          <button class="tool-icon-btn mini" @click="copyText(ecPrivateKey, 'ecpriv')">
                             <Check v-if="copiedField === 'ecpriv'" :size="10" />
                             <Copy v-else :size="10" />
                           </button>
@@ -276,7 +276,7 @@ const {
                       <div class="keypair-block">
                         <div class="keypair-head">
                           <span class="keypair-tag">公钥</span>
-                          <button class="action-btn mini" @click="copyText(edPublicKey, 'edpub')">
+                          <button class="tool-icon-btn mini" @click="copyText(edPublicKey, 'edpub')">
                             <Check v-if="copiedField === 'edpub'" :size="10" />
                             <Copy v-else :size="10" />
                           </button>
@@ -287,7 +287,7 @@ const {
                       <div class="keypair-block">
                         <div class="keypair-head">
                           <span class="keypair-tag">私钥</span>
-                          <button class="action-btn mini" @click="copyText(edPrivateKey, 'edpriv')">
+                          <button class="tool-icon-btn mini" @click="copyText(edPrivateKey, 'edpriv')">
                             <Check v-if="copiedField === 'edpriv'" :size="10" />
                             <Copy v-else :size="10" />
                           </button>
@@ -326,7 +326,7 @@ const {
             <div class="config-section grow">
               <div class="config-row">
                 <label class="config-label">Payload</label>
-                <button class="action-btn mini" @click="addCurrentTimestamp('iat')"
+                <button class="tool-icon-btn mini" @click="addCurrentTimestamp('iat')"
                   @mouseenter="showTooltip('添加 iat', $event)" @mouseleave="hideTooltip">
                   <Clock :size="11" />
                 </button>
@@ -354,13 +354,13 @@ const {
             <span>{{ currentMode === 'decode' ? '解析结果' : '生成结果' }}</span>
           </div>
           <div class="panel-actions">
-            <button v-if="currentMode === 'decode' && tokenInput" class="action-btn"
+            <button v-if="currentMode === 'decode' && tokenInput" class="tool-icon-btn"
               @click="copyText(tokenInput, 'raw-token')"
               @mouseenter="showTooltip('复制原始 Token', $event)" @mouseleave="hideTooltip">
               <Check v-if="copiedField === 'raw-token'" :size="13" />
               <Copy v-else :size="13" />
             </button>
-            <button v-if="currentMode === 'generate' && genToken" class="action-btn"
+            <button v-if="currentMode === 'generate' && genToken" class="tool-icon-btn"
               @click="copyText(genToken, 'gen-token')"
               @mouseenter="showTooltip('复制 Token', $event)" @mouseleave="hideTooltip">
               <Check v-if="copiedField === 'gen-token'" :size="13" />
@@ -386,7 +386,7 @@ const {
                     <span class="jwt-tag" v-if="header.parsed?.alg">{{ header.parsed.alg }}</span>
                     <span class="jwt-tag" v-if="header.parsed?.typ">{{ header.parsed.typ }}</span>
                   </div>
-                  <button class="action-btn mini" @click="copyText(formatJson(header.parsed), 'header')">
+                  <button class="tool-icon-btn mini" @click="copyText(formatJson(header.parsed), 'header')">
                     <Check v-if="copiedField === 'header'" :size="10" />
                     <Copy v-else :size="10" />
                   </button>
@@ -402,7 +402,7 @@ const {
                     <span>Payload</span>
                     <span class="jwt-tag">{{ Object.keys(payload.parsed).length }} 字段</span>
                   </div>
-                  <button class="action-btn mini" @click="copyText(formatJson(payload.parsed), 'payload')">
+                  <button class="tool-icon-btn mini" @click="copyText(formatJson(payload.parsed), 'payload')">
                     <Check v-if="copiedField === 'payload'" :size="10" />
                     <Copy v-else :size="10" />
                   </button>
@@ -430,7 +430,7 @@ const {
                     <span class="jwt-dot purple"></span>
                     <span>Signature</span>
                   </div>
-                  <button class="action-btn mini" @click="copyText(signature, 'sig')">
+                  <button class="tool-icon-btn mini" @click="copyText(signature, 'sig')">
                     <Check v-if="copiedField === 'sig'" :size="10" />
                     <Copy v-else :size="10" />
                   </button>
@@ -514,13 +514,6 @@ const {
 </template>
 
 <style scoped>
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 4px;
-}
-
 .mode-tag {
   display: inline-flex;
   align-items: center;
@@ -532,18 +525,12 @@ const {
 }
 
 .mode-tag.success { color: var(--accent); background: var(--accent-light); }
-.mode-tag.warning { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
-.mode-tag.error { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+.mode-tag.warning { color: #f59e0b; background: var(--warning-light); }
+.mode-tag.error { color: #ef4444; background: var(--error-light); }
 
 .panel-icon.purple { color: #6366f1; background: rgba(99, 102, 241, 0.1); }
 
 /* ====== Panel Actions ====== */
-.panel-actions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
 .panel-divider {
   width: 1px;
   height: 16px;
@@ -551,22 +538,6 @@ const {
   margin: 0 4px;
 }
 
-.action-btn {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all var(--transition-fast);
-  padding: 0;
-}
-
-.action-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
 .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .action-btn.mini { width: 22px; height: 22px; }
@@ -580,54 +551,6 @@ const {
 
 .segment-group.xs { gap: 2px; }
 
-.seg-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 5px 12px;
-  border: 1px solid var(--border-subtle);
-  background: var(--bg-secondary);
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  white-space: nowrap;
-}
-
-.seg-btn:hover {
-  border-color: var(--border-default);
-  background: var(--bg-hover);
-  color: var(--text-primary);
-}
-
-.seg-btn.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-}
-
-.seg-btn.small {
-  padding: 3px 9px;
-  font-size: 11px;
-  font-family: var(--font-mono);
-}
-
-.seg-btn.xs {
-  padding: 2px 8px;
-  font-size: 11px;
-  height: 22px;
-}
-
-.seg-btn.xxs {
-  padding: 1px 6px;
-  font-size: 10px;
-  height: 18px;
-  font-family: var(--font-mono);
-}
-
 /* ====== Config Sections ====== */
 .tool-panel-body {
   display: flex;
@@ -636,36 +559,13 @@ const {
   overflow-y: auto;
 }
 
-.config-section {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.config-section.grow {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  border-bottom: none;
-}
-
-.config-label {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
 .config-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.config-row .config-label { margin-bottom: 0; }
-
+.config-row 
 .config-row-actions {
   display: flex;
   align-items: center;
@@ -791,7 +691,7 @@ const {
 }
 
 .verify-badge.valid { color: var(--accent); background: var(--accent-light); }
-.verify-badge.invalid { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+.verify-badge.invalid { color: #ef4444; background: var(--error-light); }
 
 .verify-hint {
   font-size: 10px;
@@ -1132,7 +1032,7 @@ const {
 
 .gen-token-value.blue { background: var(--accent-light); color: var(--accent); }
 .gen-token-value.green { background: var(--success-light); color: var(--success); }
-.gen-token-value.purple { background: rgba(139, 92, 246, 0.12); color: #8b5cf6; }
+.gen-token-value.purple { background: var(--accent-light); color: #8b5cf6; }
 
 .gen-token-dot {
   font-size: 14px;

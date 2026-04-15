@@ -42,15 +42,15 @@ const {
             <span>加密配置</span>
           </div>
           <div class="panel-actions">
-            <button class="action-btn" @click="loadExample"
+            <button class="tool-icon-btn" @click="loadExample"
               @mouseenter="showTooltip('填入示例', $event)" @mouseleave="hideTooltip">
               <RotateCw :size="13" />
             </button>
-            <button class="action-btn" @click="pasteFromClipboard"
+            <button class="tool-icon-btn" @click="pasteFromClipboard"
               @mouseenter="showTooltip('粘贴', $event)" @mouseleave="hideTooltip">
               <ClipboardPaste :size="13" />
             </button>
-            <button class="action-btn" :disabled="!inputText && !keyText" @click="clearAll"
+            <button class="tool-icon-btn" :disabled="!inputText && !keyText" @click="clearAll"
               @mouseenter="showTooltip('清空', $event)" @mouseleave="hideTooltip">
               <Trash2 :size="13" />
             </button>
@@ -111,7 +111,7 @@ const {
           <div v-if="isSymmetric || isChacha" class="config-section">
             <div class="config-row">
               <label class="config-label">{{ isChacha ? '密钥（32字节）' : '密钥' }}</label>
-              <button class="action-btn mini" @click="generateRandomKey"
+              <button class="tool-icon-btn mini" @click="generateRandomKey"
                 @mouseenter="showTooltip('随机生成密钥', $event)" @mouseleave="hideTooltip">
                 <RefreshCw :size="11" />
               </button>
@@ -127,7 +127,7 @@ const {
             <div class="config-section">
               <div class="config-row">
                 <label class="config-label">密钥长度</label>
-                <button class="action-btn mini" @click="generateRsaKeyPair" :disabled="loading"
+                <button class="tool-icon-btn mini" @click="generateRsaKeyPair" :disabled="loading"
                   @mouseenter="showTooltip('生成密钥对', $event)" @mouseleave="hideTooltip">
                   <RefreshCw :size="11" />
                 </button>
@@ -144,7 +144,7 @@ const {
             <div v-if="rsaPublicKey || rsaPrivateKey" class="config-section">
               <div class="config-row">
                 <label class="config-label">密钥对</label>
-                <button class="action-btn mini" @click="showKeyPairPanel = !showKeyPairPanel">
+                <button class="tool-icon-btn mini" @click="showKeyPairPanel = !showKeyPairPanel">
                   <ArrowRightLeft :size="11" />
                 </button>
               </div>
@@ -152,7 +152,7 @@ const {
                 <div class="keypair-block">
                   <div class="keypair-head">
                     <span class="keypair-tag">公钥</span>
-                    <button class="action-btn mini" @click="copyToClipboard(rsaPublicKey, 'pub')">
+                    <button class="tool-icon-btn mini" @click="copyToClipboard(rsaPublicKey, 'pub')">
                       <Check v-if="copiedId === 'pub'" :size="10" />
                       <Copy v-else :size="10" />
                     </button>
@@ -162,7 +162,7 @@ const {
                 <div class="keypair-block">
                   <div class="keypair-head">
                     <span class="keypair-tag">私钥</span>
-                    <button class="action-btn mini" @click="copyToClipboard(rsaPrivateKey, 'priv')">
+                    <button class="tool-icon-btn mini" @click="copyToClipboard(rsaPrivateKey, 'priv')">
                       <Check v-if="copiedId === 'priv'" :size="10" />
                       <Copy v-else :size="10" />
                     </button>
@@ -207,11 +207,11 @@ const {
             <span>输出</span>
           </div>
           <div class="panel-actions">
-            <button class="action-btn" @click="swapDirection"
+            <button class="tool-icon-btn" @click="swapDirection"
               @mouseenter="showTooltip('交换输入输出', $event)" @mouseleave="hideTooltip">
               <ArrowRightLeft :size="13" />
             </button>
-            <button class="action-btn" :disabled="!outputText" @click="copyToClipboard(outputText, 'output')"
+            <button class="tool-icon-btn" :disabled="!outputText" @click="copyToClipboard(outputText, 'output')"
               @mouseenter="showTooltip('复制', $event)" @mouseleave="hideTooltip">
               <Check v-if="copiedId === 'output'" :size="13" />
               <Copy v-else :size="13" />
@@ -281,13 +281,6 @@ const {
 </template>
 
 <style scoped>
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 4px;
-}
-
 .mode-tag {
   padding: 2px 8px;
   border-radius: 10px;
@@ -296,7 +289,7 @@ const {
 }
 
 .mode-tag.encrypt { color: var(--accent); background: var(--accent-light); }
-.mode-tag.decrypt { color: #22c55e; background: rgba(34, 197, 94, 0.1); }
+.mode-tag.decrypt { color: var(--success); background: var(--success-light); }
 
 .stat-tag {
   display: inline-flex;
@@ -309,31 +302,9 @@ const {
   font-family: var(--font-mono);
 }
 
-.panel-icon.purple { color: #6366f1; background: rgba(99, 102, 241, 0.1); }
+.panel-icon.purple { color: var(--accent); background: var(--accent-light); }
 
 /* ===== Panel Actions ===== */
-.panel-actions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.action-btn {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all var(--transition-fast);
-  padding: 0;
-}
-
-.action-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
 .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .action-btn.mini {
@@ -349,30 +320,8 @@ const {
   overflow-y: auto;
 }
 
-.config-section {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.config-section.grow {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  border-bottom: none;
-}
-
 .config-section:last-child {
   border-bottom: none;
-}
-
-.config-label {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
 }
 
 .config-row {
@@ -381,48 +330,12 @@ const {
   justify-content: space-between;
 }
 
-.config-row .config-label { margin-bottom: 0; }
-
+.config-row 
 /* ===== Segment Group ===== */
 .segment-group {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-}
-
-.seg-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 5px 12px;
-  border: 1px solid var(--border-subtle);
-  background: var(--bg-secondary);
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  white-space: nowrap;
-}
-
-.seg-btn:hover {
-  border-color: var(--border-default);
-  background: var(--bg-hover);
-  color: var(--text-primary);
-}
-
-.seg-btn.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-}
-
-.seg-btn.small {
-  padding: 3px 9px;
-  font-size: 11px;
-  font-family: var(--font-mono);
 }
 
 /* ===== Config Input ===== */
