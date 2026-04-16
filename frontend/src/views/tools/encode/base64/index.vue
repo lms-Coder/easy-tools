@@ -46,10 +46,11 @@ const {
   previewUrl, previewArrayBuffer, previewFileType,
   showPreview, showFullscreen,
   encodePreviewType, decodePreviewType, isPreviewable,
+  decodedBinary, decodedMime,
   copyOutput, pasteFromClipboard, clearAll, swap,
   importFile, handleFileSelect,
   handleDragOver, handleDragLeave, handleDrop,
-  downloadFromBase64,
+  downloadFromBase64, downloadDecodedBinary,
   openFullscreen, closeFullscreen,
   onPreviewRendered, onPreviewError,
 } = useBase64()
@@ -231,6 +232,10 @@ import { computed } from 'vue'
             <span v-if="outputText" class="byte-info">{{ formatBytes(outputByteSize) }}</span>
             <div class="panel-divider"></div>
             <button v-if="hasFile && mode === 'decode'" class="tool-icon-btn" @click="downloadFromBase64"
+              @mouseenter="showTooltip('下载文件', $event)" @mouseleave="hideTooltip">
+              <Download :size="13" />
+            </button>
+            <button v-else-if="decodedBinary" class="tool-icon-btn" @click="downloadDecodedBinary"
               @mouseenter="showTooltip('下载文件', $event)" @mouseleave="hideTooltip">
               <Download :size="13" />
             </button>
