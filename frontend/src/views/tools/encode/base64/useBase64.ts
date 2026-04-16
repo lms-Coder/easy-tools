@@ -69,59 +69,120 @@ export function useBase64() {
     return encoded
   }
 
+  // 解码后的二进制数据（用于图片等二进制文件的预览和下载）
+  const decodedBinary = ref<Uint8Array | null>(null)
+  const decodedMime = ref<string>('')
+
+  function base64ToBytes(base64: string): Uint8Array {
+    let b64 = base64.trim()
+    b64 = b64.replace(/-/g, '+').replace(/_/g, '/')
+    while (b64.length % 4) b64 += '='
+    const binary = atob(b64)
+    const bytes = new Uint8Array(binary.length)
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
+    return bytes
+  }
+
   function decode(text: string): string {
-    let base64 = text.trim()
-    base64 = base64.replace(/-/g, '+').replace(/_/g, '/')
-    while (base64.length % 4) base64 += '='
-    return decodeURIComponent(escape(atob(base64)))
+    let base64Str = text.trim()
+    let mimeHint = ''
+    // 处理 data:image/png;base64,xxxx 格式
+    const dataUrlMatch = base64Str.match(/^data:([^;,]+)?(?:;([^,]*))?,(.*)$/s)
+    if (dataUrlMatch) {
+      mimeHint = dataUrlMatch[1] || ''
+      base64Str = dataUrlMatch[3] || ''
+    }
+    const bytes = base64ToBytes(base64Str)
+    // 如果有 MIME 提示，直接视为二进制
+    if (mimeHint && mimeHint !== 'text/plain') {
+      decodedBinary.value = bytes
+      decodedMime.value = mimeHint
+      return '[二进制数据，请使用下载按钮保存为文件]'
+    }
+    // 尝试作为 UTF-8 文本解码
+    try {
+      const decoded = new TextDecoder('utf-8', { fatal: true }).decode(bytes)
+      decodedBinary.value = null
+      decodedMime.value = ''
+      return decoded
+    } catch {
+      // 不是有效 UTF-8，视为二进制数据
+      decodedBinary.value = bytes
+      return '[二进制数据，请使用下载按钮保存为文件]'
+    }
   }
 
   function convert() {
     const text = inputText.value
-    if (!text) { outputText.value = ''; error.value = ''; return }
+    if (!text) {
+      outputText.value = ''; error.value = ''
+      decodedBinary.value = null; decodedMime.value = ''
+      return
+    }
     try {
-      outputText.value = mode.value === 'encode' ? encode(text) : decode(text)
+      if (mode.value === 'encode') {
+        outputText.value = encode(text)
+        decodedBinary.value = null
+        decodedMime.value = ''
+      } else {
+        outputText.value = decode(text)
+        // 二进制数据时检测 MIME 类型
+        if (decodedBinary.value) {
+          const mime = detectMimeType(decodedBinary.value)
+          decodedMime.value = mime
+          if (mime) {
+            detectPreviewFromBytes(decodedBinary.value, mime)
+          }
+        } else {
+          clearPreview()
+        }
+      }
       error.value = ''
     } catch (e: any) {
       error.value = mode.value === 'decode' ? '无效的 Base64 字符串' : (e.message || '转换失败')
       outputText.value = ''
+      decodedBinary.value = null
     }
   }
 
-  // ====== Detect Preview from decoded bytes ======
-  function detectPreview(base64: string) {
-    try {
-      const bs = atob(base64)
-      const bytes = new Uint8Array(bs.length)
-      for (let i = 0; i < bs.length; i++) bytes[i] = bs.charCodeAt(i)
+  // ====== Detect MIME type from binary bytes ======
+  function detectMimeType(bytes: Uint8Array): string {
+    if (bytes.length < 4) return ''
+    if (bytes[0] === 0x89 && bytes[1] === 0x50) return 'image/png'
+    if (bytes[0] === 0xFF && bytes[1] === 0xD8) return 'image/jpeg'
+    if (bytes[0] === 0x47 && bytes[1] === 0x49) return 'image/gif'
+    if (bytes[0] === 0x52 && bytes[1] === 0x49 && bytes.length > 8 && bytes[8] === 0x57) return 'image/webp'
+    if (bytes[0] === 0x25 && bytes[1] === 0x50) return 'application/pdf'
+    if (bytes[0] === 0x50 && bytes[1] === 0x4B && bytes[2] === 0x03 && bytes[3] === 0x04) {
+      const text = new TextDecoder().decode(bytes.slice(0, Math.min(4096, bytes.length)))
+      if (text.includes('word/')) return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      if (text.includes('xl/') || text.includes('workbook')) return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      if (text.includes('ppt/')) return 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+      return 'application/zip'
+    }
+    return ''
+  }
 
-      let mime = ''
-      if (bytes[0] === 0x89 && bytes[1] === 0x50) mime = 'image/png'
-      else if (bytes[0] === 0xFF && bytes[1] === 0xD8) mime = 'image/jpeg'
-      else if (bytes[0] === 0x47 && bytes[1] === 0x49) mime = 'image/gif'
-      else if (bytes[0] === 0x52 && bytes[1] === 0x49 && bytes.length > 8 && bytes[8] === 0x57) mime = 'image/webp'
-      else if (bytes[0] === 0x25 && bytes[1] === 0x50) mime = 'application/pdf'
-      else if (bytes[0] === 0x50 && bytes[1] === 0x4B && bytes[2] === 0x03) {
-        // ZIP-based office file
+  // ====== Generate preview from decoded binary bytes ======
+  function detectPreviewFromBytes(bytes: Uint8Array, mime: string) {
+    try {
+      if (mime.startsWith('image/') || mime === 'application/pdf') {
+        const b64 = Array.from(bytes).map(b => String.fromCharCode(b)).join('')
+        previewUrl.value = `data:${mime};base64,${btoa(b64)}`
+        previewFileType.value = mime.startsWith('image/') ? 'image' : 'pdf'
+        previewArrayBuffer.value = null
+      } else if (mime.includes('zip') || mime.includes('office') || mime.includes('document') || mime.includes('sheet') || mime.includes('presentation')) {
         previewUrl.value = 'office'
         previewArrayBuffer.value = bytes.buffer as ArrayBuffer
-        isPreviewLoading.value = true
-        // Detect specific office type
-        if (isOfficeFileType(bytes.buffer as ArrayBuffer, 'docx')) previewFileType.value = 'docx'
-        else if (isOfficeFileType(bytes.buffer as ArrayBuffer, 'xlsx')) previewFileType.value = 'xlsx'
-        else if (isOfficeFileType(bytes.buffer as ArrayBuffer, 'pptx')) previewFileType.value = 'pptx'
+        if (mime.includes('word')) previewFileType.value = 'docx'
+        else if (mime.includes('sheet')) previewFileType.value = 'xlsx'
+        else if (mime.includes('presentation')) previewFileType.value = 'pptx'
         else previewFileType.value = 'other'
-        return
-      }
-
-      if (mime) {
-        previewUrl.value = `data:${mime};base64,${base64}`
-        previewFileType.value = mime.startsWith('image/') ? 'image' : 'pdf'
       } else {
         previewUrl.value = ''
+        previewArrayBuffer.value = null
         previewFileType.value = ''
       }
-      previewArrayBuffer.value = null
     } catch {
       previewUrl.value = ''
       previewArrayBuffer.value = null
@@ -208,6 +269,31 @@ export function useBase64() {
     toast.success('文件已下载')
   }
 
+  // ====== 通用下载解码后的二进制数据 ======
+  function downloadDecodedBinary() {
+    if (!decodedBinary.value) {
+      toast.error('无可下载的二进制数据')
+      return
+    }
+    const mime = decodedMime.value || 'application/octet-stream'
+    const extMap: Record<string, string> = {
+      'image/png': 'png', 'image/jpeg': 'jpg', 'image/gif': 'gif', 'image/webp': 'webp',
+      'application/pdf': 'pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'pptx',
+    }
+    const ext = extMap[mime] || 'bin'
+    const blob = new Blob([new Uint8Array(decodedBinary.value)], { type: mime })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `decoded-file.${ext}`
+    a.click()
+    URL.revokeObjectURL(url)
+    toast.success('文件已下载')
+  }
+
   // ====== Actions ======
   async function copyOutput() {
     if (!outputText.value) return
@@ -234,6 +320,8 @@ export function useBase64() {
     outputText.value = ''
     error.value = ''
     fileInfo.value = null
+    decodedBinary.value = null
+    decodedMime.value = ''
     clearPreview()
   }
 
@@ -249,12 +337,10 @@ export function useBase64() {
     if (!outputText.value) return
     inputText.value = outputText.value
     fileInfo.value = null
+    decodedBinary.value = null
+    decodedMime.value = ''
     mode.value = mode.value === 'encode' ? 'decode' : 'encode'
     clearPreview()
-    // After swap, try to detect preview in decode mode
-    if (mode.value === 'decode') {
-      detectPreview(inputText.value)
-    }
   }
 
   function importFile() {
@@ -331,17 +417,10 @@ export function useBase64() {
   watch([inputText, urlSafe], () => {
     if (hasFile.value) return
     convert()
-    // In decode mode, try detect preview from decoded output
-    if (mode.value === 'decode' && outputText.value) {
-      detectPreview(outputText.value)
-    }
   })
   watch(mode, () => {
     if (hasFile.value) return
     convert()
-    if (mode.value === 'decode' && outputText.value) {
-      detectPreview(outputText.value)
-    }
   })
 
   return {
@@ -353,11 +432,13 @@ export function useBase64() {
     showPreview, showFullscreen, isPreviewLoading,
     encodePreviewType, decodePreviewType, isPreviewable,
     isOfficeFileType,
+    // Binary decode
+    decodedBinary, decodedMime,
     // Methods
     copyOutput, pasteFromClipboard, clearAll, swap,
     importFile, handleFileSelect,
     handleDragOver, handleDragLeave, handleDrop,
-    downloadFromBase64,
+    downloadFromBase64, downloadDecodedBinary,
     openFullscreen, closeFullscreen,
     onPreviewRendered, onPreviewError,
     getPreviewCategory,
