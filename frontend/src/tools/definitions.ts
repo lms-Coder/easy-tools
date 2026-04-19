@@ -243,7 +243,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     icon: 'icon-palette',
     route: '/tool/color-picker',
     implemented: true,
-    window: { width: 900, height: 640, minWidth: 640, minHeight: 460 },
+    window: { width: 1000, height: 720, minWidth: 700, minHeight: 520 },
   },
   {
     id: 'uuid',

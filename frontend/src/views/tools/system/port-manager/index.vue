@@ -5,14 +5,10 @@ import {
   AlertTriangle,
   Zap,
   Check,
-  Radio,
 } from 'lucide-vue-next'
 import ToolTitleBar from '@/components/common/ToolTitleBar.vue'
 import Modal from '@/components/common/Modal.vue'
-import { useTooltip } from '@/composables/useTooltip'
 import { usePortManager } from './usePortManager'
-
-const { tooltip, showTooltip, hideTooltip } = useTooltip()
 
 const {
   portInput, isSearching, searchedPort,
@@ -51,11 +47,9 @@ const {
             />
           </div>
           <button
-            class="tool-icon-btn primary"
+            class="action-btn primary"
             :disabled="isSearching || !canSearch"
             @click="lookupPort"
-            @mouseenter="showTooltip('查询端口', $event)"
-            @mouseleave="hideTooltip"
           >
             <span v-if="isSearching" class="spinner"></span>
             <Search v-else :size="14" />
@@ -63,10 +57,8 @@ const {
           </button>
           <button
             v-if="hasSearched"
-            class="tool-icon-btn"
+            class="action-btn"
             @click="clearResults"
-            @mouseenter="showTooltip('清空', $event)"
-            @mouseleave="hideTooltip"
           >
             <X :size="14" />
             <span>清空</span>
@@ -108,7 +100,7 @@ const {
               <span>端口 {{ searchedPort }} 占用情况</span>
               <span class="count">{{ portInfos.length }} 个进程</span>
             </div>
-            <button class="tool-icon-btn danger" @click="confirmKillByPort">
+            <button class="action-btn danger" @click="confirmKillByPort">
               <X :size="14" />
               <span>终止全部</span>
             </button>
@@ -172,10 +164,6 @@ const {
       </template>
     </Modal>
 
-    <!-- Tooltip -->
-    <div v-if="tooltip.show" class="toolbar-tooltip" :style="{ left: tooltip.x + 'px', top: tooltip.y + 'px' }">
-      {{ tooltip.text }}
-    </div>
   </div>
 </template>
 
@@ -249,6 +237,23 @@ const {
 .port-input::placeholder { color: var(--text-muted); }
 
 /* ====== 操作按钮 ====== */
+.action-btn {
+  height: 32px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
 .action-btn:hover:not(:disabled) {
   color: var(--text-primary);
   border-color: var(--border-default);
