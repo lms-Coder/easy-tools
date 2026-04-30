@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!--
+    Easy Tools Logo — Iteration 7
+    E (white) with T (sky blue) nested inside E's opening.
+    T correctly oriented: crossbar on top, stem going down.
+    All edges use cubic bezier curves for organic, calligraphic flow.
+  -->
+  <g id="icon">
+    <!-- Dark rounded-square background -->
+    <rect x="0" y="0" width="512" height="512" rx="80" ry="80" fill="#0F172A"/>
+
+    <!-- Letterforms group — italic slant for dynamic feel -->
+    <g transform="translate(14, 0) skewX(-8)">
+    <!--
+      E ribbon — white (#FFFFFF)
+      Flowing calligraphic E. Spine on left, three horizontal bars.
+      Bar ends curve inward for organic negative space.
+      Middle bar is shorter (classic E proportions).
+    -->
+    <path fill="#FFFFFF" d="
+      M 118,88
+      C 136,84 166,86 194,86
+      C 234,86 280,85 318,86
+      C 336,87 344,94 344,114
+      C 344,128 336,136 318,138
+      C 296,141 240,138 194,138
+      C 170,138 156,138 152,142
+      C 148,150 148,188 148,228
+      C 148,238 152,242 162,244
+      C 172,246 210,244 248,244
+      C 262,244 268,252 268,264
+      C 268,276 262,284 248,284
+      C 210,284 172,282 162,284
+      C 152,286 148,292 148,302
+      C 148,342 148,390 150,400
+      C 152,410 166,412 194,412
+      C 240,412 296,410 318,412
+      C 336,414 344,420 344,438
+      C 344,454 336,460 318,460
+      C 280,461 234,460 194,460
+      C 158,460 128,462 112,456
+      C 98,450 92,436 92,412
+      C 90,372 90,298 90,252
+      C 90,206 90,136 92,112
+      C 94,96 106,88 118,88
+      Z
+    "/>
+
+    <!--
+      T shape — sky blue (#38BDF8)
+      Correctly oriented: crossbar on top, vertical stem descending from center.
+      Nestled inside E's opening — crossbar sits between E's top bar and middle bar.
+      Stem descends into the gap right of E's shorter middle bar.
+      One continuous closed path tracing the T outline with curves.
+    -->
+    <path fill="#38BDF8" d="
+      M 286,154
+      C 306,150 346,152 380,152
+      C 410,152 434,152 448,154
+      C 462,156 468,164 468,178
+      C 468,192 462,200 448,202
+      C 434,204 410,204 380,204
+      C 360,204 346,204 338,204
+      C 334,208 332,218 332,236
+      C 332,266 332,306 332,340
+      C 332,358 332,372 334,380
+      C 336,388 342,392 352,392
+      C 362,392 368,388 370,380
+      C 372,372 372,358 372,340
+      C 372,306 372,266 372,236
+      C 372,218 370,208 366,204
+      C 362,204 356,202 348,202
+      C 334,204 318,202 306,202
+      C 292,200 284,192 284,178
+      C 284,164 290,154 286,154
+      Z
+    "/>
+    </g>
+  </g>
+</svg>
