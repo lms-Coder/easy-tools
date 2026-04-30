@@ -357,7 +357,7 @@ const {
   cursor: pointer;
   padding: 2px 6px;
   border-radius: 6px;
-  transition: all 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
 .diff-option:hover {
@@ -374,14 +374,14 @@ const {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
   flex-shrink: 0;
 }
 
 .toggle-check.on {
   background: var(--accent);
   border-color: var(--accent);
-  color: #fff;
+  color: var(--text-inverse);
 }
 
 /* ====== 编辑器 ====== */
@@ -536,7 +536,6 @@ const {
 
 /* ====== Responsive ====== */
 @media (max-width: 760px) {
-  .tool-main { grid-template-columns: 1fr !important; }
   .control-row { flex-wrap: wrap; }
 }
 </style>

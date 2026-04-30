@@ -218,7 +218,7 @@ const {
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
   outline: none;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
 }
 
 .search-input:hover { border-color: var(--border-strong); }
@@ -262,7 +262,7 @@ const {
   font-weight: 500;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
   white-space: nowrap;
 }
 
@@ -274,7 +274,7 @@ const {
 
 .scope-btn.active {
   background: var(--accent);
-  color: #fff;
+  color: var(--text-inverse);
   border-color: var(--accent);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
@@ -399,7 +399,7 @@ const {
   border-radius: 4px;
   padding: 0;
   opacity: 0;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
   flex-shrink: 0;
 }
 
@@ -478,33 +478,10 @@ const {
 }
 
 /* ====== Empty & Loading ====== */
-.tool-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 60px 20px;
-  flex: 1;
-}
-
 .empty-icon {
   color: var(--text-muted);
   opacity: 0.25;
   margin-bottom: 10px;
-}
-
-.empty-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin: 0 0 4px 0;
-}
-
-.empty-desc {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin: 0;
 }
 
 .spinner-lg {

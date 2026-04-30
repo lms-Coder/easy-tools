@@ -235,14 +235,6 @@ const {
 /* ====== Panel Actions ====== */
 .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-/* ====== Config Sections ====== */
-.tool-panel-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  overflow-y: auto;
-}
-
 /* ====== Cron Input ====== */
 .cron-text-input {
   width: 100%;
@@ -529,44 +521,8 @@ const {
   border-radius: 3px;
 }
 
-/* ====== Empty State ====== */
-.tool-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 60px 20px;
-  flex: 1;
-}
-
-.empty-icon {
-  color: var(--text-muted);
-  opacity: 0.25;
-  margin-bottom: 12px;
-}
-
-.empty-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin: 0 0 4px 0;
-}
-
-.empty-desc {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin: 0;
-}
-
-/* ====== Scrollbar ====== */
-.tool-panel-body::-webkit-scrollbar { width: 5px; }
-.tool-panel-body::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
-.tool-panel-body::-webkit-scrollbar-track { background: transparent; }
-
 /* ====== Responsive ====== */
 @media (max-width: 760px) {
-  .tool-main { grid-template-columns: 1fr !important; }
   .cron-table-head,
   .cron-table-row { grid-template-columns: 45px 60px 50px 1fr 28px; gap: 4px; }
   .cron-examples { grid-template-columns: 1fr; }

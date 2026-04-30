@@ -382,12 +382,6 @@ const onDrop = (e: DragEvent) => {
 .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ====== Config Sections ====== */
-.tool-panel-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  overflow-y: auto;
-}
 .val-code {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -424,7 +418,7 @@ const onDrop = (e: DragEvent) => {
   font-size: 12px;
   color: var(--text-muted);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
 }
 
 .upload-area:hover {
@@ -472,12 +466,12 @@ const onDrop = (e: DragEvent) => {
   color: var(--text-secondary);
   background: transparent;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
   white-space: nowrap;
 }
 
 .mode-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
-.mode-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.mode-chip.active { background: var(--accent); border-color: var(--accent); color: var(--text-inverse); }
 
 .tile-type-chips {
   display: flex;
@@ -501,11 +495,11 @@ const onDrop = (e: DragEvent) => {
   background: transparent;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
 .style-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
-.style-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.style-chip.active { background: var(--accent); border-color: var(--accent); color: var(--text-inverse); }
 
 /* ====== Color Group ====== */
 .color-group {
@@ -582,7 +576,7 @@ const onDrop = (e: DragEvent) => {
   border-radius: 4px;
   background: var(--bg-primary);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
 .pos-cell:hover { border-color: var(--accent); background: var(--accent-light); }
@@ -617,12 +611,12 @@ const onDrop = (e: DragEvent) => {
   padding: 0 16px;
   font-size: 13px;
   font-weight: 600;
-  color: #fff;
+  color: var(--text-inverse);
   background: var(--accent);
   border: 1px solid var(--accent);
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
 .export-btn:hover { filter: brightness(1.08); }
@@ -668,43 +662,8 @@ const onDrop = (e: DragEvent) => {
   z-index: 1;
 }
 
-/* ====== Empty State ====== */
-.tool-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 60px 20px;
-  flex: 1;
-}
-
-.empty-icon {
-  color: var(--text-muted);
-  opacity: 0.25;
-  margin-bottom: 12px;
-}
-
-.empty-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin: 0 0 4px 0;
-}
-
-.empty-desc {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin: 0;
-}
-/* ====== Scrollbar ====== */
-.tool-panel-body::-webkit-scrollbar { width: 5px; }
-.tool-panel-body::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
-.tool-panel-body::-webkit-scrollbar-track { background: transparent; }
-
 /* ====== Responsive ====== */
 @media (max-width: 760px) {
-  .tool-main { grid-template-columns: 1fr !important; }
   .config-row-section { grid-template-columns: 1fr; }
   .config-row-item:first-child { border-right: none; border-bottom: 1px solid var(--border-subtle); }
 }

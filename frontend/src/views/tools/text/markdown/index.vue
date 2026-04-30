@@ -214,7 +214,7 @@ const {
   border: 1px solid var(--border-subtle);
   border-radius: 6px;
   outline: none;
-  transition: all 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
 .filename-input:focus { border-color: var(--accent); box-shadow: var(--shadow-focus); }
@@ -326,36 +326,6 @@ const {
 
 .md-preview :deep(.mermaid-diagram) { margin: 16px 0; text-align: center; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 16px; overflow-x: auto; }
 .md-preview :deep(.mermaid-diagram svg) { max-width: 100%; height: auto; }
-
-/* ====== Empty State ====== */
-.tool-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 60px 20px;
-  flex: 1;
-}
-
-.empty-icon {
-  color: var(--text-muted);
-  opacity: 0.25;
-  margin-bottom: 12px;
-}
-
-.empty-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin: 0 0 4px 0;
-}
-
-.empty-desc {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin: 0;
-}
 
 /* ====== Responsive ====== */
 @media (max-width: 760px) {

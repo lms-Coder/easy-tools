@@ -319,14 +319,6 @@ const {
   gap: 2px;
 }
 
-/* ====== Config Sections ====== */
-.tool-panel-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  overflow-y: auto;
-}
-
 /* ====== 编码规则 ====== */
 .rules-list {
   display: flex;
@@ -350,28 +342,6 @@ const {
   font-family: inherit;
   font-size: inherit;
 }
-
-/* ====== Textarea ====== */
-.config-textarea {
-  flex: 1;
-  width: 100%;
-  min-height: 100px;
-  padding: 8px 10px;
-  font-size: 12px;
-  font-family: var(--font-mono);
-  color: var(--text-primary);
-  background: var(--bg-input);
-  border: 1px solid var(--border-default);
-  border-radius: 6px;
-  outline: none;
-  resize: none;
-  line-height: 1.6;
-  transition: all var(--transition-fast);
-}
-
-.config-textarea:hover { border-color: var(--border-strong); }
-.config-textarea:focus { border-color: var(--accent); box-shadow: var(--shadow-focus); }
-.config-textarea::placeholder { color: var(--text-muted); }
 
 /* ====== 输出区 ====== */
 .url-output-area {
@@ -551,47 +521,4 @@ const {
   flex-shrink: 0;
 }
 
-/* ====== Empty State ====== */
-.tool-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 60px 20px;
-  flex: 1;
-}
-
-.empty-icon {
-  color: var(--text-muted);
-  opacity: 0.25;
-  margin-bottom: 12px;
-}
-
-.empty-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin: 0 0 4px 0;
-}
-
-.empty-desc {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin: 0;
-}
-
-/* ====== Scrollbar ====== */
-.tool-panel-body::-webkit-scrollbar { width: 5px; }
-.tool-panel-body::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
-.tool-panel-body::-webkit-scrollbar-track { background: transparent; }
-
-.config-textarea::-webkit-scrollbar { width: 4px; }
-.config-textarea::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
-.config-textarea::-webkit-scrollbar-track { background: transparent; }
-
-/* ====== Responsive ====== */
-@media (max-width: 760px) {
-  .tool-main { grid-template-columns: 1fr !important; }
-}
 </style>

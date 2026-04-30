@@ -157,21 +157,8 @@ const onGenerate = () => {
 .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ====== Config Sections ====== */
-.tool-panel-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  overflow-y: auto;
-}
 
-.config-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.config-row 
-.val-code {
+.config-row .val-code {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 600;
@@ -198,7 +185,7 @@ const onGenerate = () => {
   border-radius: 6px;
   text-align: left;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
 .type-card:hover { border-color: var(--accent); background: var(--bg-hover); }
@@ -223,12 +210,12 @@ const onGenerate = () => {
   color: var(--text-secondary);
   background: transparent;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
   white-space: nowrap;
 }
 
 .format-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
-.format-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.format-chip.active { background: var(--accent); border-color: var(--accent); color: var(--text-inverse); }
 
 /* ====== Range Slider ====== */
 .qr-range {
@@ -264,12 +251,12 @@ const onGenerate = () => {
   padding: 0 16px;
   font-size: 13px;
   font-weight: 600;
-  color: #fff;
+  color: var(--text-inverse);
   background: var(--accent);
   border: 1px solid var(--accent);
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
 .generate-btn:hover { filter: brightness(1.08); }
@@ -341,49 +328,10 @@ const onGenerate = () => {
   cursor: pointer;
   flex-shrink: 0;
   opacity: 0;
-  transition: all 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
 .result-row:hover .result-copy-btn { opacity: 1; }
 .result-copy-btn:hover { background: var(--bg-secondary); color: var(--accent); }
 
-/* ====== Empty State ====== */
-.tool-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 60px 20px;
-  flex: 1;
-}
-
-.empty-icon {
-  color: var(--text-muted);
-  opacity: 0.25;
-  margin-bottom: 12px;
-}
-
-.empty-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin: 0 0 4px 0;
-}
-
-.empty-desc {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin: 0;
-}
-
-/* ====== Scrollbar ====== */
-.tool-panel-body::-webkit-scrollbar { width: 5px; }
-.tool-panel-body::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
-.tool-panel-body::-webkit-scrollbar-track { background: transparent; }
-
-/* ====== Responsive ====== */
-@media (max-width: 760px) {
-  .tool-main { grid-template-columns: 1fr !important; }
-}
 </style>

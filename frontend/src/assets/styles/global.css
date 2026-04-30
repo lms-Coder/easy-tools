@@ -128,7 +128,7 @@ html.dark body::before {
   font-weight: var(--font-weight-medium);
   color: var(--text-primary);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast);
 }
 
 .glass-btn:hover {
@@ -152,7 +152,7 @@ html.dark body::before {
   font-weight: var(--font-weight-medium);
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
   background: var(--bg-secondary);
   border: 1px solid var(--border-default);
   color: var(--text-primary);
@@ -175,7 +175,7 @@ html.dark body::before {
 .action-btn.primary {
   background: var(--accent);
   border-color: var(--accent);
-  color: #fff;
+  color: var(--text-inverse);
 }
 
 .action-btn.primary:hover:not(:disabled) {
@@ -204,7 +204,7 @@ html.dark body::before {
   justify-content: center;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
   background: transparent;
   border: 1px solid transparent;
   color: var(--text-secondary);
@@ -241,10 +241,7 @@ html.dark body::before {
   gap: 8px;
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
-  cursor: pointer;
-  padding: 6px 10px;
-  border-radius: var(--radius-sm);
-  transition: all var(--transition-fast);
+  transition: color var(--transition-fast), background var(--transition-fast);
   background: transparent;
   border: 1px solid transparent;
 }
@@ -287,7 +284,7 @@ html.dark body::before {
   font-size: var(--font-size-xs);
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
 }
 
 .glass-tag:hover {
@@ -356,15 +353,7 @@ html.dark body::before {
   font-weight: 500;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all var(--transition-fast);
-  white-space: nowrap;
-}
-
-.tool-segment-btn:hover {
-  color: var(--text-primary);
-}
-
-.tool-segment-btn.active {
+  transition: color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
   background: var(--bg-card);
   color: var(--text-primary);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.04);
@@ -459,7 +448,10 @@ html.dark body::before {
 
 .tool-panel-body {
   flex: 1;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow-y: auto;
   position: relative;
 }
 
@@ -590,29 +582,21 @@ html.dark body::before {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100%;
-  padding: 40px;
   text-align: center;
+  padding: 60px 20px;
+  flex: 1;
 }
 
 .tool-empty .empty-icon {
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  margin-bottom: 14px;
-  font-size: 22px;
   color: var(--text-muted);
+  opacity: 0.25;
+  margin-bottom: 12px;
 }
 
 .tool-empty .empty-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
   margin: 0 0 4px;
 }
 
@@ -639,23 +623,29 @@ html.dark body::before {
 
 /* 工具页 textarea 通用样式 */
 .config-textarea {
+  flex: 1;
   width: 100%;
-  padding: var(--spacing-sm);
+  min-height: 100px;
+  padding: 8px 10px;
+  font-size: 12px;
   font-family: var(--font-mono);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-normal, 1.5);
+  color: var(--text-primary);
   background: var(--bg-input);
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  color: var(--text-primary);
-  resize: none;
+  border-radius: 6px;
   outline: none;
+  resize: none;
+  line-height: 1.6;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
   box-sizing: border-box;
 }
 
 .config-textarea::placeholder {
   color: var(--text-muted);
+}
+
+.config-textarea:hover {
+  border-color: var(--border-strong);
 }
 
 .config-textarea:focus {
@@ -719,11 +709,7 @@ html.dark body::before {
   font-size: 12px;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all var(--transition-fast);
-  white-space: nowrap;
-}
-
-.seg-btn:hover {
+  transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
   border-color: var(--border-default);
   background: var(--bg-hover);
   color: var(--text-primary);
@@ -752,7 +738,7 @@ html.dark body::before {
   color: var(--text-muted);
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
   font-size: 14px;
 }
 
@@ -893,7 +879,7 @@ html.dark body::before {
   color: var(--text-primary);
   cursor: pointer;
   outline: none;
-  transition: all var(--transition-fast);
+  transition: border-color var(--transition-fast);
 }
 
 .tool-select:hover {
@@ -996,7 +982,7 @@ html.dark body::before {
 }
 
 .tool-filter-btn:hover { background: var(--bg-hover); }
-.tool-filter-btn.primary { background: var(--accent); color: white; border-color: var(--accent); }
+.tool-filter-btn.primary { background: var(--accent); color: var(--text-inverse); border-color: var(--accent); }
 .tool-filter-btn.primary:hover { opacity: 0.9; }
 
 .tool-filter-stats {
@@ -1129,6 +1115,58 @@ html.dark * {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* 面板内滚动条 - 更细 */
+.tool-panel-body::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.tool-panel-body::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 10px;
+}
+
+.tool-panel-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* 工具页配置行 */
+.config-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* 工具页输出错误提示 */
+.output-error {
+  padding: 12px 14px;
+}
+
+.output-error-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--error);
+  margin-bottom: 4px;
+}
+
+.output-error-msg {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0;
+  font-family: var(--font-mono);
+}
+
+/* 工具页响应式布局 */
+@media (max-width: 760px) {
+  .tool-main.split,
+  .tool-main {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 /* 选中文本 */

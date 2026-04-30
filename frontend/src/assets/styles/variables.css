@@ -54,6 +54,42 @@
   --error-light: rgba(239, 68, 68, 0.1);
   --info: #3b82f6;
 
+  /* Extended semantic colors */
+  --purple: #8b5cf6;
+  --purple-light: rgba(139, 92, 246, 0.1);
+  --pink: #ec4899;
+  --pink-light: rgba(236, 72, 153, 0.1);
+  --orange: #f97316;
+  --orange-light: rgba(249, 115, 22, 0.1);
+  --cyan: #06b6d4;
+  --cyan-light: rgba(6, 182, 212, 0.1);
+
+  /* Category colors */
+  --cat-dev: #3b82f6;
+  --cat-encode: #10b981;
+  --cat-time: #f59e0b;
+  --cat-text: #06b6d4;
+  --cat-security: #ef4444;
+  --cat-system: #6366f1;
+  --cat-other: #8b5cf6;
+
+  /* Diff colors */
+  --diff-add: #1a7f37;
+  --diff-add-bg: rgba(34, 197, 94, 0.1);
+  --diff-remove: #82071e;
+  --diff-remove-bg: rgba(239, 68, 68, 0.1);
+  --diff-mod: #92400e;
+  --diff-mod-bg: rgba(234, 179, 8, 0.1);
+
+  /* Syntax highlighting */
+  --syntax-key: #0550ae;
+  --syntax-string: #0a6640;
+  --syntax-number: #b35900;
+  --syntax-literal: #8250df;
+
+  /* Favorite star */
+  --favorite: #fbbf24;
+
   /* Font */
   --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace;
@@ -184,6 +220,42 @@ html.dark {
   --error: #f87171;
   --error-light: rgba(248, 113, 113, 0.15);
   --info: #60a5fa;
+
+  /* Extended semantic colors */
+  --purple: #a78bfa;
+  --purple-light: rgba(167, 139, 250, 0.15);
+  --pink: #f472b6;
+  --pink-light: rgba(244, 114, 182, 0.15);
+  --orange: #fb923c;
+  --orange-light: rgba(251, 146, 60, 0.15);
+  --cyan: #22d3ee;
+  --cyan-light: rgba(34, 211, 238, 0.15);
+
+  /* Category colors */
+  --cat-dev: #60a5fa;
+  --cat-encode: #34d399;
+  --cat-time: #fbbf24;
+  --cat-text: #22d3ee;
+  --cat-security: #f87171;
+  --cat-system: #818cf8;
+  --cat-other: #a78bfa;
+
+  /* Diff colors */
+  --diff-add: #7ee787;
+  --diff-add-bg: rgba(34, 197, 94, 0.15);
+  --diff-remove: #ff8182;
+  --diff-remove-bg: rgba(239, 68, 68, 0.15);
+  --diff-mod: #fbbf24;
+  --diff-mod-bg: rgba(234, 179, 8, 0.15);
+
+  /* Syntax highlighting */
+  --syntax-key: #79c0ff;
+  --syntax-string: #7ee787;
+  --syntax-number: #f0883e;
+  --syntax-literal: #d2a8ff;
+
+  /* Favorite star */
+  --favorite: #fbbf24;
 
   /* Shadows - deeper for dark */
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);

@@ -6,6 +6,7 @@ import { useThemeStore } from '@/stores/theme'
 import { toast } from '@/composables/useToast'
 import { useDialog } from '@/composables/useDialog'
 import { openTool } from '@/utils/toolWindow'
+import { getCategoryColor, getCategoryColorRaw } from '@/utils/categories'
 import dayjs from 'dayjs'
 
 import 'dayjs/locale/zh-cn'
@@ -176,21 +177,12 @@ const borderSubtle = computed(() => isDark.value ? 'rgba(255,255,255,0.08)' : 'r
 const accentColor = computed(() => isDark.value ? '#60a5fa' : '#3b82f6')
 
 // 工具分类数据
-const CATEGORY_COLORS: Record<string, string> = {
-  '开发工具': '#3b82f6',
-  '编码转换': '#10b981',
-  '时间处理': '#f59e0b',
-  '文本处理': '#06b6d4',
-  '安全工具': '#ef4444',
-  '系统工具': '#6366f1',
-  '其他': '#8b5cf6',
-}
-
 const allCategories = computed(() => {
   return configStore.toolsByCategory.map(cat => ({
     name: cat.name,
     count: cat.tools.length,
-    color: CATEGORY_COLORS[cat.name] || '#3b82f6',
+    color: getCategoryColor(cat.name),
+    rawColor: getCategoryColorRaw(cat.name),
     tools: cat.tools
   }))
 })
@@ -207,7 +199,7 @@ const pieOption = computed(() => {
   const data = allCategories.value.map(cat => ({
     name: cat.name,
     value: cat.count,
-    itemStyle: { color: cat.color }
+    itemStyle: { color: cat.rawColor }
   }))
 
   return {
@@ -436,8 +428,6 @@ const formatTime = (dateStr: string) => {
 
 // 方法
 const goToTools = () => router.push('/tools')
-
-const getCategoryColor = (category: string) => CATEGORY_COLORS[category] || '#3b82f6'
 
 const colorMix = (category: string, percent: number) => {
   const color = getCategoryColor(category)

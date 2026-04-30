@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useConfigStore } from '@/stores/config'
+import { getCategoryColor } from '@/utils/categories'
 import {
   LayoutGrid,
   Code,
@@ -41,20 +42,6 @@ const categoryIconMap: Record<string, any> = {
   '系统工具': LayoutGrid,
   '其他': LayoutGrid,
 }
-
-// 分类颜色映射
-const categoryColorMap: Record<string, string> = {
-  '开发工具': '#3b82f6',
-  '编码转换': '#10b981',
-  '时间处理': '#f59e0b',
-  '文本处理': '#06b6d4',
-  '安全工具': '#ef4444',
-  '系统工具': '#6366f1',
-  '其他': '#8b5cf6',
-}
-
-const getCategoryIcon = (name: string) => categoryIconMap[name] || LayoutGrid
-const getCategoryColor = (name: string) => categoryColorMap[name] || '#3b82f6'
 
 // 当前选中的分类
 const activeCategory = computed(() => {

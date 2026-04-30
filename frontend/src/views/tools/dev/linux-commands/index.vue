@@ -315,8 +315,8 @@ const importExample = JSON.stringify([
 }
 
 .custom-tag {
-  color: #f59e0b;
-  background: rgba(245, 158, 11, 0.1);
+  color: var(--warning);
+  background: var(--orange-light);
 }
 
 .custom-badge {
@@ -325,8 +325,8 @@ const importExample = JSON.stringify([
   border-radius: 8px;
   font-size: 9px;
   font-weight: 600;
-  color: #f59e0b;
-  background: rgba(245, 158, 11, 0.1);
+  color: var(--warning);
+  background: var(--orange-light);
   margin-left: 6px;
   letter-spacing: 0.3px;
 }
@@ -338,8 +338,8 @@ const importExample = JSON.stringify([
 
 /* ===== Panel Actions ===== */
 .action-btn.danger:hover {
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+  background: var(--error-light);
 }
 
 .tool-panel-body {
@@ -368,7 +368,7 @@ const importExample = JSON.stringify([
   font-weight: 500;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), opacity var(--transition-fast), box-shadow var(--transition-fast);
   white-space: nowrap;
 }
 
@@ -380,7 +380,7 @@ const importExample = JSON.stringify([
 
 .category-btn.active {
   background: var(--accent);
-  color: #fff;
+  color: var(--text-inverse);
   border-color: var(--accent);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
@@ -421,7 +421,7 @@ const importExample = JSON.stringify([
   background: var(--bg-secondary);
   color: var(--text-primary);
   outline: none;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), opacity var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .search-input:focus {
@@ -466,7 +466,7 @@ const importExample = JSON.stringify([
   padding: 10px 12px;
   border-radius: 8px;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), opacity var(--transition-fast), box-shadow var(--transition-fast);
   margin-bottom: 4px;
   border: 1px solid transparent;
 }
@@ -512,7 +512,7 @@ const importExample = JSON.stringify([
   color: var(--text-muted);
   cursor: pointer;
   border-radius: 6px;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), opacity var(--transition-fast), box-shadow var(--transition-fast);
   opacity: 0;
   padding: 0;
 }
@@ -523,12 +523,12 @@ const importExample = JSON.stringify([
 
 .fav-btn:hover {
   background: rgba(251, 191, 36, 0.15);
-  color: #fbbf24;
+  color: var(--favorite);
 }
 
 .fav-btn.active {
   opacity: 1;
-  color: #fbbf24;
+  color: var(--favorite);
 }
 
 .cmd-desc {
@@ -552,14 +552,14 @@ const importExample = JSON.stringify([
 
 .cat-file { background: var(--accent-light); color: var(--accent); }
 .cat-text { background: var(--success-light); color: var(--success); }
-.cat-network { background: rgba(6, 182, 212, 0.1); color: var(--info); }
+.cat-network { background: var(--cyan-light); color: var(--info); }
 .cat-process { background: var(--warning-light); color: var(--warning); }
-.cat-user { background: rgba(236, 72, 153, 0.1); color: #ec4899; }
+.cat-user { background: var(--pink-light); color: var(--pink); }
 .cat-disk { background: var(--error-light); color: var(--error); }
 .cat-compress { background: var(--accent-light); color: var(--accent); }
-.cat-system { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
+.cat-system { background: var(--purple-light); color: var(--purple); }
 .cat-package { background: var(--success-light); color: var(--success); }
-.cat-debug { background: rgba(249, 115, 22, 0.1); color: #f97316; }
+.cat-debug { background: var(--orange-light); color: var(--orange); }
 .cat-shell { background: var(--warning-light); color: var(--warning); }
 .cat-perf { background: rgba(14, 165, 233, 0.1); color: #0ea5e9; }
 .cat-custom { background: var(--warning-light); color: var(--warning); }
@@ -585,19 +585,6 @@ const importExample = JSON.stringify([
   color: var(--text-muted);
   margin-bottom: 12px;
   opacity: 0.3;
-}
-
-.empty-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin: 0 0 4px 0;
-}
-
-.empty-desc {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin: 0;
 }
 
 /* ===== Command Detail ===== */
@@ -666,7 +653,7 @@ const importExample = JSON.stringify([
   background: var(--bg-hover);
   color: var(--text-muted);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), opacity var(--transition-fast), box-shadow var(--transition-fast);
   flex-shrink: 0;
   margin-left: 8px;
   padding: 0;
@@ -686,7 +673,7 @@ const importExample = JSON.stringify([
   padding: 4px;
   color: var(--text-muted);
   opacity: 0.4;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), opacity var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .description-text {
@@ -791,7 +778,7 @@ const importExample = JSON.stringify([
   font-size: 11px;
   font-family: var(--font-mono);
   color: var(--text-secondary);
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), opacity var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .tag-badge:hover {
@@ -852,7 +839,7 @@ const importExample = JSON.stringify([
   cursor: pointer;
   border-radius: 6px;
   padding: 0;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), opacity var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .modal-close:hover {
@@ -902,7 +889,7 @@ const importExample = JSON.stringify([
   color: var(--text-secondary);
   font-size: 12px;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), opacity var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .btn-cancel:hover {
@@ -918,11 +905,11 @@ const importExample = JSON.stringify([
   border: none;
   border-radius: 6px;
   background: var(--accent);
-  color: #fff;
+  color: var(--text-inverse);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), opacity var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -1078,7 +1065,7 @@ const importExample = JSON.stringify([
   cursor: pointer;
   padding: 0;
   opacity: 0;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), opacity var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .example-code-wrap:hover .example-copy-btn {

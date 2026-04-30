@@ -339,20 +339,6 @@ import { computed } from 'vue'
 }
 
 /* ====== Config Sections ====== */
-.tool-panel-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  overflow-y: auto;
-}
-
-.config-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.config-row 
 .options-group {
   display: flex;
   align-items: center;
@@ -377,37 +363,15 @@ import { computed } from 'vue'
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
   flex-shrink: 0;
 }
 
 .toggle-check.on {
   background: var(--accent);
   border-color: var(--accent);
-  color: #fff;
+  color: var(--text-inverse);
 }
-
-/* ====== Textarea ====== */
-.config-textarea {
-  flex: 1;
-  width: 100%;
-  min-height: 100px;
-  padding: 8px 10px;
-  font-size: 12px;
-  font-family: var(--font-mono);
-  color: var(--text-primary);
-  background: var(--bg-input);
-  border: 1px solid var(--border-default);
-  border-radius: 6px;
-  outline: none;
-  resize: none;
-  line-height: 1.6;
-  transition: all var(--transition-fast);
-}
-
-.config-textarea:hover { border-color: var(--border-strong); }
-.config-textarea:focus { border-color: var(--accent); box-shadow: var(--shadow-focus); }
-.config-textarea::placeholder { color: var(--text-muted); }
 
 /* ====== 拖拽覆盖层 ====== */
 .drag-overlay {
@@ -480,7 +444,7 @@ import { computed } from 'vue'
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
   flex-shrink: 0;
 }
 
@@ -571,71 +535,6 @@ import { computed } from 'vue'
   margin-right: 2px;
 }
 
-/* ====== Output Error ====== */
-.output-error {
-  padding: 12px 14px;
-}
-
-.output-error-head {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--error);
-  margin-bottom: 4px;
-}
-
-.output-error-msg {
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin: 0;
-  font-family: var(--font-mono);
-}
-
-/* ====== Empty State ====== */
-.tool-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 60px 20px;
-  flex: 1;
-}
-
-.empty-icon {
-  color: var(--text-muted);
-  opacity: 0.25;
-  margin-bottom: 12px;
-}
-
-.empty-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin: 0 0 4px 0;
-}
-
-.empty-desc {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin: 0;
-}
-
-/* ====== Scrollbar ====== */
-.tool-panel-body::-webkit-scrollbar { width: 5px; }
-.tool-panel-body::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
-.tool-panel-body::-webkit-scrollbar-track { background: transparent; }
-
-.config-textarea::-webkit-scrollbar { width: 4px; }
-.config-textarea::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
-.config-textarea::-webkit-scrollbar-track { background: transparent; }
-
-/* ====== Responsive ====== */
-@media (max-width: 760px) {
-  .tool-main { grid-template-columns: 1fr !important; }
-}
 </style>
 
 <!-- 全屏预览样式（非 scoped，因为 Teleport 到 body） -->

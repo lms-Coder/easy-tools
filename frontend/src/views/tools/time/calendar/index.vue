@@ -167,12 +167,12 @@ const {
   border: 1px solid var(--accent);
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .cal-today-btn:hover {
   background: var(--accent);
-  color: #fff;
+  color: var(--text-inverse);
 }
 
 /* ====== 月历面板 ====== */
@@ -226,7 +226,7 @@ const {
   padding: 4px 2px;
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
   overflow: hidden;
 }
 
@@ -244,7 +244,7 @@ const {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  transition: all 0.12s ease;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
   flex-shrink: 0;
 }
 
@@ -283,7 +283,7 @@ const {
 
 .cal-cell.is-selected .cal-num {
   background: var(--accent);
-  color: #fff;
+  color: var(--text-inverse);
   font-weight: 700;
 }
 

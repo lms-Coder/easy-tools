@@ -281,12 +281,12 @@ const {
   padding: 0 14px;
   font-size: 12px;
   font-weight: 500;
-  color: #fff;
+  color: var(--text-inverse);
   background: var(--accent);
   border: 1px solid var(--accent);
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.12s;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
 
 .cfg-add-btn:hover { filter: brightness(1.1); }
@@ -302,7 +302,7 @@ const {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.12s;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
 
 .cfg-refresh-btn:hover:not(:disabled) {
@@ -453,7 +453,7 @@ const {
   border-radius: var(--radius-xs);
   color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.12s;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
   flex-shrink: 0;
 }
 
@@ -473,7 +473,7 @@ const {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xs);
   cursor: pointer;
-  transition: all 0.12s;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
 
 .cfg-btn-text:hover { background: var(--bg-hover); color: var(--text-primary); }
@@ -484,12 +484,12 @@ const {
   padding: 0 14px;
   font-size: 12px;
   font-weight: 500;
-  color: #fff;
+  color: var(--text-inverse);
   background: var(--accent);
   border: 1px solid var(--accent);
   border-radius: var(--radius-xs);
   cursor: pointer;
-  transition: all 0.12s;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
 
 .cfg-btn-accent:hover { filter: brightness(1.08); }
@@ -551,7 +551,7 @@ const {
   gap: 10px;
   padding: 10px 12px;
   border-radius: var(--radius-sm);
-  transition: all 0.12s;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
   border: 1px solid transparent;
 }
 
@@ -638,10 +638,10 @@ const {
   border: 1px solid var(--accent);
   border-radius: var(--radius-xs);
   cursor: pointer;
-  transition: all 0.12s;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
 
-.switch-btn:hover:not(:disabled) { color: #fff; background: var(--accent); }
+.switch-btn:hover:not(:disabled) { color: var(--text-inverse); background: var(--accent); }
 .switch-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .using-tag {
@@ -762,7 +762,7 @@ const {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xs);
   cursor: pointer;
-  transition: all 0.12s;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
 
 .popover-cancel:hover {
@@ -775,12 +775,12 @@ const {
   padding: 0 12px;
   font-size: 12px;
   font-weight: 500;
-  color: #fff;
+  color: var(--text-inverse);
   background: var(--accent);
   border: 1px solid var(--accent);
   border-radius: var(--radius-xs);
   cursor: pointer;
-  transition: all 0.12s;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
 
 .popover-confirm:hover {

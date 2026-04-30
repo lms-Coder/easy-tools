@@ -465,21 +465,13 @@ const {
   border: none;
   border-radius: 6px;
   background: var(--accent);
-  color: #fff;
+  color: var(--text-inverse);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
   padding: 0;
 }
 
 .add-field-btn:hover { filter: brightness(1.1); }
-
-/* ====== Config Sections ====== */
-.tool-panel-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  overflow-y: auto;
-}
 
 /* ====== Segment Buttons ====== */
 /* ====== Preview Tabs ====== */
@@ -512,7 +504,7 @@ const {
   border: 1px solid var(--border-default);
   border-radius: 6px;
   outline: none;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .config-input:hover { border-color: var(--border-strong); }
@@ -536,7 +528,7 @@ const {
   gap: 8px;
   padding: 6px 10px;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
   position: relative;
 }
 
@@ -588,7 +580,7 @@ const {
 .type-boolean { color: var(--warning); background: var(--warning-light); }
 .type-null { color: #94a3b8; background: rgba(148, 163, 184, 0.1); }
 .type-object { color: var(--accent); background: var(--accent-light); }
-.type-array { color: #ec4899; background: rgba(236, 72, 153, 0.1); }
+.type-array { color: var(--pink); background: var(--pink-light); }
 
 .required-indicator {
   color: var(--error);
@@ -772,7 +764,7 @@ const {
   background: var(--bg-tertiary);
   border-radius: 6px;
   border: 1px solid var(--border-subtle);
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
   font-size: 12px;
 }
 
@@ -792,7 +784,7 @@ const {
   background: var(--bg-input);
   color: var(--text-primary);
   font-size: 12px;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
   outline: none;
 }
 
@@ -836,7 +828,7 @@ const {
   font-weight: 500;
   color: var(--text-primary);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .add-child-btn:hover { background: var(--bg-hover); border-color: var(--accent); color: var(--accent); }
@@ -927,7 +919,7 @@ const {
   color: var(--text-secondary);
   font-size: 12px;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .modal-btn:hover { background: var(--bg-hover); }
@@ -935,46 +927,12 @@ const {
 .modal-btn.primary {
   background: var(--accent);
   border-color: var(--accent);
-  color: #fff;
+  color: var(--text-inverse);
 }
 
 .modal-btn.primary:hover { filter: brightness(1.1); }
 
-/* ====== Empty State ====== */
-.tool-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 60px 20px;
-  flex: 1;
-}
-
-.empty-icon {
-  color: var(--text-muted);
-  opacity: 0.25;
-  margin-bottom: 12px;
-}
-
-.empty-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin: 0 0 4px 0;
-}
-
-.empty-desc {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin: 0;
-}
-
 /* ====== Scrollbar ====== */
-.tool-panel-body::-webkit-scrollbar { width: 5px; }
-.tool-panel-body::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
-.tool-panel-body::-webkit-scrollbar-track { background: transparent; }
-
 .field-tree::-webkit-scrollbar { width: 4px; }
 .field-tree::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
 .field-tree::-webkit-scrollbar-track { background: transparent; }
@@ -987,8 +945,4 @@ const {
 .editor-body::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
 .editor-body::-webkit-scrollbar-track { background: transparent; }
 
-/* ====== Responsive ====== */
-@media (max-width: 760px) {
-  .tool-main { grid-template-columns: 1fr !important; }
-}
 </style>

@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useThemeStore } from '@/stores/theme'
 import { useConfigStore } from '@/stores/config'
 import { toast } from '@/composables/useToast'
+import { getCategoryColor } from '@/utils/categories'
 import { getIcon } from '@/utils/icons'
 import Dialog from '@/components/common/Dialog.vue'
 import Select from '@/components/ui/Select.vue'
@@ -36,22 +37,12 @@ const categories = [
 
 const setActiveCategory = (id: string) => activeCategory.value = id
 
-const categoryColors: Record<string, string> = {
-  '开发工具': '#3b82f6',
-  '编码转换': '#10b981',
-  '时间处理': '#f59e0b',
-  '文本处理': '#06b6d4',
-  '系统工具': '#6366f1',
-  '安全工具': '#ef4444',
-  '其他': '#8b5cf6'
-}
-
 const toolCategories = computed(() => {
   const keyword = toolSearch.value.trim().toLowerCase()
   return configStore.allToolsByCategory
     .map(cat => ({
       ...cat,
-      color: categoryColors[cat.name] || '#3b82f6',
+      color: getCategoryColor(cat.name),
       tools: keyword
         ? cat.tools.filter(t =>
             t.name.toLowerCase().includes(keyword) ||

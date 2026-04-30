@@ -423,7 +423,7 @@ async function pickFromScreen() {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  border: 2px solid #fff;
+  border: 2px solid var(--text-inverse);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.3);
   transform: translate(-50%, -50%);
   pointer-events: none;
@@ -453,7 +453,7 @@ async function pickFromScreen() {
   width: 6px;
   height: 18px;
   border-radius: 3px;
-  background: #fff;
+  background: var(--text-inverse);
   border: 2px solid rgba(0, 0, 0, 0.2);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
   transform: translate(-50%, -50%);
@@ -510,7 +510,7 @@ async function pickFromScreen() {
   width: 6px;
   height: 18px;
   border-radius: 3px;
-  background: #fff;
+  background: var(--text-inverse);
   border: 2px solid rgba(0, 0, 0, 0.2);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
   cursor: pointer;
@@ -532,7 +532,7 @@ async function pickFromScreen() {
   border: 1px solid var(--border-default);
   border-radius: 6px;
   outline: none;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
   min-width: 0;
 }
 
@@ -767,11 +767,6 @@ async function pickFromScreen() {
   overflow-y: auto;
   min-height: 0;
 }
-
-/* ====== Scrollbar ====== */
-.tool-panel-body::-webkit-scrollbar { width: 5px; }
-.tool-panel-body::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
-.tool-panel-body::-webkit-scrollbar-track { background: transparent; }
 
 /* ====== Responsive ====== */
 @media (max-width: 760px) {

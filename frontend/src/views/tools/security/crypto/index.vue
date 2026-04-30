@@ -313,24 +313,10 @@ const {
 }
 
 /* ===== Config Sections (card style) ===== */
-.tool-panel-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  overflow-y: auto;
-}
-
 .config-section:last-child {
   border-bottom: none;
 }
 
-.config-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.config-row 
 /* ===== Segment Group ===== */
 .segment-group {
   display: flex;
@@ -350,7 +336,7 @@ const {
   border: 1px solid var(--border-default);
   border-radius: 6px;
   outline: none;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
   margin-bottom: 6px;
 }
 
@@ -358,28 +344,6 @@ const {
 .config-input:hover { border-color: var(--border-strong); }
 .config-input:focus { border-color: var(--accent); box-shadow: var(--shadow-focus); }
 .config-input::placeholder { color: var(--text-muted); }
-
-/* ===== Config Textarea ===== */
-.config-textarea {
-  flex: 1;
-  width: 100%;
-  min-height: 100px;
-  padding: 8px 10px;
-  font-size: 12px;
-  font-family: var(--font-mono);
-  color: var(--text-primary);
-  background: var(--bg-input);
-  border: 1px solid var(--border-default);
-  border-radius: 6px;
-  outline: none;
-  resize: none;
-  line-height: 1.6;
-  transition: all var(--transition-fast);
-}
-
-.config-textarea:hover { border-color: var(--border-strong); }
-.config-textarea:focus { border-color: var(--accent); box-shadow: var(--shadow-focus); }
-.config-textarea::placeholder { color: var(--text-muted); }
 
 /* ===== Key Pair ===== */
 .keypair-blocks {
@@ -424,7 +388,7 @@ const {
   outline: none;
   resize: none;
   line-height: 1.5;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
 }
 
 .keypair-textarea:focus { border-color: var(--accent); box-shadow: var(--shadow-focus); }
@@ -447,11 +411,11 @@ const {
   border: none;
   border-radius: 8px;
   background: var(--accent);
-  color: #fff;
+  color: var(--text-inverse);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
 }
 
 .execute-btn:hover:not(:disabled) { filter: brightness(1.1); }
@@ -547,43 +511,4 @@ const {
   padding: 0;
 }
 
-/* ===== Empty State ===== */
-.tool-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 60px 20px;
-  flex: 1;
-}
-
-.empty-icon {
-  color: var(--text-muted);
-  opacity: 0.25;
-  margin-bottom: 12px;
-}
-
-.empty-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin: 0 0 4px 0;
-}
-
-.empty-desc {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin: 0;
-}
-
-/* ===== Scrollbar ===== */
-.tool-panel-body::-webkit-scrollbar { width: 5px; }
-.tool-panel-body::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
-.tool-panel-body::-webkit-scrollbar-track { background: transparent; }
-
-/* ===== Responsive ===== */
-@media (max-width: 760px) {
-  .tool-main { grid-template-columns: 1fr !important; }
-}
 </style>

@@ -5,6 +5,7 @@ import { useConfigStore } from '@/stores/config'
 import { toast } from '@/composables/useToast'
 import { openTool } from '@/utils/toolWindow'
 import { getIcon } from '@/utils/icons'
+import { getCategoryColor as getCategoryColorShared } from '@/utils/categories'
 import {
   ArrowLeft,
   Search,
@@ -29,20 +30,10 @@ const selectedCategory = computed(() => {
 const totalCount = computed(() => configStore.enabledTools.length)
 const categories = computed(() => configStore.toolsByCategory)
 
-const categoryColors: Record<string, string> = {
-  '开发工具': '#3b82f6',
-  '编码转换': '#10b981',
-  '时间处理': '#f59e0b',
-  '文本处理': '#06b6d4',
-  '系统工具': '#6366f1',
-  '安全工具': '#ef4444',
-  '其他': '#8b5cf6'
-}
-
 const categoriesWithColors = computed(() => {
   return categories.value.map((cat, index) => ({
     ...cat,
-    color: categoryColors[cat.name] || ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'][index % 4]
+    color: getCategoryColorShared(cat.name)
   }))
 })
 
@@ -78,7 +69,7 @@ function getToolIcon(iconName?: string) {
 }
 
 function getCategoryColor(category: string): string {
-  return categoryColors[category] || '#3b82f6'
+  return getCategoryColorShared(category)
 }
 
 function selectCategory(categoryName = '') {

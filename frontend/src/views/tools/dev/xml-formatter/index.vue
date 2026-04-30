@@ -355,23 +355,8 @@ html.dark .tool-page {
 }
 
 .status-badge.success { color: var(--accent); background: var(--accent-light); }
-.status-badge.error { color: #ef4444; background: var(--error-light); }
+.status-badge.error { color: var(--error); background: var(--error-light); }
 
-/* ====== Config Sections ====== */
-.tool-panel-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  overflow-y: auto;
-}
-
-.config-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.config-row 
 /* ====== Action Group ====== */
 .action-group {
   display: flex;
@@ -388,11 +373,11 @@ html.dark .tool-page {
   border: none;
   border-radius: 6px;
   background: var(--accent);
-  color: #fff;
+  color: var(--text-inverse);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
 }
 
 .execute-btn-sm:hover { filter: brightness(1.1); }
@@ -434,14 +419,14 @@ html.dark .tool-page {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
   flex-shrink: 0;
 }
 
 .toggle-check.on {
   background: var(--accent);
   border-color: var(--accent);
-  color: #fff;
+  color: var(--text-inverse);
 }
 
 /* ====== View Toggle ====== */
@@ -483,10 +468,10 @@ html.dark .tool-page {
   border: none;
   border-radius: 4px;
   background: var(--accent);
-  color: #fff;
+  color: var(--text-inverse);
   cursor: pointer;
   flex-shrink: 0;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
 }
 
 .xpath-run-btn:hover { filter: brightness(1.1); }
@@ -499,29 +484,6 @@ html.dark .tool-page {
   white-space: nowrap;
   flex-shrink: 0;
 }
-
-/* ====== Config Textarea ====== */
-.config-textarea {
-  flex: 1;
-  width: 100%;
-  min-height: 100px;
-  padding: 8px 10px;
-  font-size: 12px;
-  font-family: var(--font-mono);
-  color: var(--text-primary);
-  background: var(--bg-input);
-  border: 1px solid var(--border-default);
-  border-radius: 6px;
-  outline: none;
-  resize: none;
-  line-height: 1.6;
-  transition: all var(--transition-fast);
-}
-
-.config-textarea:hover { border-color: var(--border-strong); }
-.config-textarea:focus { border-color: var(--accent); box-shadow: var(--shadow-focus); }
-.config-textarea::placeholder { color: var(--text-muted); }
-.config-textarea.jf-wrap { white-space: pre-wrap; word-break: break-all; }
 
 /* ====== Drag Overlay ====== */
 .drag-overlay {
@@ -643,28 +605,6 @@ html.dark .tool-page {
 .search-nav:hover:not(:disabled) { background: var(--bg-hover); color: var(--text-primary); }
 .search-nav:disabled { opacity: 0.4; cursor: not-allowed; }
 
-/* ====== Output Error ====== */
-.output-error {
-  padding: 12px 14px;
-}
-
-.output-error-head {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #ef4444;
-  margin-bottom: 4px;
-}
-
-.output-error-msg {
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin: 0;
-  font-family: var(--font-mono);
-}
-
 /* ====== Syntax Highlighting ====== */
 :deep(.hljs-tag) { color: var(--xml-tag-color); font-weight: 600; }
 :deep(.hljs-name) { color: var(--xml-tag-color); }
@@ -780,41 +720,7 @@ html.dark .tool-page {
 
 .tool-context-menu button:hover { background: var(--bg-hover); }
 
-/* ====== Empty State ====== */
-.tool-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 60px 20px;
-  flex: 1;
-}
-
-.empty-icon {
-  color: var(--text-muted);
-  opacity: 0.25;
-  margin-bottom: 12px;
-}
-
-.empty-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin: 0 0 4px 0;
-}
-
-.empty-desc {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin: 0;
-}
-
 /* ====== Scrollbar ====== */
-.tool-panel-body::-webkit-scrollbar { width: 5px; }
-.tool-panel-body::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
-.tool-panel-body::-webkit-scrollbar-track { background: transparent; }
-
 .tool-code-output::-webkit-scrollbar { width: 5px; height: 5px; }
 .tool-code-output::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
 .tool-code-output::-webkit-scrollbar-track { background: transparent; }
@@ -823,8 +729,4 @@ html.dark .tool-page {
 .tree-viewer::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
 .tree-viewer::-webkit-scrollbar-track { background: transparent; }
 
-/* ====== Responsive ====== */
-@media (max-width: 760px) {
-  .tool-main { grid-template-columns: 1fr !important; }
-}
 </style>

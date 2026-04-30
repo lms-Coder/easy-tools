@@ -355,14 +355,6 @@ const tokens = computed(() => tokenizePattern(pattern.value))
   gap: 2px;
 }
 
-/* ====== Config Sections ====== */
-.tool-panel-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  overflow-y: auto;
-}
-
 .panel-stat {
   font-size: 10px;
   font-family: var(--font-mono);
@@ -472,7 +464,7 @@ const tokens = computed(() => tokenizePattern(pattern.value))
 .tt-quantifier    { color: var(--warning); background: var(--warning-light); }
 .tt-anchor        { color: var(--success); background: var(--success-light); }
 .tt-group         { color: var(--accent); background: var(--accent-light); }
-.tt-lookaround    { color: #a855f7; background: rgba(168,85,247,0.1); }
+.tt-lookaround    { color: var(--purple); background: var(--purple-light); }
 .tt-escape        { color: var(--error); background: var(--error-light); }
 .tt-backreference { color: var(--accent); background: var(--accent-light); }
 .tt-alternation   { color: var(--error); background: var(--error-light); }
@@ -500,7 +492,7 @@ const tokens = computed(() => tokenizePattern(pattern.value))
 }
 
 .preset-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
-.preset-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.preset-chip.active { background: var(--accent); border-color: var(--accent); color: var(--text-inverse); }
 
 /* ====== 测试文本区域 ====== */
 .test-text-area {
@@ -690,8 +682,8 @@ const tokens = computed(() => tokenizePattern(pattern.value))
 }
 
 .group-key { font-weight: 700; color: var(--text-muted); margin-right: 2px; }
-.match-group-tag.named { background: rgba(99, 102, 241, 0.08); border-color: rgba(99, 102, 241, 0.2); color: #6366f1; }
-.match-group-tag.named .group-key { color: #6366f1; }
+.match-group-tag.named { background: rgba(99, 102, 241, 0.08); border-color: rgba(99, 102, 241, 0.2); color: var(--cat-system); }
+.match-group-tag.named .group-key { color: var(--cat-system); }
 
 /* ====== 错误卡片 ====== */
 .regex-error-card {
@@ -703,7 +695,7 @@ const tokens = computed(() => tokenizePattern(pattern.value))
 .regex-error-icon {
   width: 36px; height: 36px;
   display: flex; align-items: center; justify-content: center;
-  background: var(--error); color: #fff; border-radius: 6px; flex-shrink: 0;
+  background: var(--error); color: var(--text-inverse); border-radius: 6px; flex-shrink: 0;
 }
 
 .regex-error-body { flex: 1; min-width: 0; }
@@ -711,16 +703,6 @@ const tokens = computed(() => tokenizePattern(pattern.value))
 .regex-error-msg { margin: 4px 0 0; font-family: var(--font-mono); font-size: 12px; color: var(--error); line-height: 1.5; opacity: 0.85; }
 
 /* ====== 紧凑空状态 ====== */
-.tool-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 60px 20px;
-  flex: 1;
-}
-
 .tool-empty.compact {
   display: flex;
   align-items: center;
@@ -733,24 +715,6 @@ const tokens = computed(() => tokenizePattern(pattern.value))
   gap: 8px;
 }
 
-.empty-icon {
-  color: var(--text-muted);
-  opacity: 0.25;
-  margin-bottom: 12px;
-}
-
-.empty-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin: 0 0 4px 0;
-}
-
-.empty-desc {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin: 0;
-}
 
 /* ====== 替换 ====== */
 .replace-section { padding: 14px 16px; }
@@ -795,7 +759,7 @@ const tokens = computed(() => tokenizePattern(pattern.value))
 }
 
 .lang-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
-.lang-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.lang-chip.active { background: var(--accent); border-color: var(--accent); color: var(--text-inverse); }
 
 .code-output-wrap { flex: 1; overflow: auto; }
 
@@ -820,7 +784,7 @@ const tokens = computed(() => tokenizePattern(pattern.value))
 .code-output :deep(.hljs-meta) { color: var(--info); }
 .code-output :deep(.hljs-symbol) { color: var(--error); }
 .code-output :deep(.hljs-variable) { color: var(--accent); }
-.code-output :deep(.hljs-attr) { color: #8b5cf6; }
+.code-output :deep(.hljs-attr) { color: var(--purple); }
 
 /* ====== Test Suite ====== */
 .test-suite-section {
@@ -899,23 +863,15 @@ const tokens = computed(() => tokenizePattern(pattern.value))
   font-weight: 500;
   color: var(--text-primary);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
   margin-top: 4px;
 }
 
 .add-case-btn:hover { background: var(--bg-hover); border-color: var(--accent); color: var(--accent); }
 
 /* ====== Scrollbar ====== */
-.tool-panel-body::-webkit-scrollbar { width: 5px; }
-.tool-panel-body::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
-.tool-panel-body::-webkit-scrollbar-track { background: transparent; }
-
 .regex-textarea::-webkit-scrollbar { width: 4px; }
 .regex-textarea::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 10px; }
 .regex-textarea::-webkit-scrollbar-track { background: transparent; }
 
-/* ====== Responsive ====== */
-@media (max-width: 760px) {
-  .tool-main { grid-template-columns: 1fr !important; }
-}
 </style>
