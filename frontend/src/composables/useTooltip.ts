@@ -1,23 +1,55 @@
 import { ref } from 'vue'
 
+export interface TooltipState {
+  show: boolean
+  text: string
+  x: number
+  y: number
+  placement: 'top' | 'bottom'
+}
+
 export function useTooltip() {
-  const tooltip = ref({ show: false, text: '', x: 0, y: 0 })
+  const tooltip = ref<TooltipState>({ show: false, text: '', x: 0, y: 0, placement: 'bottom' })
   let timer: ReturnType<typeof setTimeout> | null = null
 
-  const show = (text: string, e: MouseEvent) => {
+  const show = (text: string, e: MouseEvent, placement: 'top' | 'bottom' = 'bottom') => {
     if (timer) clearTimeout(timer)
     const el = e.currentTarget as HTMLElement
-    // 如果元素已禁用则不显示
     if ((el as HTMLButtonElement).disabled || el.classList.contains('disabled')) return
-    const rect = el.getBoundingClientRect()
-    let x = rect.left + rect.width / 2
-    const y = rect.bottom + 4
-    const w = text.length * 12 + 24
-    if (x + w / 2 > window.innerWidth - 8) x = window.innerWidth - w / 2 - 8
-    if (x - w / 2 < 8) x = w / 2 + 8
-    tooltip.value = { show: true, text, x, y }
 
-    // 监听元素的 disabled 属性变化，禁用时立即隐藏
+    const rect = el.getBoundingClientRect()
+    const estimatedHeight = 28
+    const gap = 4
+    const margin = 8
+
+    let x = rect.left + rect.width / 2
+    let y: number
+    let actualPlacement = placement
+
+    // 自动翻转：空间不足则换方向
+    if (placement === 'bottom') {
+      if (window.innerHeight - rect.bottom < estimatedHeight + gap + margin) {
+        actualPlacement = 'top'
+      }
+    } else {
+      if (rect.top < estimatedHeight + gap + margin) {
+        actualPlacement = 'bottom'
+      }
+    }
+
+    if (actualPlacement === 'bottom') {
+      y = rect.bottom + gap
+    } else {
+      y = rect.top - gap
+    }
+
+    // 水平边界 clamp
+    const w = text.length * 7 + 20
+    if (x + w / 2 > window.innerWidth - margin) x = window.innerWidth - w / 2 - margin
+    if (x - w / 2 < margin) x = w / 2 + margin
+
+    tooltip.value = { show: true, text, x, y, placement: actualPlacement }
+
     const observer = new MutationObserver(() => {
       if ((el as HTMLButtonElement).disabled) {
         hide()
@@ -25,7 +57,6 @@ export function useTooltip() {
       }
     })
     observer.observe(el, { attributes: true, attributeFilter: ['disabled'] })
-    // 元素移除时也清理
     if (el.parentElement) {
       const parentObserver = new MutationObserver(() => {
         if (!document.contains(el)) {

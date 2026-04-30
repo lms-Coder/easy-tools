@@ -6,12 +6,14 @@ import { toast } from '@/composables/useToast'
 import { openTool } from '@/utils/toolWindow'
 import { getIcon } from '@/utils/icons'
 import { getCategoryColor as getCategoryColorShared } from '@/utils/categories'
+import Tooltip from '@/components/ui/Tooltip.vue'
 import {
   ArrowLeft,
   Search,
   Star,
   Flame,
   Code,
+  ChevronRight,
 } from 'lucide-vue-next'
 import IconParkAllApplication from '@/components/icons/IconParkAllApplication.vue'
 
@@ -100,13 +102,13 @@ function goBack() {
   <div class="tools-page">
     <!-- 左侧边栏 -->
     <aside class="sidebar">
-      <div class="sidebar-header">
-        <button class="back-btn" @click="goBack">
-          <ArrowLeft :size="14" />
+      <div class="sidebar-top">
+        <button class="back-link" @click="goBack">
+          <ArrowLeft :size="13" />
           <span>返回首页</span>
         </button>
         <div class="sidebar-search">
-          <Search :size="13" class="search-icon" />
+          <Search :size="12" class="search-ico" />
           <input v-model="searchQuery" type="text" placeholder="搜索工具..." />
         </div>
       </div>
@@ -119,11 +121,11 @@ function goBack() {
         >
           <IconParkAllApplication class="nav-icon" style="width: 14px; height: 14px;" />
           <span class="nav-label">全部</span>
-          <span class="nav-count">{{ totalCount }}</span>
+          <span class="nav-cnt">{{ totalCount }}</span>
         </button>
 
         <div class="nav-section" v-if="categoriesWithColors.length">
-          <div class="nav-section-title">分类</div>
+          <div class="nav-title">分类</div>
           <button
             v-for="cat in categoriesWithColors"
             :key="cat.name"
@@ -133,74 +135,74 @@ function goBack() {
           >
             <span class="nav-dot" :style="{ background: cat.color }"></span>
             <span class="nav-label">{{ cat.name }}</span>
-            <span class="nav-count">{{ cat.tools.length }}</span>
+            <span class="nav-cnt">{{ cat.tools.length }}</span>
           </button>
         </div>
 
         <div class="nav-section" v-if="popularTools.length && !searchQuery">
-          <div class="nav-section-title">
-            <Flame :size="11" class="fire-icon" />
+          <div class="nav-title">
+            <Flame :size="10" class="fire-ico" />
             常用
           </div>
           <div
             v-for="(tool, index) in popularTools.slice(0, 5)"
             :key="tool?.id"
-            class="popular-item"
+            class="pop-item"
             @click="tool && goToTool(tool)"
           >
-            <span class="popular-rank" :class="{ top: index < 3 }">{{ index + 1 }}</span>
-            <div class="popular-icon">
+            <span class="pop-rank" :class="{ top: index < 3 }">{{ index + 1 }}</span>
+            <div class="pop-icon" :style="{ background: getCategoryColor(tool?.category || '') + '15', color: getCategoryColor(tool?.category || '') }">
               <component :is="getToolIcon(tool?.icon)" :size="11" />
             </div>
-            <span class="popular-name">{{ tool?.name }}</span>
+            <span class="pop-name">{{ tool?.name }}</span>
           </div>
         </div>
       </nav>
     </aside>
 
-    <!-- 主内容区 - macOS Finder 风格 -->
-    <main class="main-content">
-      <!-- 工具栏 -->
-      <div class="toolbar">
-        <h2 class="toolbar-title">{{ selectedCategory || '全部工具' }}</h2>
-        <span class="toolbar-count">{{ filteredTools.length }} 个工具</span>
+    <!-- 主内容区 -->
+    <main class="main-area">
+      <div class="main-head">
+        <h2 class="main-title">{{ selectedCategory || '全部工具' }}</h2>
+        <span class="main-count">{{ filteredTools.length }} 个工具</span>
       </div>
 
-      <!-- 内容区 - 网格卡片 -->
-      <div class="content-area scrollbar-hide">
+      <div class="main-scroll">
         <Transition name="list-fade" mode="out-in">
-          <div v-if="filteredTools.length" class="tool-groups" :key="selectedCategory + searchQuery">
+          <div v-if="filteredTools.length" :key="selectedCategory + searchQuery">
             <template v-for="cat in categoriesWithColors" :key="cat.name">
               <template v-if="filteredTools.some(t => t.category === cat.name)">
-                <div class="group-section">
-                  <div class="group-header">
-                    <span class="group-dot" :style="{ background: cat.color }"></span>
-                    <span class="group-name">{{ cat.name }}</span>
-                    <span class="group-count">{{ filteredTools.filter(t => t.category === cat.name).length }}</span>
+                <div class="h-group">
+                  <div class="h-group-head">
+                    <span class="h-dot" :style="{ background: cat.color }"></span>
+                    <span class="h-name">{{ cat.name }}</span>
+                    <span class="h-count">{{ filteredTools.filter(t => t.category === cat.name).length }}</span>
                   </div>
-                  <div class="tool-grid">
-                    <div
+                  <div class="h-grid">
+                    <Tooltip
                       v-for="tool in filteredTools.filter(t => t.category === cat.name)"
                       :key="tool.id"
-                      class="tool-card"
-                      @click="goToTool(tool)"
+                      placement="bottom"
                     >
-                      <div class="tool-icon-box" :style="{ background: `${cat.color}15`, color: cat.color }">
-                        <component :is="getToolIcon(tool.icon)" :size="17" />
+                      <div class="h-card" @click="goToTool(tool)">
+                        <div class="hc-icon" :style="{ background: cat.color + '15', color: cat.color }">
+                          <component :is="getToolIcon(tool.icon)" :size="17" />
+                        </div>
+                        <div class="hc-info">
+                          <span class="hc-name">{{ tool.name }}</span>
+                          <span class="hc-desc">{{ tool.desc || tool.description || '实用工具' }}</span>
+                        </div>
+                        <ChevronRight :size="14" class="hc-arrow" />
                       </div>
-                      <div class="tool-card-info">
-                        <span class="tool-name">{{ tool.name }}</span>
-                        <span class="tool-desc">{{ tool.desc || tool.description || '实用工具' }}</span>
-                      </div>
-                      <div class="tool-tip">
-                        <div class="tip-title">{{ tool.name }}</div>
-                        <div class="tip-desc">{{ tool.desc || tool.description || '实用工具' }}</div>
-                        <div class="tip-cat">
-                          <span class="tip-dot" :style="{ background: cat.color }"></span>
+                      <template #content>
+                        <div class="tp-title">{{ tool.name }}</div>
+                        <div class="tp-desc">{{ tool.desc || tool.description || '实用工具' }}</div>
+                        <div class="tp-cat">
+                          <span class="tp-dot" :style="{ background: cat.color }"></span>
                           {{ cat.name }}
                         </div>
-                      </div>
-                    </div>
+                      </template>
+                    </Tooltip>
                   </div>
                 </div>
               </template>
@@ -224,42 +226,40 @@ function goBack() {
 </template>
 
 <style scoped>
-/* ====== 页面布局 ====== */
+/* ====== Page Layout ====== */
 .tools-page {
   display: grid;
-  grid-template-columns: 200px 1fr;
+  grid-template-columns: 220px 1fr;
   height: 100%;
   overflow: hidden;
   background: var(--bg-primary);
 }
 
-/* ====== 侧边栏 ====== */
+/* ====== Sidebar ====== */
 .sidebar {
   display: flex;
   flex-direction: column;
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  border-right: 1px solid var(--glass-border-weak);
+  border-right: 1px solid var(--border-subtle);
+  background: var(--bg-secondary);
   overflow: hidden;
-  min-width: 0;
 }
 
-.sidebar-header {
+.sidebar-top {
+  padding: 16px 14px 12px;
+  border-bottom: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 16px 14px 12px;
-  border-bottom: 1px solid var(--border-subtle);
 }
 
-.back-btn {
+.back-link {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   padding: 4px 6px;
   background: transparent;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   color: var(--text-muted);
   cursor: pointer;
   transition: all 150ms ease;
@@ -267,15 +267,9 @@ function goBack() {
   width: fit-content;
 }
 
-.back-btn:hover {
+.back-link:hover {
   background: var(--bg-hover);
   color: var(--text-secondary);
-}
-
-.sidebar-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-primary);
 }
 
 .sidebar-search {
@@ -283,9 +277,9 @@ function goBack() {
   align-items: center;
   gap: 6px;
   padding: 7px 10px;
-  background: var(--bg-secondary);
+  background: var(--bg-primary);
   border: 1px solid var(--border-subtle);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   transition: all 150ms ease;
 }
 
@@ -294,8 +288,7 @@ function goBack() {
   box-shadow: 0 0 0 2px var(--accent-light);
 }
 
-.search-icon {
-  font-size: 13px;
+.search-ico {
   color: var(--text-muted);
   flex-shrink: 0;
 }
@@ -326,14 +319,10 @@ function goBack() {
   margin-bottom: 14px;
 }
 
-.nav-section:first-child {
-  margin-bottom: 8px;
-}
-
-.nav-section-title {
+.nav-title {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   padding: 6px 8px 4px;
   font-size: 10px;
   font-weight: 600;
@@ -342,8 +331,7 @@ function goBack() {
   letter-spacing: 0.4px;
 }
 
-.fire-icon {
-  font-size: 11px;
+.fire-ico {
   color: var(--warning);
 }
 
@@ -353,12 +341,9 @@ function goBack() {
   gap: 8px;
   width: 100%;
   padding: 7px 10px;
-  margin-bottom: 1px;
-  margin-left: 4px;
+  border: none;
+  border-radius: var(--radius-md);
   background: transparent;
-  border: 1px solid transparent;
-  border-left: 2.5px solid transparent;
-  border-radius: 0 6px 6px 0;
   font-size: 12px;
   color: var(--text-secondary);
   cursor: pointer;
@@ -373,9 +358,8 @@ function goBack() {
 
 .nav-item.active {
   background: var(--accent-light);
-  border-left-color: var(--accent);
   color: var(--accent);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .nav-icon {
@@ -384,8 +368,8 @@ function goBack() {
 }
 
 .nav-dot {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
 }
@@ -397,51 +381,51 @@ function goBack() {
   white-space: nowrap;
 }
 
-.nav-count {
+.nav-cnt {
   font-size: 10px;
   font-weight: 500;
-  color: var(--text-muted);
-  background: var(--bg-secondary);
   padding: 1px 6px;
   border-radius: 4px;
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
   min-width: 18px;
   text-align: center;
 }
 
-.nav-item.active .nav-count {
+.nav-item.active .nav-cnt {
   background: var(--accent-light);
   color: var(--accent);
 }
 
-.popular-item {
+/* Popular items */
+.pop-item {
   display: flex;
   align-items: center;
   gap: 7px;
   padding: 5px 10px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: background 150ms ease;
-  margin-left: 4px;
 }
 
-.popular-item:hover {
+.pop-item:hover {
   background: var(--bg-hover);
 }
 
-.popular-rank {
+.pop-rank {
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-muted);
   width: 14px;
   text-align: center;
   flex-shrink: 0;
 }
 
-.popular-rank.top {
+.pop-rank.top {
   color: var(--warning);
 }
 
-.popular-icon {
+.pop-icon {
   width: 22px;
   height: 22px;
   display: flex;
@@ -450,133 +434,126 @@ function goBack() {
   border-radius: 5px;
   font-size: 11px;
   flex-shrink: 0;
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
 }
 
-.popular-name {
+.pop-name {
   font-size: 11px;
   color: var(--text-secondary);
 }
 
-/* ====== 主内容 ====== */
-.main-content {
+/* ====== Main Area ====== */
+.main-area {
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-/* 工具栏 */
-.toolbar {
+.main-head {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 20px 10px;
+  align-items: baseline;
+  gap: 8px;
+  padding: 16px 24px 12px;
   flex-shrink: 0;
 }
 
-.toolbar-title {
-  font-size: 16px;
+.main-title {
+  font-size: 18px;
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
   letter-spacing: -0.3px;
 }
 
-.toolbar-count {
+.main-count {
   font-size: 12px;
   color: var(--text-muted);
   font-weight: 500;
 }
 
-/* 内容滚动区 */
-.content-area {
+.main-scroll {
   flex: 1;
+  padding: 0 24px 20px;
   overflow-y: auto;
-  padding: 4px 20px 20px;
+  overflow-x: hidden;
   scrollbar-width: none;
+  position: relative;
 }
 
-.content-area::-webkit-scrollbar { display: none; }
+.main-scroll::-webkit-scrollbar { display: none; }
 
-.tool-groups {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.main-scroll::-webkit-scrollbar { display: none; }
+
+/* ====== Group ====== */
+.h-group {
+  margin-bottom: 20px;
 }
 
-/* ====== 分组区域 ====== */
-.group-section {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.group-header {
+.h-group-head {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 0 2px;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
-.group-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+.h-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 4px;
   flex-shrink: 0;
 }
 
-.group-name {
+.h-name {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
 }
 
-.group-count {
-  font-size: 10px;
-  font-weight: 500;
+.h-count {
+  font-size: 11px;
   color: var(--text-muted);
+  font-weight: 500;
 }
 
-/* ====== 工具网格 ====== */
-.tool-grid {
+/* ====== Tool Grid ====== */
+.h-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 10px;
 }
 
-/* ====== 工具卡片 ====== */
-.tool-card {
-  position: relative;
+.h-grid > * {
+  min-width: 0;
+}
+
+/* ====== Tool Card ====== */
+.h-card {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border-weak);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 150ms ease;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
   backdrop-filter: var(--glass-blur-sm);
-  overflow: visible;
-  z-index: 1;
+  box-shadow: var(--shadow-glass);
+  cursor: pointer;
+  transition: all 200ms ease;
 }
 
-.tool-card:hover {
-  z-index: 10;
+.h-card:hover {
   border-color: var(--border-default);
+  box-shadow: var(--shadow-sm);
   transform: translateY(-1px);
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
 }
 
-.tool-card:active {
+.h-card:active {
   transform: translateY(0) scale(0.98);
-  transition-duration: 0.08s;
+  transition-duration: 80ms;
 }
 
-.tool-card .tool-icon-box {
-  width: 38px;
-  height: 38px;
+.hc-icon {
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -586,11 +563,11 @@ function goBack() {
   transition: transform 150ms ease;
 }
 
-.tool-card:hover .tool-icon-box {
+.h-card:hover .hc-icon {
   transform: scale(1.06);
 }
 
-.tool-card-info {
+.hc-info {
   flex: 1;
   min-width: 0;
   display: flex;
@@ -598,107 +575,35 @@ function goBack() {
   gap: 2px;
 }
 
-.tool-card .tool-name {
+.hc-name {
   font-size: 13px;
-  font-weight: 500;
-  color: var(--text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  line-height: 1.3;
-}
-
-.tool-card .tool-desc {
-  font-size: 10px;
-  color: var(--text-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  line-height: 1.2;
-  margin-top: 2px;
-}
-
-.tool-card .tool-tip {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%) scale(0.92);
-  min-width: 160px;
-  max-width: 220px;
-  padding: 10px 12px;
-  background: var(--bg-popover);
-  backdrop-filter: blur(16px) saturate(1.4);
-  -webkit-backdrop-filter: blur(16px) saturate(1.4);
-  border: 1px solid var(--border-default);
-  border-radius: 10px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: all 150ms ease 300ms;
-  z-index: 20;
-}
-
-.tool-card .tool-tip::after {
-  content: '';
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 5px solid transparent;
-  border-bottom-color: var(--border-default);
-}
-
-.tool-card .tool-tip::before {
-  content: '';
-  position: absolute;
-  bottom: calc(100% - 1px);
-  left: 50%;
-  transform: translateX(-50%);
-  border: 4px solid transparent;
-  border-bottom-color: var(--bg-popover);
-  z-index: 1;
-}
-
-.tool-card:hover .tool-tip {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) scale(1);
-}
-
-.tip-title {
-  font-size: 12px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 3px;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.tip-desc {
+.hc-desc {
   font-size: 11px;
-  color: var(--text-secondary);
-  line-height: 1.5;
-  margin-bottom: 6px;
-}
-
-.tip-cat {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 10px;
   color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.tip-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
+.hc-arrow {
+  color: var(--text-muted);
   flex-shrink: 0;
+  transition: all 150ms ease;
 }
 
-/* ====== 空状态 ====== */
+.h-card:hover .hc-arrow {
+  color: var(--accent);
+  transform: translateX(2px);
+}
+
+/* ====== Empty State ====== */
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -718,7 +623,6 @@ function goBack() {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   margin-bottom: 16px;
-  font-size: 22px;
   color: var(--text-muted);
 }
 
@@ -752,7 +656,7 @@ function goBack() {
   border-color: var(--accent);
 }
 
-/* ====== 动画 ====== */
+/* ====== Transition ====== */
 .list-fade-enter-active {
   animation: fadeIn 0.2s ease;
 }
@@ -771,35 +675,23 @@ function goBack() {
   to { opacity: 0; }
 }
 
-/* 交错入场动画 */
-.list-fade-enter-active .tool-card {
+.list-fade-enter-active .h-card {
   animation: cardStagger 0.3s ease both;
 }
 
 @keyframes cardStagger {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.list-fade-enter-active .tool-card:nth-child(1) { animation-delay: 0s; }
-.list-fade-enter-active .tool-card:nth-child(2) { animation-delay: 0.03s; }
-.list-fade-enter-active .tool-card:nth-child(3) { animation-delay: 0.06s; }
-.list-fade-enter-active .tool-card:nth-child(4) { animation-delay: 0.09s; }
-.list-fade-enter-active .tool-card:nth-child(5) { animation-delay: 0.12s; }
-.list-fade-enter-active .tool-card:nth-child(6) { animation-delay: 0.15s; }
-.list-fade-enter-active .tool-card:nth-child(7) { animation-delay: 0.18s; }
-.list-fade-enter-active .tool-card:nth-child(8) { animation-delay: 0.21s; }
-.list-fade-enter-active .tool-card:nth-child(9) { animation-delay: 0.24s; }
-.list-fade-enter-active .tool-card:nth-child(10) { animation-delay: 0.27s; }
-.list-fade-enter-active .tool-card:nth-child(n+11) { animation-delay: 0.3s; }
+.list-fade-enter-active .h-card:nth-child(1) { animation-delay: 0s; }
+.list-fade-enter-active .h-card:nth-child(2) { animation-delay: 0.03s; }
+.list-fade-enter-active .h-card:nth-child(3) { animation-delay: 0.06s; }
+.list-fade-enter-active .h-card:nth-child(4) { animation-delay: 0.09s; }
+.list-fade-enter-active .h-card:nth-child(5) { animation-delay: 0.12s; }
+.list-fade-enter-active .h-card:nth-child(n+6) { animation-delay: 0.15s; }
 
-/* ====== 响应式 ====== */
+/* ====== Responsive ====== */
 @media (max-width: 800px) {
   .tools-page {
     grid-template-columns: 1fr;
@@ -809,51 +701,23 @@ function goBack() {
     display: none;
   }
 
-  .content-area {
-    padding: 12px 16px 16px;
+  .main-scroll {
+    padding: 0 16px 16px;
   }
 }
 
 @media (max-width: 500px) {
-  .toolbar {
+  .main-head {
     padding: 12px 16px 8px;
   }
 
-  .content-area {
-    padding: 10px 12px 14px;
-  }
-
-  .tool-grid {
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  .h-grid {
+    grid-template-columns: 1fr;
     gap: 8px;
   }
 
-  .tool-card {
-    padding: 14px 6px 10px;
-    border-radius: 12px;
+  .h-card {
+    padding: 12px 14px;
   }
-
-  .tool-card .tool-icon-box {
-    width: 34px;
-    height: 34px;
-    font-size: 16px;
-    border-radius: 10px;
-  }
-
-  .tool-card .tool-name {
-    font-size: 11px;
-  }
-}
-
-html.dark .tool-card .tool-desc {
-  color: var(--text-muted);
-}
-
-html.dark .tip-title {
-  color: var(--text-primary);
-}
-
-html.dark .tip-desc {
-  color: #94a3b8;
 }
 </style>

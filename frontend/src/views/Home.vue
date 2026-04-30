@@ -4,7 +4,6 @@ import { useRouter, useRoute } from 'vue-router'
 import { useConfigStore } from '@/stores/config'
 import { useThemeStore } from '@/stores/theme'
 import { toast } from '@/composables/useToast'
-import { useDialog } from '@/composables/useDialog'
 import { openTool } from '@/utils/toolWindow'
 import { getCategoryColor, getCategoryColorRaw } from '@/utils/categories'
 import dayjs from 'dayjs'
@@ -16,16 +15,18 @@ import {
   Flame,
   Calendar,
   ChevronRight,
-  Code,
   Inbox,
+  Wrench,
+  FolderOpen,
+  Zap,
+  TrendingUp,
 } from 'lucide-vue-next'
 import { getIcon } from '@/utils/icons'
 
-// 注册图表组件
 import VChart from 'vue-echarts'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
-import { PieChart, BarChart, LineChart } from 'echarts/charts'
+import { PieChart, LineChart } from 'echarts/charts'
 import {
   TooltipComponent,
   LegendComponent,
@@ -35,7 +36,6 @@ import {
 use([
   CanvasRenderer,
   PieChart,
-  BarChart,
   LineChart,
   TooltipComponent,
   LegendComponent,
@@ -48,21 +48,28 @@ const router = useRouter()
 const route = useRoute()
 const configStore = useConfigStore()
 const themeStore = useThemeStore()
-const { } = useDialog()
 
-// 当前时间
 const now = ref(dayjs())
 let timer: ReturnType<typeof setInterval>
+let lastStatsLoad = 0
+
+const loadStatsThrottled = () => {
+  const now = Date.now()
+  if (now - lastStatsLoad < 10000) return
+  lastStatsLoad = now
+  configStore.loadUsageStats()
+}
 
 onMounted(() => {
   timer = setInterval(() => now.value = dayjs(), 1000)
-  configStore.loadUsageStats()
+  loadStatsThrottled()
+  typewriterRunning = true
+  runCycle()
 })
 
-// 每次进入首页时刷新统计数据
 watch(() => route.path, (path) => {
   if (path === '/' || path === '/home') {
-    configStore.loadUsageStats()
+    loadStatsThrottled()
   }
 })
 
@@ -92,8 +99,10 @@ const initialGreeting = getGreeting(dayjs().hour())
 const currentSub = ref(initialGreeting.subs[Math.floor(Math.random() * initialGreeting.subs.length)])
 const typedSub = ref('')
 let typeTimer: ReturnType<typeof setTimeout> | null = null
+let typewriterRunning = false
 
 const runCycle = () => {
+  if (!typewriterRunning) return
   const { subs } = getGreeting(now.value.hour())
   const nextSub = subs[Math.floor(Math.random() * subs.length)]
   currentSub.value = nextSub
@@ -101,6 +110,7 @@ const runCycle = () => {
   let phase: 'type' | 'pause' | 'delete' = 'type'
 
   const tick = () => {
+    if (!typewriterRunning) return
     if (phase === 'type') {
       if (i < nextSub.length) {
         typedSub.value = nextSub.slice(0, i + 1)
@@ -127,56 +137,63 @@ const runCycle = () => {
   typeTimer = setTimeout(tick, 300)
 }
 
-runCycle()
-
 onUnmounted(() => {
+  typewriterRunning = false
   if (typeTimer) clearTimeout(typeTimer)
 })
 
-const currentTime = computed(() => now.value.format('HH:mm:ss'))
 const currentDate = computed(() => now.value.format('YYYY年M月D日'))
 const currentWeekday = computed(() => now.value.format('dddd'))
+const timeHour = computed(() => now.value.format('HH'))
+const timeMinute = computed(() => now.value.format('mm'))
+const timeSecond = computed(() => now.value.format('ss'))
 
-// 统计数据
 const stats = computed(() => [
   {
     label: '工具总数',
     value: configStore.enabledTools.length,
-    icon: LayoutGrid,
+    icon: Wrench,
     color: 'var(--accent)',
     bgColor: 'var(--accent-light)'
   },
   {
     label: '分类数量',
     value: configStore.toolsByCategory.length,
-    icon: Calendar,
-    color: 'var(--info)',
-    bgColor: 'var(--accent-light)'
+    icon: FolderOpen,
+    color: 'var(--purple)',
+    bgColor: 'var(--purple-light)'
   },
   {
     label: '今日使用',
     value: configStore.usageStatsSummary?.todayCount || 0,
-    icon: Clock,
+    icon: Zap,
     color: 'var(--success)',
     bgColor: 'var(--success-light)'
   },
   {
     label: '本周使用',
     value: configStore.usageStatsSummary?.weekCount || 0,
-    icon: Flame,
-    color: 'var(--warning)',
-    bgColor: 'var(--warning-light)'
+    icon: TrendingUp,
+    color: 'var(--orange)',
+    bgColor: 'var(--orange-light)'
   },
 ])
 
-// 主题相关
 const isDark = computed(() => themeStore.currentTheme === 'dark')
-const textSecondary = computed(() => isDark.value ? '#64748b' : '#475569')
-const textMuted = computed(() => isDark.value ? '#94a3b8' : '#94a3b8')
-const borderSubtle = computed(() => isDark.value ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)')
+const textSecondary = computed(() => isDark.value ? '#94a3b8' : '#475569')
+const textMuted = computed(() => isDark.value ? '#64748b' : '#94a3b8')
 const accentColor = computed(() => isDark.value ? '#60a5fa' : '#3b82f6')
 
-// 工具分类数据
+const tooltipStyle = computed(() => ({
+  backgroundColor: isDark.value ? '#1e293b' : '#ffffff',
+  borderColor: isDark.value ? '#334155' : '#e2e8f0',
+  borderWidth: 1,
+  textStyle: {
+    color: isDark.value ? '#f1f5f9' : '#0f172a',
+    fontSize: 12
+  }
+}))
+
 const allCategories = computed(() => {
   return configStore.toolsByCategory.map(cat => ({
     name: cat.name,
@@ -187,14 +204,12 @@ const allCategories = computed(() => {
   }))
 })
 
-// 热门分类 - 按工具数量取前4
 const categoryData = computed(() => {
   return [...allCategories.value]
     .sort((a, b) => b.count - a.count)
     .slice(0, 4)
 })
 
-// 饼图 - 工具分类分布
 const pieOption = computed(() => {
   const data = allCategories.value.map(cat => ({
     name: cat.name,
@@ -204,14 +219,8 @@ const pieOption = computed(() => {
 
   return {
     tooltip: {
+      ...tooltipStyle.value,
       trigger: 'item',
-      backgroundColor: isDark.value ? '#1e293b' : '#ffffff',
-      borderColor: isDark.value ? '#334155' : '#e2e8f0',
-      borderWidth: 1,
-      textStyle: {
-        color: isDark.value ? '#f1f5f9' : '#0f172a',
-        fontSize: 12
-      },
       formatter: (params: any) => {
         return `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${params.color};margin-right:6px;"></span>${params.name}: <b>${params.value}</b>个 (${params.percent}%)`
       }
@@ -256,7 +265,6 @@ const pieOption = computed(() => {
   }
 })
 
-// 使用趋势图 - 近7天真实数据
 const trendOption = computed(() => {
   const days: string[] = []
   const data: number[] = []
@@ -280,14 +288,8 @@ const trendOption = computed(() => {
 
   return {
     tooltip: {
+      ...tooltipStyle.value,
       trigger: 'axis',
-      backgroundColor: isDark.value ? '#1e293b' : '#ffffff',
-      borderColor: isDark.value ? '#334155' : '#e2e8f0',
-      borderWidth: 1,
-      textStyle: {
-        color: isDark.value ? '#f1f5f9' : '#0f172a',
-        fontSize: 12
-      },
       axisPointer: {
         type: 'line',
         lineStyle: {
@@ -376,7 +378,6 @@ const trendOption = computed(() => {
   }
 })
 
-// 使用排行 - TOP5
 const rankData = computed(() => {
   const ranking = configStore.usageStatsSummary?.ranking || []
   if (ranking.length === 0) return []
@@ -393,28 +394,22 @@ const rankData = computed(() => {
   })
 })
 
-// 左栏底部卡片 tab 切换
-const activeTab = ref<'trend' | 'rank'>('rank')
-
-// 最近使用工具 - 最多4个（排除已禁用的）
 const recentTools = computed(() => {
   const recent = configStore.usageStatsSummary?.recentUsed || []
-  return recent
-    .filter(item => {
-      const tool = configStore.getToolById(item.toolId)
-      return tool?.enabled
+  const result: { id: string; name: string; icon: string | undefined; category: string | undefined; time: string }[] = []
+  for (const item of recent) {
+    if (result.length >= 4) break
+    const tool = configStore.getToolById(item.toolId)
+    if (!tool?.enabled) continue
+    result.push({
+      id: item.toolId,
+      name: tool.name || item.toolId,
+      icon: tool.icon,
+      category: tool.category,
+      time: formatTime(item.timestamp)
     })
-    .slice(0, 4)
-    .map(item => {
-      const tool = configStore.getToolById(item.toolId)
-      return {
-        id: item.toolId,
-        name: tool?.name || item.toolId,
-        icon: tool?.icon,
-        category: tool?.category,
-        time: formatTime(item.timestamp)
-      }
-    })
+  }
+  return result
 })
 
 const formatTime = (dateStr: string) => {
@@ -426,7 +421,6 @@ const formatTime = (dateStr: string) => {
   return date.format('M/D')
 }
 
-// 方法
 const goToTools = () => router.push('/tools')
 
 const colorMix = (category: string, percent: number) => {
@@ -445,176 +439,153 @@ const goToTool = async (tool: any) => {
 
 <template>
   <div class="home">
-    <!-- 顶部欢迎区 - macOS 风格简洁标题栏 -->
-    <header class="hero-section">
-      <div class="hero-content">
-        <div class="greeting-block">
-          <h1 class="greeting-title">{{ greetingText }}</h1>
-          <p class="greeting-sub"><span>{{ typedSub }}</span><span class="cursor" v-if="typedSub.length < currentSub.length">|</span></p>
+    <!-- 左侧面板 -->
+    <aside class="side-panel">
+      <div class="side-greeting">
+        <h1>{{ greetingText }}</h1>
+        <p><span>{{ typedSub }}</span><span class="cursor" v-if="typedSub.length < currentSub.length">|</span></p>
+      </div>
+
+      <div class="side-time card">
+        <div class="time-big">{{ timeHour }}<span class="colon">:</span>{{ timeMinute }}<span class="time-sec">:{{ timeSecond }}</span></div>
+        <div class="date-row">
+          <span>{{ currentDate }}</span>
+          <span class="weekday">{{ currentWeekday }}</span>
         </div>
+      </div>
 
-        <div class="hero-deco"></div>
-
-        <div class="time-block">
-          <div class="time-display">
-            {{ now.format('HH') }}<span class="colon">:</span>{{ now.format('mm') }}<span class="colon">:</span>{{ now.format('ss') }}
+      <div class="side-stats">
+        <div v-for="stat in stats" :key="stat.label" class="mini-stat card">
+          <div class="ms-icon" :style="{ background: stat.bgColor, color: stat.color }">
+            <component :is="stat.icon" :size="14" />
           </div>
-          <div class="date-display">
-            <span class="date">{{ currentDate }}</span>
-            <span class="weekday">{{ currentWeekday }}</span>
+          <div class="ms-text">
+            <span class="ms-val">{{ stat.value }}</span>
+            <span class="ms-lbl">{{ stat.label }}</span>
           </div>
         </div>
       </div>
-    </header>
 
-    <!-- 主体内容 - 无滚动一屏布局 -->
-    <main class="main-content">
-      <!-- 顶部行：统计 + 快捷入口 -->
-      <section class="top-row">
-        <div class="stats-row">
+      <button class="tools-entry-btn" @click="goToTools">
+        <div class="teb-icon">
+          <LayoutGrid :size="20" />
+        </div>
+        <div class="teb-body">
+          <span class="teb-title">工具箱</span>
+          <span class="teb-sub">{{ configStore.enabledTools.length }} 个工具</span>
+        </div>
+        <ChevronRight :size="16" class="teb-arrow" />
+      </button>
+
+      <!-- 最近使用 -->
+      <div class="side-recent">
+        <div class="side-section-title">最近使用</div>
+        <div class="side-recent-list">
           <div
-            v-for="stat in stats"
-            :key="stat.label"
-            class="stat-card"
+            v-for="item in recentTools"
+            :key="item.id"
+            class="side-recent-item"
+            @click="goToTool(item)"
           >
-            <div class="stat-icon" :style="{ background: stat.bgColor, color: stat.color }">
-              <component :is="stat.icon" :size="16" />
+            <div class="sri-icon" :style="{ background: colorMix(item.category ?? '', 10), color: getCategoryColor(item.category ?? '') }">
+              <component :is="getIcon(item.icon)" v-if="item.icon" :size="11" />
+              <span v-else>{{ item.name[0] }}</span>
             </div>
-            <div class="stat-info">
-              <span class="stat-value">{{ stat.value }}</span>
-              <span class="stat-label">{{ stat.label }}</span>
+            <div class="sri-info">
+              <span class="sri-name">{{ item.name }}</span>
+              <span class="sri-time">{{ item.time }}</span>
             </div>
+          </div>
+          <div v-if="recentTools.length === 0" class="empty-hint-sm">
+            <Inbox :size="16" class="empty-hint-icon" />
+            <span>暂无记录</span>
           </div>
         </div>
-        <button class="tools-tile" @click="goToTools">
-          <div class="tile-icon">
-            <LayoutGrid :size="17" />
-          </div>
-          <div class="tile-body">
-            <span class="tile-title">工具箱</span>
-            <span class="tile-sub">{{ configStore.enabledTools.length }} 个工具</span>
-          </div>
-          <ChevronRight :size="12" class="tile-arrow" />
-        </button>
-      </section>
+      </div>
+    </aside>
 
-      <!-- 双栏内容 - 撑满剩余空间 -->
-      <div class="content-grid">
-        <!-- 左栏 -->
-        <div class="content-col">
-          <!-- 最近使用 -->
-          <div class="content-group">
-            <div class="group-header">
-              <h3 class="group-title">最近使用</h3>
-            </div>
-            <div class="group-content list-content">
-              <div
-                v-for="item in recentTools"
-                :key="item.id"
-                class="recent-item"
-                @click="goToTool(item)"
-              >
-                <div class="recent-icon" :style="{ background: colorMix(item.category ?? '', 12), color: getCategoryColor(item.category ?? '') }">
-                  <component :is="getIcon(item.icon)" v-if="item.icon" :size="14" />
-                  <span v-else class="icon-fallback">{{ item.name[0] }}</span>
-                </div>
-                <div class="recent-info">
-                  <span class="recent-name">{{ item.name }}</span>
-                  <span class="recent-category">{{ item.category }}</span>
-                </div>
-                <span class="recent-time">{{ item.time }}</span>
+    <!-- 右侧主区域 -->
+    <main class="main-area">
+      <!-- 左列：排行 + 趋势 上下排列 -->
+      <div class="main-col">
+        <!-- 使用排行 -->
+        <div class="card flex-grow">
+          <div class="card-header">
+            <h3 class="card-title">使用排行</h3>
+          </div>
+          <div class="card-body rank-body" v-if="rankData.length > 0">
+            <div
+              v-for="(item, idx) in rankData"
+              :key="item.id"
+              class="rank-item"
+              @click="goToTool(item)"
+            >
+              <span class="rank-num" :class="{ 'rank-top': idx < 3 }">{{ idx + 1 }}</span>
+              <span class="rank-name">{{ item.name }}</span>
+              <div class="rank-bar-bg">
+                <div class="rank-bar" :style="{ width: item.percent + '%' }"></div>
               </div>
-              <div v-if="recentTools.length === 0" class="empty-state-sm">
-                <Inbox :size="20" class="empty-state-icon" />
-                <span class="empty-state-title">暂无使用记录</span>
-                <span class="empty-state-desc">使用工具后会在这里显示</span>
-              </div>
+              <span class="rank-count">{{ item.count }}</span>
             </div>
           </div>
-
-          <!-- 使用趋势 / 排行（tab 切换） -->
-          <div class="content-group flex-1">
-            <div class="group-header">
-              <div class="tab-switch">
-                <button
-                  class="tab-btn" :class="{ active: activeTab === 'rank' }"
-                  @click="activeTab = 'rank'"
-                >使用排行</button>
-                <button
-                  class="tab-btn" :class="{ active: activeTab === 'trend' }"
-                  @click="activeTab = 'trend'"
-                >近7天使用</button>
-              </div>
-            </div>
-            <div class="group-content chart-content" v-show="activeTab === 'trend'">
-              <v-chart class="chart" :option="trendOption" autoresize />
-            </div>
-            <div class="group-content rank-content" v-show="activeTab === 'rank'" v-if="rankData.length > 0" style="flex: 1; overflow-y: auto;">
-              <div
-                v-for="(item, idx) in rankData"
-                :key="item.id"
-                class="rank-item"
-                @click="goToTool(item)"
-              >
-                <span class="rank-num" :class="{ 'rank-top': idx < 3 }">{{ idx + 1 }}</span>
-                <span class="rank-name">{{ item.name }}</span>
-                <div class="rank-bar-bg">
-                  <div class="rank-bar" :style="{ width: item.percent + '%' }"></div>
-                </div>
-                <span class="rank-count">{{ item.count }}</span>
-              </div>
-            </div>
-            <div class="group-content" v-show="activeTab === 'rank'" v-else>
-              <div class="empty-state-sm">
-                <Inbox :size="20" class="empty-state-icon" />
-                <span class="empty-state-title">暂无排行数据</span>
-                <span class="empty-state-desc">使用工具后会生成排行</span>
-              </div>
+          <div class="card-body" v-else>
+            <div class="empty-state-sm">
+              <Inbox :size="20" class="empty-state-icon" />
+              <span class="empty-state-title">暂无排行数据</span>
+              <span class="empty-state-desc">使用工具后会生成排行</span>
             </div>
           </div>
         </div>
 
-        <!-- 右栏 -->
-        <div class="content-col">
-          <!-- 分类饼图 -->
-          <div class="content-group flex-1">
-            <div class="group-header">
-              <h3 class="group-title">分类分布</h3>
-            </div>
-            <div class="group-content chart-content">
-              <v-chart class="chart" :option="pieOption" autoresize />
-            </div>
+        <!-- 近7天使用趋势 -->
+        <div class="card" style="flex-shrink:0">
+          <div class="card-header">
+            <h3 class="card-title">近7天使用</h3>
           </div>
+          <div class="card-body chart-body" style="height:180px">
+            <v-chart class="chart" :option="trendOption" autoresize />
+          </div>
+        </div>
+      </div>
 
-          <!-- 热门分类 -->
-          <div class="content-group">
-            <div class="group-header">
-              <h3 class="group-title">热门分类</h3>
-            </div>
-            <div class="group-content cat-list-content">
-              <div
-                v-for="cat in categoryData"
-                :key="cat.name"
-                class="category-item"
-              >
-                <div class="category-row">
-                  <div class="category-info">
-                    <div class="category-dot" :style="{ background: cat.color }"></div>
-                    <span class="category-name">{{ cat.name }}</span>
-                  </div>
-                  <span class="category-count" :style="{ color: cat.color }">{{ cat.count }}个</span>
+      <!-- 右列：饼图 + 热门分类 -->
+      <div class="main-col">
+        <div class="card flex-grow">
+          <div class="card-header">
+            <h3 class="card-title">分类分布</h3>
+          </div>
+          <div class="card-body chart-body">
+            <v-chart class="chart" :option="pieOption" autoresize />
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">热门分类</h3>
+          </div>
+          <div class="card-body cat-list">
+            <div
+              v-for="cat in categoryData"
+              :key="cat.name"
+              class="category-item"
+            >
+              <div class="category-row">
+                <div class="category-info">
+                  <div class="category-dot" :style="{ background: cat.color }"></div>
+                  <span class="category-name">{{ cat.name }}</span>
                 </div>
-                <div class="category-tools">
-                  <span
-                    v-for="tool in cat.tools"
-                    :key="tool.id"
-                    class="tool-tag"
-                    :style="{ '--tag-color': cat.color }"
-                    @click="goToTool(tool)"
-                  >
-                    {{ tool.name }}
-                  </span>
-                </div>
+                <span class="category-count" :style="{ color: cat.color }">{{ cat.count }}个</span>
+              </div>
+              <div class="category-tools">
+                <span
+                  v-for="tool in cat.tools"
+                  :key="tool.id"
+                  class="tool-tag"
+                  :style="{ '--tag-color': cat.color }"
+                  @click="goToTool(tool)"
+                >
+                  {{ tool.name }}
+                </span>
               </div>
             </div>
           </div>
@@ -631,58 +602,9 @@ const goToTool = async (tool: any) => {
   background: var(--bg-primary);
   overflow: hidden;
   display: flex;
-  flex-direction: column;
 }
 
-/* ====== Header ====== */
-.hero-section {
-  padding: 20px 28px 16px;
-  flex-shrink: 0;
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.hero-deco {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 200px;
-  height: 80px;
-  background: radial-gradient(ellipse, var(--accent) 0%, transparent 70%);
-  opacity: 0.06;
-  pointer-events: none;
-}
-
-.greeting-block {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.greeting-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 0;
-  letter-spacing: -0.5px;
-  line-height: 1.2;
-}
-
-.greeting-sub {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin: 0;
-  min-height: 1.5em;
-}
-
-.greeting-sub .cursor {
+.cursor {
   display: inline;
   animation: blink 0.8s step-end infinite;
   color: var(--accent);
@@ -693,20 +615,7 @@ const goToTool = async (tool: any) => {
   50% { opacity: 0; }
 }
 
-.time-block {
-  text-align: right;
-}
-
-.time-display {
-  font-size: 36px;
-  font-weight: 200;
-  color: var(--text-primary);
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -1.5px;
-}
-
-.time-display .colon {
+.colon {
   animation: colon-blink 1s step-end infinite;
 }
 
@@ -715,12 +624,59 @@ const goToTool = async (tool: any) => {
   50% { opacity: 0.3; }
 }
 
-.date-display {
+/* ====== Left Panel ====== */
+.side-panel {
+  width: 250px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border-subtle);
+  background: var(--bg-secondary);
+  padding: 20px 14px 14px;
+  gap: 14px;
+}
+
+.side-greeting h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.side-greeting p {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 3px;
+  min-height: 1.4em;
+}
+
+.side-time {
+  text-align: center;
+  padding: 14px;
+}
+
+.time-big {
+  font-size: 36px;
+  font-weight: 200;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -1.5px;
+  line-height: 1;
+}
+
+.time-sec {
+  font-size: 22px;
+  color: var(--text-muted);
+}
+
+.date-row {
   display: flex;
   gap: 8px;
-  margin-top: 5px;
-  justify-content: flex-end;
-  font-size: 12px;
+  margin-top: 6px;
+  justify-content: center;
+  font-size: 11px;
   color: var(--text-muted);
   font-weight: 500;
 }
@@ -729,186 +685,254 @@ const goToTool = async (tool: any) => {
   color: var(--accent);
 }
 
-/* ====== Main - 无滚动一屏 ====== */
-.main-content {
-  flex: 1;
-  padding: 14px 24px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  overflow: hidden;
-  min-height: 0;
-}
-
-/* ====== Top Row: Stats + 工具箱按钮 ====== */
-.top-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-.stats-row {
-  flex: 1;
+.side-stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
 }
 
-.stat-card {
+.mini-stat {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border-weak);
-  border-radius: var(--radius-xl);
-  backdrop-filter: var(--glass-blur-sm);
+  gap: 8px;
+  padding: 8px 10px;
   transition: all 150ms ease;
 }
 
-.stat-card:hover {
-  border-color: var(--accent);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+.mini-stat:hover {
   transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
-.stat-icon {
-  width: 36px;
-  height: 36px;
+.ms-icon {
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
-  font-size: 17px;
+  border-radius: 8px;
   flex-shrink: 0;
 }
 
-.stat-info {
+.ms-text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
 }
 
-.stat-value {
-  font-size: 20px;
+.ms-val {
+  font-size: 15px;
   font-weight: 700;
   color: var(--text-primary);
-  line-height: 1;
   font-variant-numeric: tabular-nums;
+  line-height: 1;
 }
 
-.stat-label {
-  font-size: 11px;
+.ms-lbl {
+  font-size: 10px;
   color: var(--text-muted);
   font-weight: 500;
 }
 
-/* 工具箱入口 - 品牌色玻璃拟态 */
-.tools-tile {
+/* 工具箱入口按钮 */
+.tools-entry-btn {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  background: color-mix(in srgb, var(--accent) 10%, var(--glass-bg));
-  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  gap: 12px;
+  padding: 14px 16px;
   border-radius: var(--radius-xl);
-  backdrop-filter: var(--glass-blur-sm);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, transparent), color-mix(in srgb, var(--purple) 8%, transparent));
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
   cursor: pointer;
-  transition: all 150ms ease;
-  flex-shrink: 0;
-  min-width: 140px;
-}
-
-.tools-tile:hover {
-  background: color-mix(in srgb, var(--accent) 18%, var(--glass-bg));
-  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
-  box-shadow: 0 2px 12px color-mix(in srgb, var(--accent) 15%, transparent);
-  transform: translateY(-1px);
-}
-
-.tools-tile:active {
-  transform: translateY(0) scale(0.98);
-}
-
-.tile-icon {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  font-size: 17px;
-  background: color-mix(in srgb, var(--accent) 15%, transparent);
-  color: var(--accent);
-  flex-shrink: 0;
-}
-
-.tile-body {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  transition: all 200ms ease;
+  color: var(--text-primary);
+  width: 100%;
   text-align: left;
 }
 
-.tile-title {
-  font-size: 13px;
-  font-weight: 600;
+.teb-icon {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
   color: var(--accent);
-  line-height: 1;
+  flex-shrink: 0;
 }
 
-.tile-sub {
+.teb-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.teb-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.teb-sub {
   font-size: 11px;
   color: var(--text-muted);
   font-weight: 500;
 }
 
-.tile-arrow {
-  font-size: 12px;
-  color: var(--text-muted);
+.teb-arrow {
   margin-left: auto;
-  transition: all 150ms ease;
+  color: var(--text-muted);
+  transition: all 200ms ease;
 }
 
-.tools-tile:hover .tile-arrow {
+.tools-entry-btn:hover {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, transparent), color-mix(in srgb, var(--purple) 14%, transparent));
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 15%, transparent);
+  transform: translateY(-1px);
+}
+
+.tools-entry-btn:hover .teb-arrow {
   color: var(--accent);
-  transform: translateX(2px);
+  transform: translateX(3px);
 }
 
-/* ====== Content Grid - 双栏撑满 ====== */
-.content-grid {
+.tools-entry-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Side recent */
+.side-recent {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.side-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 6px;
+  padding: 0 4px;
+}
+
+.side-recent-list {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.side-recent-list::-webkit-scrollbar {
+  display: none;
+}
+
+.side-recent-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.side-recent-item:hover {
+  background: var(--bg-hover);
+}
+
+.sri-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.sri-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sri-name {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sri-time {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.empty-hint-sm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.empty-hint-icon {
+  opacity: 0.3;
+}
+
+/* ====== Main Area ====== */
+.main-area {
+  flex: 1;
+  padding: 20px 24px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   min-height: 0;
+  overflow: hidden;
 }
 
-.content-col {
+.main-col {
   display: flex;
   flex-direction: column;
   gap: 12px;
   min-height: 0;
 }
 
-/* ====== Content Group ====== */
-.content-group {
+/* ====== Card ====== */
+.card {
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   overflow: hidden;
   background: var(--bg-card);
-  flex-shrink: 0;
+  backdrop-filter: var(--glass-blur-sm);
+  box-shadow: var(--shadow-glass);
+  transition: box-shadow 150ms ease;
 }
 
-.content-group.flex-1 {
+.card:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.flex-grow {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
 }
 
-.group-header {
+.card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -918,7 +942,7 @@ const goToTool = async (tool: any) => {
   flex-shrink: 0;
 }
 
-.group-title {
+.card-title {
   font-size: 12px;
   font-weight: 600;
   color: var(--text-secondary);
@@ -927,73 +951,25 @@ const goToTool = async (tool: any) => {
   letter-spacing: 0.3px;
 }
 
-.view-all-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  font-size: 11px;
-  color: var(--accent);
-  background: transparent;
-  border: none;
-  padding: 3px 6px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  font-weight: 500;
-  transition: all var(--transition-fast);
-}
-
-.view-all-btn:hover {
-  background: var(--accent-light);
-}
-
-.view-all-btn :deep(svg) {
-  font-size: 11px;
-}
-
-/* ====== Tab Switch ====== */
-.tab-switch {
-  display: inline-flex;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-sm);
-  padding: 2px;
-  gap: 1px;
-}
-
-.tab-btn {
-  padding: 3px 10px;
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--text-muted);
-  background: transparent;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 150ms ease;
-  white-space: nowrap;
-}
-
-.tab-btn.active {
-  background: var(--bg-card);
-  color: var(--text-primary);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-}
-
-.tab-btn:hover:not(.active) {
-  color: var(--text-secondary);
-}
-
-.group-content {
+.card-body {
   padding: 6px;
 }
 
-.group-content.list-content {
-  overflow: hidden;
-}
-
-.group-content.chart-content {
+.chart-body {
   flex: 1;
   min-height: 0;
   padding: 8px;
+}
+
+.rank-body {
+  flex: 1;
+  padding: 4px 8px 8px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.rank-body::-webkit-scrollbar {
+  display: none;
 }
 
 .chart {
@@ -1001,108 +977,7 @@ const goToTool = async (tool: any) => {
   height: 100%;
 }
 
-/* ====== Recent List ====== */
-.recent-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all 150ms ease;
-}
-
-.recent-item:hover {
-  background: var(--bg-hover);
-  transform: translateX(2px);
-}
-
-.recent-item:active {
-  transform: translateX(2px) scale(0.99);
-}
-
-.recent-icon {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  flex-shrink: 0;
-}
-
-.icon-fallback {
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.recent-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  min-width: 0;
-}
-
-.recent-name {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.recent-category {
-  font-size: 11px;
-  color: var(--text-muted);
-}
-
-.recent-time {
-  font-size: 11px;
-  color: var(--text-muted);
-  font-weight: 500;
-  flex-shrink: 0;
-}
-
-.empty-state-sm {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 16px;
-  text-align: center;
-  gap: 4px;
-}
-
-.empty-state-icon {
-  color: var(--text-muted);
-  opacity: 0.3;
-  margin-bottom: 4px;
-}
-
-.empty-state-title {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-
-.empty-state-desc {
-  font-size: 11px;
-  color: var(--text-muted);
-}
-
 /* ====== Rank List ====== */
-.rank-content {
-  padding: 4px 6px 6px;
-  scrollbar-width: none;
-}
-
-.rank-content::-webkit-scrollbar {
-  display: none;
-}
-
 .rank-item {
   display: flex;
   align-items: center;
@@ -1166,13 +1041,13 @@ const goToTool = async (tool: any) => {
   flex-shrink: 0;
 }
 
-/* ====== Category List ====== */
-.cat-list-content {
+/* ====== Category ====== */
+.cat-list {
   overflow-y: auto;
   scrollbar-width: none;
 }
 
-.cat-list-content::-webkit-scrollbar {
+.cat-list::-webkit-scrollbar {
   display: none;
 }
 
@@ -1242,33 +1117,62 @@ const goToTool = async (tool: any) => {
   background: color-mix(in srgb, var(--tag-color, var(--accent)) 15%, transparent);
 }
 
+/* ====== Empty ====== */
+.empty-state-sm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  text-align: center;
+  gap: 4px;
+}
+
+.empty-state-icon {
+  color: var(--text-muted);
+  opacity: 0.3;
+  margin-bottom: 4px;
+}
+
+.empty-state-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.empty-state-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
 /* ====== Responsive ====== */
 @media (max-width: 900px) {
-  .content-grid {
-    grid-template-columns: 1fr;
+  .side-panel {
+    width: 200px;
   }
 
-  .stats-row {
-    grid-template-columns: repeat(2, 1fr);
+  .main-area {
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 600px) {
-  .hero-section {
-    padding: 10px 16px 8px;
+  .home {
+    flex-direction: column;
   }
 
-  .main-content {
-    padding: 10px 16px 12px;
-    gap: 10px;
+  .side-panel {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 12px;
+    gap: 8px;
   }
 
-  .greeting-title {
-    font-size: 17px;
-  }
-
-  .time-display {
-    font-size: 22px;
+  .side-recent {
+    display: none;
   }
 }
 </style>

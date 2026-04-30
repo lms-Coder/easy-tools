@@ -9,6 +9,7 @@ import { getIcon } from '@/utils/icons'
 import Dialog from '@/components/common/Dialog.vue'
 import Select from '@/components/ui/Select.vue'
 import Input from '@/components/ui/Input.vue'
+import Switch from '@/components/ui/Switch.vue'
 import {
   ArrowLeft,
   Sun,
@@ -191,7 +192,8 @@ onMounted(async () => {
           :class="{ active: activeCategory === cat.id }"
           @click="setActiveCategory(cat.id)"
         >
-          {{ cat.name }}
+          <component :is="cat.icon" :size="15" class="nav-icon" />
+          <span>{{ cat.name }}</span>
         </button>
       </nav>
     </aside>
@@ -202,7 +204,6 @@ onMounted(async () => {
       <Transition name="tab-switch" mode="out-in">
         <!-- 外观设置 -->
         <div v-if="activeCategory === 'appearance'" key="appearance">
-          <!-- 通用 -->
           <div class="group-card">
             <div class="group-title">通用</div>
             <div class="group-body">
@@ -242,7 +243,6 @@ onMounted(async () => {
             </div>
           </div>
 
-          <!-- 字体 -->
           <div class="group-card">
             <div class="group-title">字体</div>
             <div class="group-body">
@@ -261,11 +261,10 @@ onMounted(async () => {
             </div>
           </div>
 
-          <!-- 主题色 -->
           <div class="group-card">
             <div class="group-title">主题色</div>
-            <div class="group-body color-body">
-              <div class="color-preview-row">
+            <div class="group-body">
+              <div class="color-grid">
                 <div
                   v-for="color in presetColors"
                   :key="color"
@@ -295,7 +294,6 @@ onMounted(async () => {
             </div>
           </div>
 
-          <!-- 重置 -->
           <div class="group-card">
             <div class="group-title">重置</div>
             <div class="group-body">
@@ -314,11 +312,7 @@ onMounted(async () => {
         <div v-else-if="activeCategory === 'tools'" key="tools">
           <div class="search-bar">
             <Search :size="14" />
-            <input
-              v-model="toolSearch"
-              type="text"
-              placeholder="搜索工具..."
-            />
+            <input v-model="toolSearch" type="text" placeholder="搜索工具..." />
           </div>
           <template v-for="category in toolCategories" :key="category.name">
             <div class="group-card">
@@ -353,14 +347,10 @@ onMounted(async () => {
                     >
                       {{ tool.allowMultiple ? '多开' : '单开' }}
                     </button>
-                    <label class="toggle">
-                      <input
-                        type="checkbox"
-                        :checked="tool.enabled"
-                        @change="(e: Event) => toggleToolEnabled(tool.id, (e.target as HTMLInputElement).checked)"
-                      />
-                      <span class="toggle-slider"></span>
-                    </label>
+                    <Switch
+                      :model-value="tool.enabled"
+                      @update:model-value="(v: boolean) => toggleToolEnabled(tool.id, v)"
+                    />
                   </div>
                 </div>
               </div>
@@ -378,14 +368,7 @@ onMounted(async () => {
                   <span class="setting-label">最小化到托盘</span>
                   <span class="setting-desc">点击最小化时隐藏到系统托盘</span>
                 </div>
-                <label class="toggle">
-                  <input
-                    type="checkbox"
-                    :checked="systemConfig.minimizeToTray"
-                    @change="(e: Event) => toggleMinimizeToTray((e.target as HTMLInputElement).checked)"
-                  />
-                  <span class="toggle-slider"></span>
-                </label>
+                <Switch :model-value="systemConfig.minimizeToTray" @update:model-value="toggleMinimizeToTray" />
               </div>
               <div class="group-row">
                 <div class="setting-info">
@@ -417,14 +400,7 @@ onMounted(async () => {
                   <span class="setting-label">开机启动</span>
                   <span class="setting-desc">系统启动时自动运行</span>
                 </div>
-                <label class="toggle">
-                  <input
-                    type="checkbox"
-                    :checked="systemConfig.launchOnStartup"
-                    @change="(e: Event) => toggleLaunchOnStartup((e.target as HTMLInputElement).checked)"
-                  />
-                  <span class="toggle-slider"></span>
-                </label>
+                <Switch :model-value="systemConfig.launchOnStartup" @update:model-value="toggleLaunchOnStartup" />
               </div>
             </div>
           </div>
@@ -432,7 +408,6 @@ onMounted(async () => {
 
         <!-- 关于 -->
         <div v-else-if="activeCategory === 'about'" key="about">
-          <!-- Logo -->
           <div class="about-hero">
             <div class="about-logo">
               <span class="logo-text">{{ configStore.appName?.[0] || 'E' }}</span>
@@ -443,7 +418,6 @@ onMounted(async () => {
             </div>
           </div>
 
-          <!-- Stats -->
           <div class="about-stats">
             <div class="about-stat-item">
               <span class="about-stat-value">{{ configStore.tools.length }}</span>
@@ -459,7 +433,6 @@ onMounted(async () => {
             </div>
           </div>
 
-          <!-- Info -->
           <div class="group-card">
             <div class="group-title">信息</div>
             <div class="group-body">
@@ -474,7 +447,6 @@ onMounted(async () => {
             </div>
           </div>
 
-          <!-- Data management -->
           <div class="group-card">
             <div class="group-title">数据管理</div>
             <div class="group-body">
@@ -492,7 +464,6 @@ onMounted(async () => {
       </div>
     </main>
 
-    <!-- 重置确认对话框 -->
     <Dialog
       v-model:visible="showResetDialog"
       type="confirm"
@@ -504,7 +475,6 @@ onMounted(async () => {
       @confirm="resetAppearance"
     />
 
-    <!-- 清空确认对话框 -->
     <Dialog
       v-model:visible="showClearDialog"
       type="warning"
@@ -528,11 +498,11 @@ onMounted(async () => {
 
 /* ====== Sidebar ====== */
 .settings-sidebar {
-  width: 170px;
+  width: 180px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  padding: 20px 10px 16px;
+  padding: 16px 8px 12px;
   background: var(--bg-sidebar);
   border-right: 1px solid var(--border-subtle);
   backdrop-filter: var(--glass-blur);
@@ -540,16 +510,16 @@ onMounted(async () => {
 }
 
 .sidebar-header {
-  padding: 0 12px 14px 16px;
+  padding: 0 8px 12px 12px;
   border-bottom: 1px solid var(--border-subtle);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .back-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 0;
+  padding: 4px 0;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -572,20 +542,24 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 12px;
-  border-radius: 8px;
-  border-left: 2.5px solid transparent;
-  margin-left: 4px;
+  padding: 8px 10px 8px 12px;
+  border-radius: var(--radius-md);
   font-size: 13px;
+  font-weight: 500;
   color: var(--text-secondary);
   cursor: pointer;
   transition: all var(--transition-fast);
   text-align: left;
-  border-right: none;
-  border-top: none;
-  border-bottom: none;
+  border: none;
   background: transparent;
-  width: calc(100% - 4px);
+  width: 100%;
+  position: relative;
+}
+
+.nav-icon {
+  opacity: 0.7;
+  flex-shrink: 0;
+  transition: opacity var(--transition-fast);
 }
 
 .sidebar-nav-item:hover {
@@ -593,40 +567,65 @@ onMounted(async () => {
   color: var(--text-primary);
 }
 
+.sidebar-nav-item:hover .nav-icon {
+  opacity: 1;
+}
+
 .sidebar-nav-item.active {
   background: var(--accent-light);
-  border-left-color: var(--accent);
   color: var(--accent);
-  font-weight: 500;
+}
+
+.sidebar-nav-item.active .nav-icon {
+  opacity: 1;
+  color: var(--accent);
+}
+
+.sidebar-nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 16px;
+  border-radius: 2px;
+  background: var(--accent);
 }
 
 /* ====== Main content ====== */
 .main-content {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 24px;
+  padding: 24px 28px;
   display: flex;
   justify-content: center;
 }
 
 .content-wrapper {
   width: 100%;
-  max-width: 520px;
+  max-width: 540px;
 }
 
 /* ====== Group card ====== */
 .group-card {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  border-radius: 14px;
+  border-radius: 16px;
   backdrop-filter: var(--glass-blur-sm);
   -webkit-backdrop-filter: var(--glass-blur-sm);
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   overflow: hidden;
+  box-shadow: var(--shadow-glass);
+  transition: box-shadow 0.2s ease;
+}
+
+.group-card:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .group-title {
-  padding: 12px 18px 6px;
+  padding: 14px 18px 8px;
   font-size: 11px;
   font-weight: 600;
   color: var(--text-muted);
@@ -655,18 +654,14 @@ onMounted(async () => {
 }
 
 .group-body {
-  padding: 0 18px 14px;
-}
-
-.group-body.color-body {
-  padding: 0 18px 18px;
+  padding: 0 18px 16px;
 }
 
 .group-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
+  padding: 13px 0;
 }
 
 .group-row + .group-row {
@@ -677,15 +672,9 @@ onMounted(async () => {
 .setting-info {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
   flex: 1;
   min-width: 0;
-}
-
-.setting-info.horizontal {
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
 }
 
 .setting-label {
@@ -710,20 +699,20 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   background: var(--bg-tertiary);
-  padding: 2px;
-  border-radius: var(--radius-sm);
+  padding: 3px;
+  border-radius: var(--radius-md);
 }
 
 .segment-slider {
   position: absolute;
-  top: 2px;
-  left: 2px;
-  width: calc(50% - 2px);
-  height: calc(100% - 4px);
+  top: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  height: calc(100% - 6px);
   background: var(--bg-card);
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.05);
-  transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 5px;
+  box-shadow: var(--shadow-sm);
+  transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
 }
 
@@ -734,15 +723,14 @@ onMounted(async () => {
 .segment-btn {
   position: relative;
   z-index: 1;
-  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 5px;
-  padding: 5px 14px;
+  padding: 6px 16px;
   background: transparent;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   font-size: 12px;
   color: var(--text-secondary);
   cursor: pointer;
@@ -774,33 +762,32 @@ onMounted(async () => {
 }
 
 /* ====== Color picker ====== */
-.color-preview-row {
+.color-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 14px;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
 .color-swatch {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   cursor: pointer;
   padding: 4px;
 }
 
 .swatch-circle {
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   border-radius: 12px;
   background: var(--swatch);
   display: flex;
   align-items: center;
   justify-content: center;
   border: 2.5px solid transparent;
-  transition: all var(--transition-fast);
-  box-shadow: 0 2px 8px color-mix(in srgb, var(--swatch) 30%, transparent);
+  transition: all 0.2s ease;
 }
 
 .color-swatch:hover .swatch-circle {
@@ -809,12 +796,11 @@ onMounted(async () => {
 
 .color-swatch.active .swatch-circle {
   border-color: var(--text-primary);
-  box-shadow: 0 0 0 2.5px var(--bg-card), 0 2px 12px color-mix(in srgb, var(--swatch) 40%, transparent);
+  box-shadow: 0 0 0 2.5px var(--bg-card);
 }
 
 .swatch-check {
   color: #fff;
-  font-size: 16px;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
@@ -874,54 +860,9 @@ onMounted(async () => {
   border-radius: 6px;
 }
 
-/* ====== Toggle ====== */
-.toggle {
-  position: relative;
-  display: inline-block;
-  width: 36px;
-  height: 20px;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.toggle input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.toggle-slider {
-  position: absolute;
-  inset: 0;
-  background: var(--border-strong);
-  border-radius: 10px;
-  transition: all var(--transition-fast);
-}
-
-.toggle-slider::before {
-  content: '';
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 16px;
-  height: 16px;
-  background: var(--text-inverse, #fff);
-  border-radius: 50%;
-  transition: all var(--transition-fast);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-}
-
-.toggle input:checked + .toggle-slider {
-  background: var(--accent);
-}
-
-.toggle input:checked + .toggle-slider::before {
-  transform: translateX(16px);
-}
-
 /* ====== Text button ====== */
 .text-btn {
-  padding: 4px 10px;
+  padding: 5px 12px;
   background: transparent;
   border: none;
   border-radius: var(--radius-sm);
@@ -951,9 +892,9 @@ onMounted(async () => {
   gap: 8px;
   padding: 0 12px;
   height: 32px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   background: var(--bg-tertiary);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   color: var(--text-muted);
 }
 
@@ -979,12 +920,11 @@ onMounted(async () => {
   align-items: center;
   padding: 10px 6px;
   margin: 0 -6px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   transition: background var(--transition-fast);
 }
 
 .tool-row + .tool-row {
-  border-top: none;
   margin-top: 1px;
 }
 
@@ -1052,7 +992,7 @@ onMounted(async () => {
   padding: 3px 10px;
   background: var(--bg-input);
   border: 1px solid var(--border-subtle);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 11px;
   font-weight: 500;
   color: var(--text-muted);
@@ -1081,24 +1021,24 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 8px 0 20px;
+  padding: 12px 0 24px;
   text-align: center;
 }
 
 .about-logo {
-  width: 60px;
-  height: 60px;
-  border-radius: 16px;
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
   background: linear-gradient(135deg, #3b82f6, #6366f1);
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25);
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .logo-text {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 700;
   color: #fff;
   line-height: 1;
@@ -1124,26 +1064,26 @@ onMounted(async () => {
 .about-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 16px;
-  max-width: 520px;
 }
 
 .about-stat-item {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  border-radius: 12px;
+  border-radius: 14px;
   backdrop-filter: var(--glass-blur-sm);
   -webkit-backdrop-filter: var(--glass-blur-sm);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  padding: 16px 12px;
+  padding: 18px 12px;
+  box-shadow: var(--shadow-glass);
 }
 
 .about-stat-value {
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1;
